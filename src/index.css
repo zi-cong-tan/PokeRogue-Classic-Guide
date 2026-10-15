@@ -1,0 +1,84 @@
+:root {
+  --ground: #1B1940;
+  --panel: #110F2E;
+  --ink: #F3F0FF;
+  --ink-soft: #C9C3F0;
+  --seg-a: #3A3588;
+  --seg-b: #4A44A6;
+  --final: #C2512A;
+  --focus: #FFAA7A;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font: 400 18px/1.55 "Bricolage Grotesque", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-family: "Pixelify Sans", sans-serif; font-weight: 600; margin: 0; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px 64px; }
+
+.hero { padding: 96px 0 56px; }
+.hero h1 { font-size: clamp(48px, 8.6vw, 124px); line-height: .95; letter-spacing: -.02em; }
+.sub { margin: 20px 0 0; font: 400 clamp(20px, 2.6vw, 32px)/1.2 "Pixelify Sans", sans-serif; color: var(--ink-soft); }
+
+.run { background: var(--panel); border-radius: 28px; padding: 36px 36px 32px; }
+.run-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px 24px; flex-wrap: wrap; }
+.run-head h2 { font-size: 28px; }
+.run-head p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+.track-scroll { margin-top: 28px; }
+.track { position: relative; height: 164px; }
+.segs { position: absolute; left: 0; right: 0; bottom: 26px; height: 40px; display: flex; border-radius: 10px; overflow: hidden; }
+.seg { flex: 1; background: var(--seg-a); }
+.seg:nth-child(even) { background: var(--seg-b); }
+.seg.last { background: var(--final); }
+.ticks { position: absolute; left: 0; right: 0; bottom: 0; height: 20px; }
+.tick { position: absolute; left: var(--p); transform: translateX(-50%); font: 600 14px "Bricolage Grotesque", sans-serif; color: var(--ink-soft); }
+
+.pin {
+  position: absolute; left: var(--p); bottom: 66px; transform: translateX(-50%);
+  background: none; border: 0; padding: 10px 10px 0; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center;
+}
+.pin b { width: 18px; height: 18px; border-radius: 5px; background: var(--c); transition: transform .18s ease; }
+.pin::after { content: ""; width: 2px; height: var(--h); background: var(--c); }
+.pin:hover b { transform: scale(1.3); }
+.pin:active b { transform: scale(.9); }
+.pin[aria-pressed="true"] b { transform: scale(1.45); outline: 3px solid var(--ink); outline-offset: 3px; }
+
+.legend { list-style: none; padding: 0; margin: 24px 0 0; display: flex; gap: 8px 22px; flex-wrap: wrap; font-size: 16px; color: var(--ink-soft); }
+.legend li::before { content: ""; display: inline-block; width: 11px; height: 11px; border-radius: 3px; background: var(--c); margin-right: 8px; }
+
+.detail { margin-top: 28px; display: grid; grid-template-columns: 3.2ch 1fr; gap: 24px; align-items: start; min-height: 120px; }
+.wave { font: 800 64px/1 "Bricolage Grotesque", sans-serif; color: var(--c); font-variant-numeric: tabular-nums; }
+.detail h3 { font-size: 26px; }
+.detail h3 small { font: 400 16px "Bricolage Grotesque", sans-serif; color: var(--ink-soft); margin-left: 8px; }
+.detail p { margin: 8px 0 0; max-width: 62ch; }
+
+.foot { margin-top: 40px; font-size: 16px; color: var(--ink-soft); max-width: 62ch; }
+
+@media (max-width: 700px) {
+  .wrap { padding: 0 16px 48px; }
+  .hero { padding: 56px 0 36px; }
+  .run { padding: 24px 18px; border-radius: 22px; display: flex; flex-direction: column; }
+  .sub { font-size: 18px; }
+  /* Details sit above the tall track and stay in view while you scroll it. */
+  .detail { order: 1; position: sticky; top: 0; z-index: 2; background: var(--panel); margin: 16px -18px 0; padding: 12px 18px 16px; min-height: 0; }
+  .track-scroll { order: 2; }
+  .legend { order: 3; }
+  .detail { grid-template-columns: auto 1fr; gap: 4px 14px; align-items: baseline; }
+  .detail-text { grid-column: 1 / -1; }
+  .wave { font-size: 40px; }
+
+  /* On a phone the run reads top to bottom instead of scrolling sideways. */
+  .track-scroll { margin-top: 24px; }
+  .track { height: 600px; }
+  .segs { flex-direction: column; left: 44px; right: auto; top: 0; bottom: 0; width: 34px; height: auto; }
+  .ticks { top: 0; bottom: 0; width: 36px; height: auto; }
+  .tick { left: auto; right: 0; top: var(--p); transform: translateY(-50%); }
+  .pin { left: 78px; top: var(--p); bottom: auto; transform: translateY(-50%); flex-direction: row-reverse; padding: 6px 6px 6px 0; }
+  .pin::after { width: var(--h); height: 2px; }
+}
