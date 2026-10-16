@@ -91,11 +91,16 @@ function damagePanel(info, e, i, calc) {
 // ---- left band: your run and your team
 function runPanel(info, enemies) {
   const w = Math.max(1, info.wave || 1);
-  const next = FIGHTS.find(f => Math.max(...f.waves) >= w);
+  // The rival, villain and League fights and the wave-200 finale are Classic only. Endless has Eternatus every 250 waves
+  // (Eternamax every 1000, game-mode.ts); the gym waves and biome bosses work the same in every mode.
+  const mode = info.gameMode || '';
+  const classic = !/endless|daily/i.test(mode), endless = /endless/i.test(mode);
+  const next = classic ? FIGHTS.find(f => Math.max(...f.waves) >= w) : null;
   const boss = Math.ceil(w / 10) * 10;
   const pool = BIOME_BOSSES[info.biome];
   const gymWave = boss % 30 === 20 || boss % 30 === 0;
-  const bossText = { 190: 'The Champion', 200: 'Eternatus' }[boss]
+  const bossText = (classic ? { 190: 'The Champion', 200: 'Eternatus' }[boss] : null)
+    || (endless && boss % 1000 === 0 ? 'Eternamax Eternatus' : endless && boss % 250 === 0 ? 'Eternatus' : null)
     || `${gymWave && pool?.gyms.length ? `Gym leader ${pool.gyms.map(g => g[0]).join(' or ')}, or a` : 'A'} ${info.biome || 'biome'} boss`;
   const target = enemies[0];
   const team = (info.party || []).map(p => {
@@ -109,7 +114,7 @@ function runPanel(info, enemies) {
       ${a && a.threat >= 2 ? `<div class="warn">Takes ${x(a.threat)} from it</div>` : ''}
     </li>`;
   }).join('');
-  return `<section><h3>Wave ${esc(info.wave)}, ${esc(info.biome)}</h3>
+  return `<section><h3>Wave ${esc(info.wave)}, ${esc(info.biome)}${classic ? '' : ` <small>${esc(mode)}</small>`}</h3>
       <dl>
         ${next ? `<div><dt>Next fight</dt><dd>${esc(next.title)}, wave ${next.waves.filter(v => v >= w).join(' or ')}</dd></div>` : ''}
         <div><dt>Boss wave ${boss}</dt><dd>${esc(bossText)}</dd></div>
