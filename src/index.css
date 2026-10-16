@@ -160,7 +160,8 @@ section { padding: var(--section) var(--m); }
 
 /* ---------- starter planner: the total and its receipt ---------- */
 .planner { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); }
-.total-side { grid-column: 1 / 5; display: flex; flex-direction: column; justify-content: space-between; gap: 48px; }
+.total-side { grid-column: 1 / 5; display: flex; flex-direction: column; gap: 48px; }
+.total-side > :last-child { position: sticky; top: 32px; }
 .total-side h2 { max-width: 12ch; }
 .total-side p { max-width: 38ch; margin-top: 20px; }
 .total { font: 600 var(--step-giant)/0.8 "Source Serif 4", Georgia, serif; font-variant-numeric: lining-nums tabular-nums; letter-spacing: -0.03em; margin: 0 !important; }
@@ -195,6 +196,30 @@ section { padding: var(--section) var(--m); }
 .ivs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
 .ivs label { display: grid; gap: 4px; font-size: var(--step-small); color: var(--muted); }
 .move-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+/* the build sheet's second half: a printed divider, then suggestion slips */
+.editor-part {
+  font: 400 var(--step-lead)/1.1 "Pixelify Sans", sans-serif; margin: 40px 0 0; padding-top: 20px;
+  border-top: 4px dotted color-mix(in srgb, var(--ink) 30%, transparent);
+}
+.suggest { margin-top: 10px; padding: 14px 16px; background: var(--bg); display: grid; gap: 6px; justify-items: start; }
+.suggest small { color: var(--muted); font-size: var(--step-small); }
+.suggest-moves { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; width: 100%; }
+.suggest-moves li { display: grid; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.mini-btn {
+  background: var(--accent); color: var(--accent-ink); border: 0; font-weight: 600; font-size: var(--step-small);
+  padding: 8px 14px; min-height: 44px; margin-top: 4px; transition: background-color .15s;
+}
+.mini-btn:hover { background: #d8f7b8; }
+.evo-row + .evo-row { margin-top: 8px; }
+.editor fieldset .chips { margin-top: 6px; }
+
+/* receipt extras: weakness tally rows reuse the dotted leader, share/clear sit side by side */
+.tally { margin-top: 12px; font-size: var(--step-small); }
+.tally li { display: flex; align-items: baseline; gap: 10px; padding: 3px 0; font-variant-numeric: tabular-nums; }
+.tally b { flex: 1; border-bottom: 3px dotted currentColor; opacity: .3; transform: translateY(-4px); }
+.receipt-actions { display: flex; gap: 20px; flex-wrap: wrap; }
+.receipt > p.notice { background: var(--accent); color: var(--accent-ink); padding: 8px 12px; margin: 16px 0 0; }
+.receipt > p.notice .text-btn { padding: 0; color: inherit; }
 
 .picker { grid-column: 1 / -1; margin-top: 72px; }
 .find { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }

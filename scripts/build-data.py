@@ -45,8 +45,31 @@ def clean(a):
     return None if a in (None, "NONE") else a
 
 
+def how(e):
+    """[target, how it evolves] in plain words. Conditions beyond the basic ones are summed up, not spelled out."""
+    target = re.search(r"speciesId: SpeciesId\.(\w+)", e)[1]
+    level, item = int(re.search(r"level: (\d+)", e)[1]), re.search(r"item: EvolutionItem\.(\w+)", e)
+    time, move = re.search(r"TimeOfDay\.(\w+)", e), re.search(r"move: MoveId\.(\w+)", e)
+    mtype = re.search(r"pkmnType: PokemonType\.(\w+)", e)
+    words = []
+    words += ["level %d" % level] if level > 1 else []
+    words += [item[1].replace("_", " ").title()] if item else []
+    for cond in dict.fromkeys(re.findall(r"key: EvoCondKey\.(\w+)", e)):
+        if cond == "TIME" and time:
+            words.append("at night" if time[1] in ("NIGHT", "DUSK") else "during the day")
+        elif cond == "MOVE" and move:
+            words.append("knowing " + move[1].replace("_", " ").title())
+        elif cond == "MOVE_TYPE" and mtype:
+            words.append(f"knowing a {mtype[1].title()} move")
+        else:
+            words.append({"FRIENDSHIP": "high friendship", "BIOME": "being in a certain biome", "GENDER": "its gender",
+                          "WEATHER": "certain weather", "NATURE": "its nature", "HELD_ITEM": "holding a certain item",
+                          "SPECIES_CAUGHT": "having caught a certain Pokemon", "TYROGUE": "its highest stat"}.get(cond, "a special condition"))
+    return [target, " + ".join(words) or "level 1"]
+
+
 # --- species: every block, plus the extra fields on starters
-species, starters = {}, {}
+species, starters, forms = {}, {}, {}
 for g in range(1, 10):
     text = fetch(f"{SRC}balance/species/generation-0{g}.ts")
     for block in re.split(r"\n  generation\w+SpeciesData\[SpeciesId\.", text)[1:]:
@@ -56,6 +79,16 @@ for g in range(1, 10):
               for k in ("ability1", "ability2", "abilityHidden")]
         evo = block.split("evolutions: [", 1)[1].split("\n    ],", 1)[0] if "evolutions: [" in block else ""
         species[sid] = {"ab": ab, "evos": list(dict.fromkeys(re.findall(r"speciesId: SpeciesId\.(\w+)", evo)))}
+        stat = lambda k: int(re.search(k + r": (\d+)", head)[1])
+        lm = block.split("levelMoves: [", 1)[1].split("\n    ],", 1)[0] if "levelMoves: [" in block else ""
+        lm = lm.replace("EVOLVE_MOVE", "0").replace("RELEARN_MOVE", "-1")
+        forms[sid] = {
+            "types": " ".join(t.lower() for t in re.findall(r"type[12]: PokemonType\.(\w+)", head)),
+            "stats": [stat(k) for k in ("baseHp", "baseAtk", "baseDef", "baseSpatk", "baseSpdef", "baseSpd")],
+            "level": [[int(l), m] for l, m in re.findall(r"\[(-?\d+), MoveId\.(\w+)\]", lm)],
+            "tms": re.findall(r"MoveId\.(\w+)", block.split("tms: [", 1)[1].split("]", 1)[0]) if "tms: [" in block else [],
+            "how": list(map(list, dict.fromkeys(tuple(how(e)) for e in re.findall(r"new Species(?:Form)?Evolution\(\{(.*?)\}\)", evo, re.S)))),
+        }
 
         cost = re.search(r"\n    starterCost: (\d+)", block)
         if not cost:
@@ -90,11 +123,11 @@ def species_key(name):
 
 
 def display_name(sid):
-    if camel(sid) in pokemon_names:
-        return pokemon_names[camel(sid)]
     for prefix, word in (("ALOLA_", "Alolan "), ("GALAR_", "Galarian "), ("HISUI_", "Hisuian "), ("PALDEA_", "Paldean ")):
         if sid.startswith(prefix) and camel(sid[len(prefix):]) in pokemon_names:
             return word + pokemon_names[camel(sid[len(prefix):])]
+    if camel(sid) in pokemon_names:
+        return pokemon_names[camel(sid)]
     return sid.title().replace("_", " ")
 
 
@@ -149,6 +182,95 @@ out = (
     f"export const EVOS = {j(evos)};\n"
 )
 (ROOT / "src/data/builds.js").write_text(out, encoding="utf-8")
+# --- learnsets.js: every form in each starter's line, for the mid-run build, advice and the team check
+move_src = fetch(f"{SRC}moves/move.ts")
+tm_tier = dict(re.findall(r"\[MoveId\.(\w+)\]: ModifierTier\.(\w)", fetch(f"{SRC}balance/tm-pool-tiers.ts")))
+risky_attrs = ("RechargeAttr", "SacrificialAttr", "SacrificialFullRestoreAttr", "OneHitKOAttr", "FixedDamageAttr",
+               "LevelDamageAttr", "CounterDamageAttr")
+move_data = {}
+chunks = re.split(r"\n\s*new (?=\w+Move\(\s*MoveId\.)", move_src)[1:]
+for c in chunks:
+    m = re.match(r"(\w+Move)\(\s*MoveId\.(\w+),\s*PokemonType\.(\w+),\s*(?:MoveCategory\.(\w+),\s*(-?\d+),\s*(-?\d+))?", c)
+    if not m or m[2] == "NONE":
+        continue
+    cls, key, typ, cat, power, acc = m.groups()
+    power = int(power or 0)
+    if "MultiHitAttr" in c and power > 0:
+        hit = re.search(r"MultiHitType\.(\w+)", c)
+        power *= {"TWO": 2, "THREE": 3, "TEN": 6}.get(hit[1] if hit else "", 3)  # 2 to 5 hits averages about 3
+    risky = cls.startswith("Charging") or any(a in c for a in risky_attrs)
+    # [type, P/S/X (status), power (0 = status or varies), accuracy (-1 = never misses), 1 if a poor default pick]
+    move_data[key] = [typ.lower(), {"PHYSICAL": "P", "SPECIAL": "S"}.get(cat, "X"), max(power, 0), int(acc or -1), int(risky)]
+
+species_ids, n = {}, 0
+for k, v in re.findall(r"^\s*([A-Z0-9_]+)(?: = (\d+))?,", fetch(f"{SRC.replace('data/', 'enums/')}species-id.ts"), re.M):
+    n = int(v) if v else n + 1
+    species_ids[k] = n
+api = {p["name"]: int(p["url"].rstrip("/").rsplit("/", 1)[1])
+       for p in json.loads(fetch("https://pokeapi.co/api/v2/pokemon?limit=2000"))["results"]}
+
+
+def sprite_id(sid, fallback):
+    for prefix, suffix in (("ALOLA_", "-alola"), ("GALAR_", "-galar"), ("HISUI_", "-hisui"), ("PALDEA_", "-paldea")):
+        if sid.startswith(prefix):
+            return api.get(sid[len(prefix):].lower().replace("_", "-") + suffix, fallback)
+    return species_ids.get(sid, fallback) if species_ids.get(sid, 99999) < 10000 else fallback
+
+
+move_list, move_ix = [], {}
+def mi(key):
+    if key not in move_ix:
+        move_ix[key] = len(move_list)
+        move_list.append(key)
+    return move_ix[key]
+
+
+form_out, lines = {}, []
+for (name, sprite, _cost, _types), b in zip(guide, builds):
+    sid = species_key(name)
+    if not b:
+        lines.append([]); continue
+    chain, queue = [], [sid]
+    while queue:
+        f = queue.pop(0)
+        if f in chain or f not in forms:
+            continue
+        chain.append(f)
+        queue += [t for t, _ in forms[f]["how"]]
+    tms = {sid: forms[sid]["tms"]}
+    for f in chain:
+        for t, _ in forms[f]["how"]:
+            tms.setdefault(t, list(dict.fromkeys(forms.get(t, {"tms": []})["tms"] + tms[f])))
+    for f in chain:
+        if f in form_out:
+            continue
+        d = forms[f]
+        form_out[f] = [display_name(f), sprite if f == sid else sprite_id(f, sprite), d["types"], d["stats"],
+                       [x for lm in d["level"] for x in (lm[0], mi(lm[1])) if lm[1] in move_data],
+                       [mi(t) for t in tms[f] if t in move_data], d["how"]]
+    for e in b[3]:
+        mi(e)
+    lines.append(chain)
+
+moves_out = [[named(k, move_names, "effect")[0], *move_data[k], tm_tier.get(k, "")] for k in move_list]
+out2 = (
+    "// Every form in each starter's line, its moves and how it evolves. From src/data/balance/species/*.ts,\n"
+    "// src/data/moves/move.ts and src/data/balance/tm-pool-tiers.ts in the PokeRogue source.\n"
+    "// Generated by scripts/build-data.py, do not edit by hand.\n\n"
+    "// [name, type, P physical / S special / X status, power (0 = status or varies; multi-hit counted as 2 or 3 hits),\n"
+    "//  accuracy (-1 never misses), 1 if a poor default pick (recharge, charge-up, faints, one-hit KO, fixed damage), TM tier C/G/U]\n"
+    f"export const MOVE_LIST = {j(moves_out)};\n\n"
+    "// Move keys in the same order, so egg moves and starting moves (by key) can be looked up.\n"
+    f"export const MOVE_KEYS = {j(move_list)};\n\n"
+    "// form key: [name, PokeAPI sprite id, types, [HP, Atk, Def, SpA, SpD, Spe],\n"
+    "//  level-up moves as flat [level, move index, ...] (0 = on evolving, -1 = relearn only), TM move indexes,\n"
+    "//  [[form it evolves into, how]]]\n"
+    f"export const FORMS = {j(form_out)};\n\n"
+    "// Per starter, in STARTERS order: its own form key first, then everything it can evolve into.\n"
+    f"export const LINES = {j(lines)};\n"
+)
+(ROOT / "src/data/learnsets.js").write_text(out2, encoding="utf-8")
+print(f"Wrote src/data/learnsets.js: {len(form_out)} forms, {len(move_list)} moves, {len(out2) // 1024} KB")
 print(f"Wrote src/data/builds.js: {len(builds)} starters, {len(abilities)} abilities, {len(moves)} moves, {len(out) // 1024} KB")
 for p in problems:
     print("CHECK:", p)

@@ -1,31 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { STARTERS } from '../data/starters';
+import { TYPE_COLOR, cap, typeInk } from '../data/types';
+import { NATURES, STATS, suggestNature, suggestMoves, evolveAdvice, learnable } from '../advice';
 import { sprite } from '../art';
 
-// Natures and the stat each one raises / lowers (none for the five neutral ones).
-const NATURES = [
-  ['Hardy'], ['Lonely', 'Atk', 'Def'], ['Brave', 'Atk', 'Spe'], ['Adamant', 'Atk', 'SpA'], ['Naughty', 'Atk', 'SpD'],
-  ['Bold', 'Def', 'Atk'], ['Docile'], ['Relaxed', 'Def', 'Spe'], ['Impish', 'Def', 'SpA'], ['Lax', 'Def', 'SpD'],
-  ['Timid', 'Spe', 'Atk'], ['Hasty', 'Spe', 'Def'], ['Serious'], ['Jolly', 'Spe', 'SpA'], ['Naive', 'Spe', 'SpD'],
-  ['Modest', 'SpA', 'Atk'], ['Mild', 'SpA', 'Def'], ['Quiet', 'SpA', 'Spe'], ['Bashful'], ['Rash', 'SpA', 'SpD'],
-  ['Calm', 'SpD', 'Atk'], ['Gentle', 'SpD', 'Def'], ['Sassy', 'SpD', 'Spe'], ['Careful', 'SpD', 'SpA'], ['Quirky'],
-];
-const STATS = ['HP', 'Atk', 'Def', 'SpA', 'SpD', 'Spe'];
 const ABILITY_SLOT = ['Ability 1', 'Ability 2', 'Hidden ability'];
 
 const shinySprite = id => sprite(id).replace('/pokemon/', '/pokemon/shiny/');
+const SOURCE_GROUP = { level: 'Level-up', egg: 'Egg moves', tm: 'TMs' };
+const moveText = ([n, t, cat, power, acc]) =>
+  `${n}: ${cap(t)}${cat === 'X' ? ', status' : `, ${power || 'varies'}`}${acc > 0 && acc < 100 ? `, ${acc}%` : ''}`;
+// The last form of a line reachable from `form` (first branch), for advice that should look ahead.
+const finalForm = (form, F) => (F[form][6].length ? finalForm(F[form][6][0][0], F) : form);
 
 const newBuild = opts => ({
   shiny: false, ability: 0, passive: false, nature: 'Hardy', ivs: [31, 31, 31, 31, 31, 31],
   egg: [false, false, false, false], moves: opts ? opts[2].slice(0, 4) : [],
 });
 
-export default function PartyEditor({ party, builds, setBuild }) {
-  const [data, setData] = useState(null);
+export default function PartyEditor({ party, builds, setBuild, data }) {
   const [cur, setCur] = useState(0);
-
-  // The options file is big, so it only loads once a starter is picked.
-  useEffect(() => { if (party.length && !data) import('../data/builds').then(setData); }, [party.length, data]);
 
   const at = Math.min(cur, party.length - 1);
   if (!party.length) {
@@ -38,7 +32,7 @@ export default function PartyEditor({ party, builds, setBuild }) {
   }
   if (!data) return <div className="editor"><p>Loading the move and ability lists...</p></div>;
 
-  const { BUILDS, ABILITIES, MOVES, EVOS } = data;
+  const { BUILDS, ABILITIES, MOVES, EVOS, FORMS, LINES, MOVE_LIST, MOVE_KEYS } = data;
   const i = party[at];
   const [name, id] = STARTERS[i];
   const opts = BUILDS[i];
@@ -53,6 +47,26 @@ export default function PartyEditor({ party, builds, setBuild }) {
   const slot = abilities[b.ability] ? b.ability : 0;
   const evoAbility = evoAb => evoAb[slot] || evoAb[0];
   const changes = EVOS[i].filter(([, evoAb]) => evoAbility(evoAb) && evoAbility(evoAb) !== ab);
+
+  // During the run: the form it is now, what it can learn there, and suggestions for that form.
+  const line = LINES[i];
+  const form = line.includes(b.form) ? b.form : line[0];
+  const unlockedEggs = eggMoves.filter((_, k) => b.egg[k]);
+  const ahead = finalForm(form, FORMS);
+  const nature = suggestNature(FORMS[ahead][3]);
+  const learn = learnable(line, form, unlockedEggs, data);
+  const suggested = suggestMoves(line, form, unlockedEggs, data);
+  const evolving = evolveAdvice(form, data);
+  const runMoves = (b.runMoves || []).filter(k => learn.has(MOVE_KEYS.indexOf(k)));
+  const grouped = Object.keys(SOURCE_GROUP).map(kind => [kind, [...learn].filter(([, v]) => v.kind === kind)
+    .sort((x, y) => MOVE_LIST[x[0]][0].localeCompare(MOVE_LIST[y[0]][0]))]);
+  const setRunMove = (slot, k) => {
+    const moves = [...runMoves];
+    const other = moves.indexOf(k);
+    if (other > -1) moves[other] = moves[slot];
+    moves[slot] = k;
+    set({ runMoves: moves.filter(Boolean) });
+  };
 
   const setMove = (slot, m) => {
     const moves = [...b.moves];
@@ -113,6 +127,11 @@ export default function PartyEditor({ party, builds, setBuild }) {
             {NATURES.map(([n, up, down]) => <option key={n} value={n}>{up ? `${n}: +${up}, -${down}` : `${n}: no change`}</option>)}
           </select>
           {nat[1] && <p className="hint">Raises {nat[1]} by 10% and lowers {nat[2]} by 10%.</p>}
+          <div className="suggest">
+            <p><strong>Suggested: {nature.nature}</strong>{ahead !== line[0] && <small> for {FORMS[ahead][0]}</small>}</p>
+            <p className="hint">{nature.why}</p>
+            {b.nature !== nature.nature && <button type="button" className="mini-btn" onClick={() => set({ nature: nature.nature })}>Use {nature.nature}</button>}
+          </div>
         </fieldset>
 
         <fieldset>
@@ -147,6 +166,58 @@ export default function PartyEditor({ party, builds, setBuild }) {
             ))}
           </div>
           <p className="hint">Choices are the moves it learns by level 5 plus the egg moves you have unlocked, as on the game's starter screen.</p>
+        </fieldset>
+
+        <h4 className="editor-part">During the run</h4>
+        {line.length > 1 && (
+          <fieldset>
+            <legend>It is now</legend>
+            <select value={form} onChange={e => set({ form: e.target.value })} aria-label="Current form">
+              {line.map(f => <option key={f} value={f}>{FORMS[f][0]}</option>)}
+            </select>
+            <span className="chips">{FORMS[form][2].split(' ').map(t => <span key={t} className="ty" style={{ '--t': TYPE_COLOR[t], '--ti': typeInk(t) }}>{cap(t)}</span>)}</span>
+          </fieldset>
+        )}
+
+        <fieldset>
+          <legend>When to evolve</legend>
+          {evolving.length ? evolving.map(e => (
+            <div key={e.to} className="evo-row">
+              <p>Evolves into <strong>{e.name}</strong> {e.how.startsWith('level') ? 'at' : 'with'} {e.how}.</p>
+              {e.keep.length > 0 && (
+                <p className="hint">
+                  Learn {e.keep.map(k => `${MOVE_LIST[k.m][0]} (level ${k.lvl})`).join(', ')} first: {e.name} can't learn {e.keep.length > 1 ? 'them' : 'it'} later.
+                  {e.keep.some(k => k.late) && ' Use Pause Evolution in the party menu to wait.'}
+                </p>
+              )}
+            </div>
+          )) : <p className="hint">{FORMS[form][0]} does not evolve any further.</p>}
+        </fieldset>
+
+        <fieldset>
+          <legend>Moves now</legend>
+          <div className="move-slots">
+            {[0, 1, 2, 3].map(slot => (
+              <select key={slot} value={runMoves[slot] || ''} onChange={e => setRunMove(slot, e.target.value)} aria-label={`Move ${slot + 1} now`}>
+                <option value="">Empty</option>
+                {grouped.map(([kind, list]) => list.length > 0 && (
+                  <optgroup key={kind} label={SOURCE_GROUP[kind]}>
+                    {list.map(([m, v]) => <option key={m} value={MOVE_KEYS[m]}>{moveText(MOVE_LIST[m])} ({v.label})</option>)}
+                  </optgroup>
+                ))}
+              </select>
+            ))}
+          </div>
+          <div className="suggest">
+            <p><strong>Suggested for {FORMS[form][0]}</strong></p>
+            <ol className="suggest-moves">
+              {suggested.map(x => <li key={x.m}><span>{moveText(MOVE_LIST[x.m])}</span><small>{x.label}</small></li>)}
+            </ol>
+            <p className="hint">Two strong moves of its own types, then moves that hit the most other types hard. TMs only turn up at random in shops, so level-up and egg moves win ties. A starting point, not the only answer.</p>
+            {suggested.map(x => MOVE_KEYS[x.m]).join() !== runMoves.join() && (
+              <button type="button" className="mini-btn" onClick={() => set({ runMoves: suggested.map(x => MOVE_KEYS[x.m]) })}>Use these moves</button>
+            )}
+          </div>
         </fieldset>
       </div>
     </div>
