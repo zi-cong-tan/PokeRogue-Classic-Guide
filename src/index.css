@@ -180,6 +180,8 @@ section { padding: var(--section) var(--m); }
 .cloud-list { list-style: none; padding: 0; margin: 0; width: 100%; display: grid; gap: 4px; }
 .cloud-list li { display: flex; align-items: center; gap: 14px; }
 .cloud-list li > div { flex: 1; display: grid; min-width: 0; }
+.paper .cloud-list li button { display: inline; width: auto; margin: 0; padding: 0; min-height: 44px; background: none; flex: none; } /* not the receipt's dotted rows */
+.paper .cloud-list li button:hover { background: none; color: var(--paper-soft); }
 .cloud-list small { color: var(--paper-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cloud-msg { color: var(--paper-ink) !important; }
 .receipt .empty { color: var(--paper-soft); }
