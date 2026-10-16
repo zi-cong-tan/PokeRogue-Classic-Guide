@@ -79,6 +79,11 @@ const SETUP = { SWORDS_DANCE: 'P', DRAGON_DANCE: 'P', BULK_UP: 'P', SHIFT_GEAR: 
 
 const hits = types => new Set(types.flatMap(t => CHART[t][0]));
 
+// Status moves worth a slot when there is room, best first: recovery, setup-adjacent support, status that wins fights.
+const GOOD_STATUS = ['RECOVER', 'ROOST', 'SLACK_OFF', 'SOFT_BOILED', 'MILK_DRINK', 'SYNTHESIS', 'MOONLIGHT', 'MORNING_SUN', 'SHORE_UP',
+  'SPORE', 'SLEEP_POWDER', 'YAWN', 'WILL_O_WISP', 'THUNDER_WAVE', 'TOXIC', 'GLARE', 'STUN_SPORE', 'LEECH_SEED', 'PROTECT', 'DETECT',
+  'SUBSTITUTE', 'ENCORE', 'TAUNT', 'REST', 'WISH', 'HAZE', 'MEMENTO', 'SAFEGUARD', 'REFLECT', 'LIGHT_SCREEN', 'AGILITY', 'CURSE'];
+
 // Two moves of its own types, then the moves that hit the most new types for double, with a stat-boosting move
 // in the last slot when one fits and a fourth attack would add little. Level-up and egg moves are preferred over
 // TMs, which only show up at random in shops.
@@ -113,6 +118,16 @@ export function suggestMoves(line, form, eggKeys, L) {
   const setup = [...src.keys()].find(m => SETUP[MOVE_KEYS[m]] && (SETUP[MOVE_KEYS[m]] === r || SETUP[MOVE_KEYS[m]] === 'M' || r === 'M'));
   if (setup !== undefined && (pick.length < 4 || lastGain <= 1)) pick.splice(3, 1, setup);
   for (const m of attacks) if (pick.length < 4 && !pick.includes(m)) pick.push(m);
+  // Short movepools (Wobbuffet, Pyukumuku, Magikarp...): fill with attacks whose power varies, then useful status
+  // moves, then the risky attacks, then anything left, so every slot it can fill gets a suggestion.
+  const all = [...src.keys()];
+  const fillers = [
+    all.filter(m => MOVE_LIST[m][2] !== 'X' && !MOVE_LIST[m][3] && !MOVE_LIST[m][5]),
+    GOOD_STATUS.map(k => MOVE_KEYS.indexOf(k)).filter(m => src.has(m)),
+    all.filter(m => MOVE_LIST[m][2] !== 'X' && MOVE_LIST[m][5]),
+    all,
+  ];
+  for (const list of fillers) for (const m of list) if (pick.length < 4 && !pick.includes(m)) pick.push(m);
   return pick.map(m => ({ m, ...src.get(m) }));
 }
 
