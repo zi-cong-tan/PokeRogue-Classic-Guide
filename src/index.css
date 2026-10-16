@@ -88,7 +88,7 @@ section { padding: var(--section) var(--m); }
 .mark { font: 700 var(--step-body) "Pixelify Sans", sans-serif; text-decoration: none; }
 .links { display: flex; gap: 28px; }
 .links a { text-decoration: none; color: var(--ink); transition: color .15s; white-space: nowrap; }
-@media (max-width: 1100px) { .links { display: none; } } /* six links stop fitting beside the wordmark and button */
+@media (max-width: 1100px) { .links { display: none; } .rung-trainer { grid-template-columns: 1fr; } } /* six links stop fitting beside the wordmark and button */
 .links a:hover { color: var(--accent); }
 .btn {
   background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 600;
@@ -328,6 +328,34 @@ section { padding: var(--section) var(--m); }
 .atlas button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 
 /* ---------- types: one giant word, then a stack of bars ---------- */
+/* ---------- the league: a ladder of five rungs on a black field, the champion's rung printed on paper ---------- */
+.league { background: var(--black); }
+.league-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
+.league-head h2 { grid-column: 1 / 7; max-width: 10ch; }
+.league-head p { grid-column: 8 / 13; max-width: 44ch; }
+.regions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 48px; }
+.regions button { background: var(--black-step); color: var(--ink); border: 0; min-height: 44px; padding: 8px 16px; transition: background-color .15s; }
+.regions button:hover { background: #262626; }
+.regions button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.ladder { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 6px; }
+.rung { display: grid; grid-template-columns: 120px 1fr; gap: 24px; background: var(--black-step); padding: 24px; }
+.rung.champ { background: var(--paper); color: var(--paper-ink); }
+.rung-wave { font: 600 var(--step-lead)/1 "Source Serif 4", Georgia, serif; font-variant-numeric: tabular-nums; }
+.rung-wave span { display: block; font-size: var(--step-small); font-weight: 400; color: var(--muted); margin-bottom: 4px; }
+.rung.champ .rung-wave span { color: var(--paper-soft); }
+.rung-who { display: grid; gap: 20px; }
+.rung-trainer { display: grid; grid-template-columns: 260px 1fr; gap: 24px; align-items: center; }
+.rung-or { grid-column: 1 / -1; font-style: italic; color: var(--muted); }
+.rung-id { display: flex; align-items: flex-end; gap: 14px; }
+.rung-id h3 { font: 400 var(--step-lead)/1.05 "Pixelify Sans", sans-serif; margin: 0 0 8px; }
+.rung-sprite { width: var(--w); height: var(--h); background-repeat: no-repeat; image-rendering: pixelated; flex: none; }
+.rung-mixed { font-size: var(--step-small); color: var(--muted); }
+.rung .party h4 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.rung .party li { background: #202020; }
+.rung .party li.danger { background: #2c2c2c; }
+.rung.champ .party li { background: var(--paper-step); }
+.rung.champ .party li.danger { background: #d6e2cc; }
+
 /* ---------- mystery encounters: an index of sealed letters, one opened on paper ---------- */
 .enc-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
 .enc-head h2 { grid-column: 1 / 7; max-width: 9ch; }
@@ -490,7 +518,10 @@ section { padding: var(--section) var(--m); }
   .slip { padding: 16px 12px; }
 
   .ticket { grid-template-columns: 1fr; border-radius: 22px; }
-  .enc-head, .enc-body { grid-template-columns: 1fr; }
+  .enc-head, .enc-body, .league-head { grid-template-columns: 1fr; }
+  .league-head > * { grid-column: 1 / -1 !important; }
+  .rung { grid-template-columns: 1fr; padding: 18px 14px; gap: 10px; }
+  .rung-trainer { grid-template-columns: 1fr; gap: 12px; }
   .enc-head > *, .enc-body > * { grid-column: 1 / -1 !important; }
   .enc-index { display: none; }
   .enc-pick { display: grid; }

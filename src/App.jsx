@@ -1,6 +1,7 @@
 import Hero from './components/Hero';
 import Itinerary from './components/Itinerary';
 import Villains from './components/Villains';
+import League from './components/League';
 import Planner from './components/Planner';
 import Eggs from './components/Eggs';
 import Biomes from './components/Biomes';
@@ -16,6 +17,7 @@ export default function App() {
         <Hero />
         <Itinerary />
         <Villains />
+        <League />
         <Planner />
         <Eggs />
         <Biomes />

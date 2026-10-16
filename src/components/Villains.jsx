@@ -1,27 +1,8 @@
 import { useRef, useState } from 'react';
 import { useReveal, gsap, MOTION_OK } from '../motion';
 import { VILLAINS } from '../data/villains';
-import { sprite } from '../art';
+import Party from './Party';
 import Trainer from './Trainer';
-
-const TAGS = { B: 'Two health bars', M: 'Mega', G: 'Gigantamax' };
-
-function Party({ title, slots }) {
-  return (
-    <div className="party">
-      <h4>{title}</h4>
-      <ul>
-        {slots.map(([names, id, tags], i) => (
-          <li key={i} className={tags ? 'danger' : undefined}>
-            <img src={sprite(id)} alt="" width="96" height="96" loading="lazy" />
-            <span className="party-n">{names.join(' or ')}</span>
-            {tags && <span className="tags">{[...tags].map(t => <b key={t}>{TAGS[t]}</b>)}</span>}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
 export default function Villains() {
   const root = useReveal();
