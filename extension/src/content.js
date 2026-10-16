@@ -204,7 +204,12 @@ const CSS = `
   font: 13px/1.4 "Source Serif 4", Georgia, serif; scrollbar-width: thin; }
 .rail.folded { width: auto !important; }
 .rail.folded .body, .rail.folded .guide-btn { display: none; }
-.body { display: grid; gap: 8px; }
+.body { display: grid; gap: 8px; container-type: inline-size; }
+/* narrow side bands: move the verdict under the move, tighten padding */
+@container (max-width: 230px) {
+  section { padding: 8px; } .dmg li { grid-template-columns: 1fr auto; gap: 2px 6px; padding: 4px 6px; }
+  .dmg li strong { grid-column: 1 / -1; } .rewards li, .opt { padding: 6px; } h3 { font-size: 14px; }
+}
 .fold { all: unset; cursor: pointer; justify-self: start; background: #c6f19d; color: #0f1f10; font: 700 12px/1 Georgia, serif; padding: 8px 12px; }
 .right .fold { justify-self: end; }
 button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid #c6f19d; outline-offset: 2px; }
@@ -301,11 +306,13 @@ function mount() {
   function place() {
     const c = document.querySelector('canvas');
     const r = c ? c.getBoundingClientRect() : { left: 0, right: innerWidth, top: 0, bottom: innerHeight };
-    const spaceL = r.left - 12, spaceR = innerWidth - r.right - 12;
-    roomy = Math.min(spaceL, spaceR) >= 200;
-    const top = Math.max(6, r.top + 6), maxH = Math.max(200, Math.min(innerHeight, r.bottom) - top - 6);
-    left.style.cssText = `left:${roomy ? 6 : r.left + 6}px;top:${top}px;width:${roomy ? Math.min(320, spaceL) : 280}px;max-height:${maxH}px`;
-    right.style.cssText = `right:${roomy ? 6 : innerWidth - r.right + 6}px;top:${top}px;width:${roomy ? Math.min(320, spaceR) : 280}px;max-height:${maxH}px;${right.dataset.hide ? 'display:none' : ''}`;
+    // 4px from the window edge and from the game: the panels fill the bands beside it (at least 140px wide)
+    const spaceL = r.left - 8, spaceR = innerWidth - r.right - 8;
+    roomy = Math.min(spaceL, spaceR) >= 140;
+    // beside the game they can run to the bottom of the window; over it, they stop at the game's bottom edge
+    const top = Math.max(6, r.top + 6), maxH = Math.max(200, (roomy ? innerHeight : Math.min(innerHeight, r.bottom)) - top - 6);
+    left.style.cssText = `left:${roomy ? 4 : r.left + 6}px;top:${top}px;width:${roomy ? Math.min(340, spaceL) : 280}px;max-height:${maxH}px`;
+    right.style.cssText = `right:${roomy ? 4 : innerWidth - r.right + 6}px;top:${top}px;width:${roomy ? Math.min(340, spaceR) : 280}px;max-height:${maxH}px;${right.dataset.hide ? 'display:none' : ''}`;
     left.classList.toggle('folded', ui.left ?? !roomy);
     right.classList.toggle('folded', ui.right ?? !roomy);
   }
