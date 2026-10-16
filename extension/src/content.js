@@ -129,6 +129,20 @@ function rewardsPanel(info, rewards) {
     <p class="muted tiny">Rules of thumb for this run: your wave, HP, fainted, types, moves and items. TMs don't check who can learn them.</p></section>`;
 }
 
+// Each ball's chance to catch it now, from the game's own formula (page.js). "Certain" only when the game skips the roll.
+function catchPanel(e) {
+  const c = e.catch;
+  if (!c) return '';
+  if (c.blocked) return `<h4>Catching</h4><p class="muted">${esc(c.blocked)}</p>`;
+  const rows = c.balls.filter(b => b.have || b.odds === 1 && b.name !== 'Master Ball').map(b => {
+    const sure = b.odds === 1;
+    const odds = b.odds == null ? 'too strong' : sure ? 'Certain' : `${b.odds < 0.01 ? '<1' : Math.round(b.odds * 100)}%`;
+    return `<li class="${sure ? 'ko' : ''}"><span>${esc(b.name)} <small>×${esc(b.have)}</small></span><span></span><strong>${odds}</strong></li>`;
+  }).join('');
+  return `<h4>Catching</h4>${rows ? `<ul class="dmg">${rows}</ul>` : '<p class="muted">You have no balls.</p>'}
+    ${c.strong ? '<p class="muted tiny">Bosses only take a ball once down to their last bar (Master Ball works any time).</p>' : '<p class="muted tiny">From the game\'s catch formula: HP, status, ball, Pokédex size and Catching Charm. Lower its HP or put it to sleep to raise the odds.</p>'}`;
+}
+
 function enemyPanel(info, enemies, encounterId, rewards, calc) {
   if (rewards?.options?.length) return rewardsPanel(info, rewards);
   const me = ME_BY_ID[encounterId];
@@ -151,6 +165,7 @@ function enemyPanel(info, enemies, encounterId, rewards, calc) {
         ${half.length || none.length ? `<p class="muted">${half.length ? `Resists ${half.map(cap).join(', ')}` : ''}${none.length ? `${half.length ? '; ' : ''}immune to ${none.map(cap).join(', ')}` : ''}</p>` : ''}
         <p class="pick">${top ? `Use <strong>${esc(top.best.name)}</strong> from ${esc(top.who)} (${x(top.best.eff)})` : 'No super-effective move on your team: use your strongest same-type move, or switch.'}</p>
         ${damagePanel(info, e, i, calc)}
+        ${catchPanel(e)}
       </section>`;
     }).join('');
   }

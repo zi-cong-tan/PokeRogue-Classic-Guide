@@ -27,17 +27,52 @@
     const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
     if (!battle?.currentBattle) return [];
     try {
-      return battle.getEnemyField().filter(p => p && !p.isFainted?.()).map(p => {
+      const field = battle.getEnemyField().filter(p => p && !p.isFainted?.());
+      return field.map(p => {
         let types;
         try { types = typeNames(p.getTypes({ includeTeraType: true })); } catch { types = typeNames(p.getTypes?.()); }
         return {
           name: p.name, species: p.species?.name, level: p.level, hp: p.hp, maxHp: p.getMaxHp?.(), types,
           boss: !!p.isBoss?.(), bars: p.bossSegments || 0, barIndex: p.bossSegmentIndex ?? 0, terastallized: !!p.isTerastallized,
           // for the damage estimate: defences and their stat changes (Stat enum: DEF 2, SPDEF 4)
+          catch: catchOdds(battle, p, field.length),
           def: p.getStat?.(2), spDef: p.getStat?.(4), defStage: p.getStatStage?.(2) ?? 0, spDefStage: p.getStatStage?.(4) ?? 0,
         };
       });
     } catch { return []; }
+  }
+
+  // Catch odds for each ball, by the game's own formula (phases/attempt-capture-phase.ts, data/pokeball.ts):
+  // rate = round((3·maxHP − 2·HP)·catchRate·ball / (3·maxHP) · status); each of 3 shakes passes with
+  // round(65536 / (255/rate)^0.1875) / 65536; a critical capture (by Pokédex size and Catching Charm) needs one shake.
+  // Also the game's rules for when no ball can be thrown. Shiny bonus left out (it only makes it easier).
+  const BALLS = [['Poké Ball', 1], ['Great Ball', 1.5], ['Ultra Ball', 2], ['Rogue Ball', 3], ['Master Ball', -1]];
+  const STATUS_CATCH = [1, 1.5, 1.5, 1.5, 2.5, 2.5, 1.5];   // StatusEffect: none, poison, toxic, paralysis, sleep, freeze, burn
+  function catchOdds(battle, p, onField) {
+    try {
+      const b = battle.currentBattle;
+      if (b.battleType === 1) return { blocked: 'Trainer Pokémon can’t be caught.' };   // BattleType.TRAINER
+      if (b.isBattleMysteryEncounter?.() && !b.mysteryEncounter?.catchAllowed) return { blocked: 'This encounter can’t be caught.' };
+      if (onField > 1) return { blocked: 'Knock out the other one first: balls need a single target.' };
+      const strong = p.isBoss?.() && p.bossSegmentIndex >= 1;
+      const dex = battle.gameData?.getSpeciesCount?.(d => !!d.caughtAttr) || 0;
+      const charm = { value: 1 };
+      battle.findModifier?.(m => m.is?.('CriticalCatchChanceBoosterModifier'))?.apply(charm);
+      const dexMult = battle.gameMode?.isFreshStartChallenge?.() ? 0 : battle.gameMode?.isDaily || dex > 800 ? 2.5 : dex > 600 ? 2 : dex > 400 ? 1.5 : dex > 200 ? 1 : dex > 100 ? 0.5 : 0;
+      const m3 = 3 * p.getMaxHp(), h2 = 2 * p.hp, status = STATUS_CATCH[p.status?.effect || 0] || 1;
+      const counts = battle.pokeballCounts || {};
+      return {
+        strong,
+        balls: BALLS.map(([name, mult], i) => {
+          if (mult === -1) return { name, odds: 1, have: counts[i] || 0 };
+          if (strong) return { name, odds: null, have: counts[i] || 0 };
+          const rate = Math.round(((m3 - h2) * p.species.catchRate * mult / m3) * status);
+          const shake = Math.round(65536 / Math.pow(255 / rate, 0.1875)) / 65536;
+          const crit = Math.floor((charm.value * dexMult * Math.min(255, rate)) / 6) / 256;
+          return { name, odds: rate >= 255 ? 1 : Math.min(1, crit * shake + (1 - crit) * shake ** 3), have: counts[i] || 0 };
+        }),
+      };
+    } catch { return null; }
   }
 
   const WEATHER = ['', 'Sun', 'Rain', 'Sandstorm', 'Hail', 'Snow', 'Fog', 'Heavy rain', 'Harsh sun', 'Strong winds'];
