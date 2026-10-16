@@ -1,0 +1,2840 @@
+- generic [ref=f2e2]:
+  - main [ref=f2e3]:
+    - generic [ref=f2e4]:
+      - navigation "Sections" [ref=f2e5]:
+        - link "PokeRogue Field Guide" [ref=f2e6] [cursor=pointer]:
+          - /url: "#top"
+        - generic [ref=f2e7]:
+          - link "The run" [ref=f2e8] [cursor=pointer]:
+            - /url: "#run"
+          - link "Villains" [ref=f2e9] [cursor=pointer]:
+            - /url: "#villains"
+          - link "Starters" [ref=f2e10] [cursor=pointer]:
+            - /url: "#starters"
+          - link "Biomes" [ref=f2e11] [cursor=pointer]:
+            - /url: "#biomes"
+          - link "Types" [ref=f2e12] [cursor=pointer]:
+            - /url: "#types"
+        - link "Plan a team" [ref=f2e13] [cursor=pointer]:
+          - /url: "#starters"
+      - generic [ref=f2e14]:
+        - heading "200 waves to Eternatus" [level=1] [ref=f2e15]:
+          - generic [ref=f2e16]: 200 waves
+          - generic [ref=f2e17]: to Eternatus
+        - paragraph [ref=f2e18]:
+          - generic [ref=f2e19]: Classic mode
+          - generic [ref=f2e21]: 10 starter points
+          - generic [ref=f2e23]: A boss every 10 waves
+        - img "Eternatus, the final boss, idling" [ref=f2e24]
+        - paragraph [ref=f2e25]: "A field guide to one PokeRogue Classic run, printed like the paperwork of the trip: the fight schedule, your starter receipt, a biome ticket. Every number comes from the game's source code."
+    - region [ref=f2e26]:
+      - generic [ref=f2e27]:
+        - heading "The run, wave by wave" [level=2] [ref=f2e28]
+        - paragraph [ref=f2e29]: The biome changes every 10 waves and every wave ending in 0 is a boss. Between those, these fights are fixed. Pick one on the schedule.
+        - generic [ref=f2e30]:
+          - img "Youngster in Town" [ref=f2e32]
+          - generic [ref=f2e33]:
+            - paragraph [ref=f2e34]: "5"
+            - heading "Youngster in Town" [level=3] [ref=f2e35]
+            - paragraph [ref=f2e36]: A fixed trainer to teach the ropes. Your first real check that the team works.
+      - generic [ref=f2e37]:
+        - generic [ref=f2e38]:
+          - heading "Waves 1 to 50" [level=3] [ref=f2e39]
+          - list [ref=f2e40]:
+            - listitem [ref=f2e41]:
+              - button "Youngster in Town 5" [pressed] [ref=f2e42] [cursor=pointer]:
+                - generic [ref=f2e43]: Youngster in Town
+                - generic [ref=f2e45]: "5"
+            - listitem [ref=f2e46]:
+              - button "Rival, round 1 8" [ref=f2e47] [cursor=pointer]:
+                - generic [ref=f2e48]: Rival, round 1
+                - generic [ref=f2e50]: "8"
+            - listitem [ref=f2e51]:
+              - button "Gym leader 20 or 30" [ref=f2e52] [cursor=pointer]:
+                - generic [ref=f2e53]: Gym leader
+                - generic [ref=f2e55]: 20 or 30
+            - listitem [ref=f2e56]:
+              - button "Rival, round 2 25" [ref=f2e57] [cursor=pointer]:
+                - generic [ref=f2e58]: Rival, round 2
+                - generic [ref=f2e60]: "25"
+            - listitem [ref=f2e61]:
+              - button "Evil team grunt 35" [ref=f2e62] [cursor=pointer]:
+                - generic [ref=f2e63]: Evil team grunt
+                - generic [ref=f2e65]: "35"
+            - listitem [ref=f2e66]:
+              - button "Gym leader 50 or 60" [ref=f2e67] [cursor=pointer]:
+                - generic [ref=f2e68]: Gym leader
+                - generic [ref=f2e70]: 50 or 60
+        - generic [ref=f2e71]:
+          - heading "Waves 51 to 100" [level=3] [ref=f2e72]
+          - list [ref=f2e73]:
+            - listitem [ref=f2e74]:
+              - button "Rival, round 3 55" [ref=f2e75] [cursor=pointer]:
+                - generic [ref=f2e76]: Rival, round 3
+                - generic [ref=f2e78]: "55"
+            - listitem [ref=f2e79]:
+              - button "Evil team hideout 62 to 66" [ref=f2e80] [cursor=pointer]:
+                - generic [ref=f2e81]: Evil team hideout
+                - generic [ref=f2e83]: 62 to 66
+            - listitem [ref=f2e84]:
+              - button "Gym leader 80 or 90" [ref=f2e85] [cursor=pointer]:
+                - generic [ref=f2e86]: Gym leader
+                - generic [ref=f2e88]: 80 or 90
+            - listitem [ref=f2e89]:
+              - button "Rival, round 4 95" [ref=f2e90] [cursor=pointer]:
+                - generic [ref=f2e91]: Rival, round 4
+                - generic [ref=f2e93]: "95"
+        - generic [ref=f2e94]:
+          - heading "Waves 101 to 150" [level=3] [ref=f2e95]
+          - list [ref=f2e96]:
+            - listitem [ref=f2e97]:
+              - button "Gym leader 110 or 120" [ref=f2e98] [cursor=pointer]:
+                - generic [ref=f2e99]: Gym leader
+                - generic [ref=f2e101]: 110 or 120
+            - listitem [ref=f2e102]:
+              - button "Evil team, second strike 112 to 115" [ref=f2e103] [cursor=pointer]:
+                - generic [ref=f2e104]: Evil team, second strike
+                - generic [ref=f2e106]: 112 to 115
+            - listitem [ref=f2e107]:
+              - button "Gym leader 140 or 150" [ref=f2e108] [cursor=pointer]:
+                - generic [ref=f2e109]: Gym leader
+                - generic [ref=f2e111]: 140 or 150
+            - listitem [ref=f2e112]:
+              - button "Rival, round 5 145" [ref=f2e113] [cursor=pointer]:
+                - generic [ref=f2e114]: Rival, round 5
+                - generic [ref=f2e116]: "145"
+        - generic [ref=f2e117]:
+          - heading "Waves 151 to 199" [level=3] [ref=f2e118]
+          - list [ref=f2e119]:
+            - listitem [ref=f2e120]:
+              - button "Evil boss rematch 164 to 165" [ref=f2e121] [cursor=pointer]:
+                - generic [ref=f2e122]: Evil boss rematch
+                - generic [ref=f2e124]: 164 to 165
+            - listitem [ref=f2e125]:
+              - button "Gym leader 170 or 180" [ref=f2e126] [cursor=pointer]:
+                - generic [ref=f2e127]: Gym leader
+                - generic [ref=f2e129]: 170 or 180
+            - listitem [ref=f2e130]:
+              - button "Elite Four 182 to 188" [ref=f2e131] [cursor=pointer]:
+                - generic [ref=f2e132]: Elite Four
+                - generic [ref=f2e134]: 182 to 188
+            - listitem [ref=f2e135]:
+              - button "Champion 190" [ref=f2e136] [cursor=pointer]:
+                - generic [ref=f2e137]: Champion
+                - generic [ref=f2e139]: "190"
+            - listitem [ref=f2e140]:
+              - button "Rival, final round 195" [ref=f2e141] [cursor=pointer]:
+                - generic [ref=f2e142]: Rival, final round
+                - generic [ref=f2e144]: "195"
+        - list [ref=f2e145]:
+          - listitem [ref=f2e146]:
+            - button "Eternatus wave 200" [ref=f2e147] [cursor=pointer]:
+              - generic [ref=f2e148]: Eternatus
+              - generic [ref=f2e150]: wave 200
+    - region [ref=f2e151]:
+      - generic [ref=f2e152]:
+        - heading "The ten villain teams" [level=2] [ref=f2e153]
+        - paragraph [ref=f2e154]: The grunt on wave 35 decides which team your run gets, and you keep fighting that team until its boss falls on wave 165. Pokemon marked below are the ones to plan for.
+      - generic [ref=f2e155]:
+        - tablist "Villain teams" [ref=f2e156]:
+          - tab "Team Rocket" [selected] [ref=f2e157] [cursor=pointer]
+          - tab "Team Magma" [ref=f2e158] [cursor=pointer]
+          - tab "Team Aqua" [ref=f2e159] [cursor=pointer]
+          - tab "Team Galactic" [ref=f2e160] [cursor=pointer]
+          - tab "Team Plasma" [ref=f2e161] [cursor=pointer]
+          - tab "Team Flare" [ref=f2e162] [cursor=pointer]
+          - tab "Aether Foundation" [ref=f2e163] [cursor=pointer]
+          - tab "Team Skull" [ref=f2e164] [cursor=pointer]
+          - tab "Macro Cosmos" [ref=f2e165] [cursor=pointer]
+          - tab "Team Star" [ref=f2e166] [cursor=pointer]
+        - tabpanel "Team Rocket" [ref=f2e167]:
+          - generic [ref=f2e168]:
+            - generic [ref=f2e169]:
+              - img "Giovanni, boss of Team Rocket" [ref=f2e170]
+              - img "A Team Rocket grunt" [ref=f2e171]
+            - heading "Team Rocket" [level=3] [ref=f2e172]
+            - generic [ref=f2e173]:
+              - generic [ref=f2e174]:
+                - term [ref=f2e175]: Grunts
+                - definition [ref=f2e176]: Waves 35, 62, 64 and 112
+              - generic [ref=f2e177]:
+                - term [ref=f2e178]: Admin, wave 66
+                - definition [ref=f2e179]: Petrel
+              - generic [ref=f2e180]:
+                - term [ref=f2e181]: Admin, wave 114
+                - definition [ref=f2e182]: Proton
+              - generic [ref=f2e183]:
+                - term [ref=f2e184]: Admin, wave 164
+                - definition [ref=f2e185]: Archer or Ariana
+              - generic [ref=f2e186]:
+                - term [ref=f2e187]: Boss, waves 115 and 165
+                - definition [ref=f2e188]: Giovanni
+          - generic [ref=f2e189]:
+            - generic [ref=f2e190]:
+              - heading "Giovanni on wave 115" [level=4] [ref=f2e191]
+              - list [ref=f2e192]:
+                - listitem [ref=f2e193]:
+                  - generic [ref=f2e194]: Persian
+                - listitem [ref=f2e195]:
+                  - generic [ref=f2e196]: Dugtrio or Alolan Dugtrio
+                - listitem [ref=f2e197]:
+                  - generic [ref=f2e198]: Honchkrow
+                - listitem [ref=f2e199]:
+                  - generic [ref=f2e200]: Nidoqueen or Nidoking
+                - listitem [ref=f2e201]:
+                  - generic [ref=f2e202]: Kangaskhan
+                - listitem [ref=f2e203]:
+                  - generic [ref=f2e204]: Rhyperior
+                  - generic [ref=f2e205]: Two health bars
+            - generic [ref=f2e207]:
+              - heading "Giovanni on wave 165, stronger" [level=4] [ref=f2e208]
+              - list [ref=f2e209]:
+                - listitem [ref=f2e210]:
+                  - generic [ref=f2e211]: Rhyperior
+                  - generic [ref=f2e212]: Two health bars
+                - listitem [ref=f2e214]:
+                  - generic [ref=f2e215]: Nidoking or Nidoqueen
+                - listitem [ref=f2e216]:
+                  - generic [ref=f2e217]: Honchkrow
+                - listitem [ref=f2e218]:
+                  - generic [ref=f2e219]: Kangaskhan
+                  - generic [ref=f2e220]: Mega
+                - listitem [ref=f2e222]:
+                  - generic [ref=f2e223]: Articuno or Zapdos or Moltres
+                  - generic [ref=f2e224]: Two health bars
+                - listitem [ref=f2e226]:
+                  - generic [ref=f2e227]: Mewtwo
+                  - generic [ref=f2e228]: Two health bars
+      - paragraph [ref=f2e230]: "Two health bars means the Pokemon is a boss: damage stops at the end of each bar, so one big hit will not take it down. Where a slot names two or three Pokemon, the game picks one of them."
+    - region [ref=f2e231]:
+      - generic [ref=f2e232]:
+        - generic [ref=f2e233]:
+          - heading "Spend your 10 points" [level=2] [ref=f2e234]
+          - paragraph [ref=f2e235]: Classic gives you 10 starter points and Endless gives 15. Each starter has a cost, and candy can lower it twice. Pick up to six below.
+        - generic [ref=f2e236]:
+          - paragraph [aria-hidden] [ref=f2e237]: "10"
+          - paragraph [ref=f2e238]: points left to spend
+      - generic [ref=f2e240]:
+        - heading "Build sheet" [level=3] [ref=f2e241]
+        - paragraph [ref=f2e242]: "Pick starters below and set each one up here: shiny, ability, passive, nature, IVs, egg moves and the four moves it starts with. It saves in this browser."
+      - generic [ref=f2e243]:
+        - heading "Your party" [level=3] [ref=f2e244]
+        - list [ref=f2e245]:
+          - listitem [ref=f2e246]: Nobody yet. Three 3-cost starters and a 1-cost is a common opener.
+        - paragraph [ref=f2e247]:
+          - generic [ref=f2e248]: Spent
+          - generic [ref=f2e249]: 0 of 10
+      - generic [ref=f2e250]:
+        - generic [ref=f2e251]:
+          - searchbox "Search starters" [ref=f2e252]
+          - generic [ref=f2e253] [cursor=pointer]:
+            - checkbox "Only show what fits" [ref=f2e254]
+            - text: Only show what fits
+        - paragraph [ref=f2e255]: Showing 572 of 572 starters, cheapest first
+        - list [ref=f2e256]:
+          - listitem [ref=f2e257]:
+            - button "Alolan Rattata, costs 1, dark normal type" [ref=f2e258] [cursor=pointer]:
+              - generic [ref=f2e259]: "1"
+              - generic [ref=f2e260]: Alolan Rattata
+          - listitem [ref=f2e264]:
+            - button "Castform, costs 1, normal type" [ref=f2e265] [cursor=pointer]:
+              - generic [ref=f2e266]: "1"
+              - generic [ref=f2e267]: Castform
+          - listitem [ref=f2e270]:
+            - button "Cherubi, costs 1, grass type" [ref=f2e271] [cursor=pointer]:
+              - generic [ref=f2e272]: "1"
+              - generic [ref=f2e273]: Cherubi
+          - listitem [ref=f2e276]:
+            - button "Delibird, costs 1, ice flying type" [ref=f2e277] [cursor=pointer]:
+              - generic [ref=f2e278]: "1"
+              - generic [ref=f2e279]: Delibird
+          - listitem [ref=f2e283]:
+            - button "Finneon, costs 1, water type" [ref=f2e284] [cursor=pointer]:
+              - generic [ref=f2e285]: "1"
+              - generic [ref=f2e286]: Finneon
+          - listitem [ref=f2e289]:
+            - button "Gulpin, costs 1, poison type" [ref=f2e290] [cursor=pointer]:
+              - generic [ref=f2e291]: "1"
+              - generic [ref=f2e292]: Gulpin
+          - listitem [ref=f2e295]:
+            - button "Igglybuff, costs 1, normal fairy type" [ref=f2e296] [cursor=pointer]:
+              - generic [ref=f2e297]: "1"
+              - generic [ref=f2e298]: Igglybuff
+          - listitem [ref=f2e302]:
+            - button "Kricketot, costs 1, bug type" [ref=f2e303] [cursor=pointer]:
+              - generic [ref=f2e304]: "1"
+              - generic [ref=f2e305]: Kricketot
+          - listitem [ref=f2e308]:
+            - button "Ledyba, costs 1, bug flying type" [ref=f2e309] [cursor=pointer]:
+              - generic [ref=f2e310]: "1"
+              - generic [ref=f2e311]: Ledyba
+          - listitem [ref=f2e315]:
+            - button "Luvdisc, costs 1, water type" [ref=f2e316] [cursor=pointer]:
+              - generic [ref=f2e317]: "1"
+              - generic [ref=f2e318]: Luvdisc
+          - listitem [ref=f2e321]:
+            - button "Nickit, costs 1, dark type" [ref=f2e322] [cursor=pointer]:
+              - generic [ref=f2e323]: "1"
+              - generic [ref=f2e324]: Nickit
+          - listitem [ref=f2e327]:
+            - button "Patrat, costs 1, normal type" [ref=f2e328] [cursor=pointer]:
+              - generic [ref=f2e329]: "1"
+              - generic [ref=f2e330]: Patrat
+          - listitem [ref=f2e333]:
+            - button "Pidove, costs 1, normal flying type" [ref=f2e334] [cursor=pointer]:
+              - generic [ref=f2e335]: "1"
+              - generic [ref=f2e336]: Pidove
+          - listitem [ref=f2e340]:
+            - button "Rattata, costs 1, normal type" [ref=f2e341] [cursor=pointer]:
+              - generic [ref=f2e342]: "1"
+              - generic [ref=f2e343]: Rattata
+          - listitem [ref=f2e346]:
+            - button "Seel, costs 1, water type" [ref=f2e347] [cursor=pointer]:
+              - generic [ref=f2e348]: "1"
+              - generic [ref=f2e349]: Seel
+          - listitem [ref=f2e352]:
+            - button "Sentret, costs 1, normal type" [ref=f2e353] [cursor=pointer]:
+              - generic [ref=f2e354]: "1"
+              - generic [ref=f2e355]: Sentret
+          - listitem [ref=f2e358]:
+            - button "Skitty, costs 1, normal type" [ref=f2e359] [cursor=pointer]:
+              - generic [ref=f2e360]: "1"
+              - generic [ref=f2e361]: Skitty
+          - listitem [ref=f2e364]:
+            - button "Smeargle, costs 1, normal type" [ref=f2e365] [cursor=pointer]:
+              - generic [ref=f2e366]: "1"
+              - generic [ref=f2e367]: Smeargle
+          - listitem [ref=f2e370]:
+            - button "Spearow, costs 1, normal flying type" [ref=f2e371] [cursor=pointer]:
+              - generic [ref=f2e372]: "1"
+              - generic [ref=f2e373]: Spearow
+          - listitem [ref=f2e377]:
+            - button "Spinarak, costs 1, bug poison type" [ref=f2e378] [cursor=pointer]:
+              - generic [ref=f2e379]: "1"
+              - generic [ref=f2e380]: Spinarak
+          - listitem [ref=f2e384]:
+            - button "Spinda, costs 1, normal type" [ref=f2e385] [cursor=pointer]:
+              - generic [ref=f2e386]: "1"
+              - generic [ref=f2e387]: Spinda
+          - listitem [ref=f2e390]:
+            - button "Sunkern, costs 1, grass type" [ref=f2e391] [cursor=pointer]:
+              - generic [ref=f2e392]: "1"
+              - generic [ref=f2e393]: Sunkern
+          - listitem [ref=f2e396]:
+            - button "Tarountula, costs 1, bug type" [ref=f2e397] [cursor=pointer]:
+              - generic [ref=f2e398]: "1"
+              - generic [ref=f2e399]: Tarountula
+          - listitem [ref=f2e402]:
+            - button "Unown, costs 1, psychic type" [ref=f2e403] [cursor=pointer]:
+              - generic [ref=f2e404]: "1"
+              - generic [ref=f2e405]: Unown
+          - listitem [ref=f2e408]:
+            - button "Weedle, costs 1, bug poison type" [ref=f2e409] [cursor=pointer]:
+              - generic [ref=f2e410]: "1"
+              - generic [ref=f2e411]: Weedle
+          - listitem [ref=f2e415]:
+            - button "Wurmple, costs 1, bug type" [ref=f2e416] [cursor=pointer]:
+              - generic [ref=f2e417]: "1"
+              - generic [ref=f2e418]: Wurmple
+          - listitem [ref=f2e421]:
+            - button "Aipom, costs 2, normal type" [ref=f2e422] [cursor=pointer]:
+              - generic [ref=f2e423]: "2"
+              - generic [ref=f2e424]: Aipom
+          - listitem [ref=f2e427]:
+            - button "Alolan Diglett, costs 2, ground steel type" [ref=f2e428] [cursor=pointer]:
+              - generic [ref=f2e429]: "2"
+              - generic [ref=f2e430]: Alolan Diglett
+          - listitem [ref=f2e434]:
+            - button "Alolan Sandshrew, costs 2, ice steel type" [ref=f2e435] [cursor=pointer]:
+              - generic [ref=f2e436]: "2"
+              - generic [ref=f2e437]: Alolan Sandshrew
+          - listitem [ref=f2e441]:
+            - button "Amaura, costs 2, rock ice type" [ref=f2e442] [cursor=pointer]:
+              - generic [ref=f2e443]: "2"
+              - generic [ref=f2e444]: Amaura
+          - listitem [ref=f2e448]:
+            - button "Baltoy, costs 2, ground psychic type" [ref=f2e449] [cursor=pointer]:
+              - generic [ref=f2e450]: "2"
+              - generic [ref=f2e451]: Baltoy
+          - listitem [ref=f2e455]:
+            - button "Barboach, costs 2, water ground type" [ref=f2e456] [cursor=pointer]:
+              - generic [ref=f2e457]: "2"
+              - generic [ref=f2e458]: Barboach
+          - listitem [ref=f2e462]:
+            - button "Bellsprout, costs 2, grass poison type" [ref=f2e463] [cursor=pointer]:
+              - generic [ref=f2e464]: "2"
+              - generic [ref=f2e465]: Bellsprout
+          - listitem [ref=f2e469]:
+            - button "Bidoof, costs 2, normal type" [ref=f2e470] [cursor=pointer]:
+              - generic [ref=f2e471]: "2"
+              - generic [ref=f2e472]: Bidoof
+          - listitem [ref=f2e475]:
+            - button "Blipbug, costs 2, bug type" [ref=f2e476] [cursor=pointer]:
+              - generic [ref=f2e477]: "2"
+              - generic [ref=f2e478]: Blipbug
+          - listitem [ref=f2e481]:
+            - button "Blitzle, costs 2, electric type" [ref=f2e482] [cursor=pointer]:
+              - generic [ref=f2e483]: "2"
+              - generic [ref=f2e484]: Blitzle
+          - listitem [ref=f2e487]:
+            - button "Bonsly, costs 2, rock type" [ref=f2e488] [cursor=pointer]:
+              - generic [ref=f2e489]: "2"
+              - generic [ref=f2e490]: Bonsly
+          - listitem [ref=f2e493]:
+            - button "Buizel, costs 2, water type" [ref=f2e494] [cursor=pointer]:
+              - generic [ref=f2e495]: "2"
+              - generic [ref=f2e496]: Buizel
+          - listitem [ref=f2e499]:
+            - button "Buneary, costs 2, normal type" [ref=f2e500] [cursor=pointer]:
+              - generic [ref=f2e501]: "2"
+              - generic [ref=f2e502]: Buneary
+          - listitem [ref=f2e505]:
+            - button "Burmy, costs 2, bug type" [ref=f2e506] [cursor=pointer]:
+              - generic [ref=f2e507]: "2"
+              - generic [ref=f2e508]: Burmy
+          - listitem [ref=f2e511]:
+            - button "Cacnea, costs 2, grass type" [ref=f2e512] [cursor=pointer]:
+              - generic [ref=f2e513]: "2"
+              - generic [ref=f2e514]: Cacnea
+          - listitem [ref=f2e517]:
+            - button "Carbink, costs 2, rock fairy type" [ref=f2e518] [cursor=pointer]:
+              - generic [ref=f2e519]: "2"
+              - generic [ref=f2e520]: Carbink
+          - listitem [ref=f2e524]:
+            - button "Carnivine, costs 2, grass type" [ref=f2e525] [cursor=pointer]:
+              - generic [ref=f2e526]: "2"
+              - generic [ref=f2e527]: Carnivine
+          - listitem [ref=f2e530]:
+            - button "Caterpie, costs 2, bug type" [ref=f2e531] [cursor=pointer]:
+              - generic [ref=f2e532]: "2"
+              - generic [ref=f2e533]: Caterpie
+          - listitem [ref=f2e536]:
+            - button "Chatot, costs 2, normal flying type" [ref=f2e537] [cursor=pointer]:
+              - generic [ref=f2e538]: "2"
+              - generic [ref=f2e539]: Chatot
+          - listitem [ref=f2e543]:
+            - button "Chinchou, costs 2, water electric type" [ref=f2e544] [cursor=pointer]:
+              - generic [ref=f2e545]: "2"
+              - generic [ref=f2e546]: Chinchou
+          - listitem [ref=f2e550]:
+            - button "Chingling, costs 2, psychic type" [ref=f2e551] [cursor=pointer]:
+              - generic [ref=f2e552]: "2"
+              - generic [ref=f2e553]: Chingling
+          - listitem [ref=f2e556]:
+            - button "Cleffa, costs 2, fairy type" [ref=f2e557] [cursor=pointer]:
+              - generic [ref=f2e558]: "2"
+              - generic [ref=f2e559]: Cleffa
+          - listitem [ref=f2e562]:
+            - button "Clobbopus, costs 2, fighting type" [ref=f2e563] [cursor=pointer]:
+              - generic [ref=f2e564]: "2"
+              - generic [ref=f2e565]: Clobbopus
+          - listitem [ref=f2e568]:
+            - button "Combee, costs 2, bug flying type" [ref=f2e569] [cursor=pointer]:
+              - generic [ref=f2e570]: "2"
+              - generic [ref=f2e571]: Combee
+          - listitem [ref=f2e575]:
+            - button "Corsola, costs 2, water rock type" [ref=f2e576] [cursor=pointer]:
+              - generic [ref=f2e577]: "2"
+              - generic [ref=f2e578]: Corsola
+          - listitem [ref=f2e582]:
+            - button "Cranidos, costs 2, rock type" [ref=f2e583] [cursor=pointer]:
+              - generic [ref=f2e584]: "2"
+              - generic [ref=f2e585]: Cranidos
+          - listitem [ref=f2e588]:
+            - button "Croagunk, costs 2, poison fighting type" [ref=f2e589] [cursor=pointer]:
+              - generic [ref=f2e590]: "2"
+              - generic [ref=f2e591]: Croagunk
+          - listitem [ref=f2e595]:
+            - button "Cubchoo, costs 2, ice type" [ref=f2e596] [cursor=pointer]:
+              - generic [ref=f2e597]: "2"
+              - generic [ref=f2e598]: Cubchoo
+          - listitem [ref=f2e601]:
+            - button "Dedenne, costs 2, electric fairy type" [ref=f2e602] [cursor=pointer]:
+              - generic [ref=f2e603]: "2"
+              - generic [ref=f2e604]: Dedenne
+          - listitem [ref=f2e608]:
+            - button "Deerling, costs 2, normal grass type" [ref=f2e609] [cursor=pointer]:
+              - generic [ref=f2e610]: "2"
+              - generic [ref=f2e611]: Deerling
+          - listitem [ref=f2e615]:
+            - button "Diglett, costs 2, ground type" [ref=f2e616] [cursor=pointer]:
+              - generic [ref=f2e617]: "2"
+              - generic [ref=f2e618]: Diglett
+          - listitem [ref=f2e621]:
+            - button "Ditto, costs 2, normal type" [ref=f2e622] [cursor=pointer]:
+              - generic [ref=f2e623]: "2"
+              - generic [ref=f2e624]: Ditto
+          - listitem [ref=f2e627]:
+            - button "Drifloon, costs 2, ghost flying type" [ref=f2e628] [cursor=pointer]:
+              - generic [ref=f2e629]: "2"
+              - generic [ref=f2e630]: Drifloon
+          - listitem [ref=f2e634]:
+            - button "Drowzee, costs 2, psychic type" [ref=f2e635] [cursor=pointer]:
+              - generic [ref=f2e636]: "2"
+              - generic [ref=f2e637]: Drowzee
+          - listitem [ref=f2e640]:
+            - button "Ducklett, costs 2, water flying type" [ref=f2e641] [cursor=pointer]:
+              - generic [ref=f2e642]: "2"
+              - generic [ref=f2e643]: Ducklett
+          - listitem [ref=f2e647]:
+            - button "Ekans, costs 2, poison type" [ref=f2e648] [cursor=pointer]:
+              - generic [ref=f2e649]: "2"
+              - generic [ref=f2e650]: Ekans
+          - listitem [ref=f2e653]:
+            - button "Electrike, costs 2, electric type" [ref=f2e654] [cursor=pointer]:
+              - generic [ref=f2e655]: "2"
+              - generic [ref=f2e656]: Electrike
+          - listitem [ref=f2e659]:
+            - button "Elgyem, costs 2, psychic type" [ref=f2e660] [cursor=pointer]:
+              - generic [ref=f2e661]: "2"
+              - generic [ref=f2e662]: Elgyem
+          - listitem [ref=f2e665]:
+            - button "Emolga, costs 2, electric flying type" [ref=f2e666] [cursor=pointer]:
+              - generic [ref=f2e667]: "2"
+              - generic [ref=f2e668]: Emolga
+          - listitem [ref=f2e672]:
+            - button "Espurr, costs 2, psychic type" [ref=f2e673] [cursor=pointer]:
+              - generic [ref=f2e674]: "2"
+              - generic [ref=f2e675]: Espurr
+          - listitem [ref=f2e678]:
+            - button "Farfetch'd, costs 2, normal flying type" [ref=f2e679] [cursor=pointer]:
+              - generic [ref=f2e680]: "2"
+              - generic [ref=f2e681]: Farfetch'd
+          - listitem [ref=f2e685]:
+            - button "Fidough, costs 2, fairy type" [ref=f2e686] [cursor=pointer]:
+              - generic [ref=f2e687]: "2"
+              - generic [ref=f2e688]: Fidough
+          - listitem [ref=f2e691]:
+            - button "Fomantis, costs 2, grass type" [ref=f2e692] [cursor=pointer]:
+              - generic [ref=f2e693]: "2"
+              - generic [ref=f2e694]: Fomantis
+          - listitem [ref=f2e697]:
+            - button "Galarian Ponyta, costs 2, psychic type" [ref=f2e698] [cursor=pointer]:
+              - generic [ref=f2e699]: "2"
+              - generic [ref=f2e700]: Galarian Ponyta
+          - listitem [ref=f2e703]:
+            - button "Galarian Stunfisk, costs 2, ground steel type" [ref=f2e704] [cursor=pointer]:
+              - generic [ref=f2e705]: "2"
+              - generic [ref=f2e706]: Galarian Stunfisk
+          - listitem [ref=f2e710]:
+            - button "Glameow, costs 2, normal type" [ref=f2e711] [cursor=pointer]:
+              - generic [ref=f2e712]: "2"
+              - generic [ref=f2e713]: Glameow
+          - listitem [ref=f2e716]:
+            - button "Goldeen, costs 2, water type" [ref=f2e717] [cursor=pointer]:
+              - generic [ref=f2e718]: "2"
+              - generic [ref=f2e719]: Goldeen
+          - listitem [ref=f2e722]:
+            - button "Gossifleur, costs 2, grass type" [ref=f2e723] [cursor=pointer]:
+              - generic [ref=f2e724]: "2"
+              - generic [ref=f2e725]: Gossifleur
+          - listitem [ref=f2e728]:
+            - button "Grimer, costs 2, poison type" [ref=f2e729] [cursor=pointer]:
+              - generic [ref=f2e730]: "2"
+              - generic [ref=f2e731]: Grimer
+          - listitem [ref=f2e734]:
+            - button "Happiny, costs 2, normal type" [ref=f2e735] [cursor=pointer]:
+              - generic [ref=f2e736]: "2"
+              - generic [ref=f2e737]: Happiny
+          - listitem [ref=f2e740]:
+            - button "Hoothoot, costs 2, normal flying type" [ref=f2e741] [cursor=pointer]:
+              - generic [ref=f2e742]: "2"
+              - generic [ref=f2e743]: Hoothoot
+          - listitem [ref=f2e747]:
+            - button "Hoppip, costs 2, grass flying type" [ref=f2e748] [cursor=pointer]:
+              - generic [ref=f2e749]: "2"
+              - generic [ref=f2e750]: Hoppip
+          - listitem [ref=f2e754]:
+            - button "Illumise, costs 2, bug type" [ref=f2e755] [cursor=pointer]:
+              - generic [ref=f2e756]: "2"
+              - generic [ref=f2e757]: Illumise
+          - listitem [ref=f2e760]:
+            - button "Kecleon, costs 2, normal type" [ref=f2e761] [cursor=pointer]:
+              - generic [ref=f2e762]: "2"
+              - generic [ref=f2e763]: Kecleon
+          - listitem [ref=f2e766]:
+            - button "Koffing, costs 2, poison type" [ref=f2e767] [cursor=pointer]:
+              - generic [ref=f2e768]: "2"
+              - generic [ref=f2e769]: Koffing
+          - listitem [ref=f2e772]:
+            - button "Lechonk, costs 2, normal type" [ref=f2e773] [cursor=pointer]:
+              - generic [ref=f2e774]: "2"
+              - generic [ref=f2e775]: Lechonk
+          - listitem [ref=f2e778]:
+            - button "Litleo, costs 2, fire normal type" [ref=f2e779] [cursor=pointer]:
+              - generic [ref=f2e780]: "2"
+              - generic [ref=f2e781]: Litleo
+          - listitem [ref=f2e785]:
+            - button "Mantyke, costs 2, water flying type" [ref=f2e786] [cursor=pointer]:
+              - generic [ref=f2e787]: "2"
+              - generic [ref=f2e788]: Mantyke
+          - listitem [ref=f2e792]:
+            - button "Maractus, costs 2, grass type" [ref=f2e793] [cursor=pointer]:
+              - generic [ref=f2e794]: "2"
+              - generic [ref=f2e795]: Maractus
+          - listitem [ref=f2e798]:
+            - button "Mareanie, costs 2, poison water type" [ref=f2e799] [cursor=pointer]:
+              - generic [ref=f2e800]: "2"
+              - generic [ref=f2e801]: Mareanie
+          - listitem [ref=f2e805]:
+            - button "Mareep, costs 2, electric type" [ref=f2e806] [cursor=pointer]:
+              - generic [ref=f2e807]: "2"
+              - generic [ref=f2e808]: Mareep
+          - listitem [ref=f2e811]:
+            - button "Mawile, costs 2, steel fairy type" [ref=f2e812] [cursor=pointer]:
+              - generic [ref=f2e813]: "2"
+              - generic [ref=f2e814]: Mawile
+          - listitem [ref=f2e818]:
+            - button "Mime Jr., costs 2, psychic fairy type" [ref=f2e819] [cursor=pointer]:
+              - generic [ref=f2e820]: "2"
+              - generic [ref=f2e821]: Mime Jr.
+          - listitem [ref=f2e825]:
+            - button "Minun, costs 2, electric type" [ref=f2e826] [cursor=pointer]:
+              - generic [ref=f2e827]: "2"
+              - generic [ref=f2e828]: Minun
+          - listitem [ref=f2e831]:
+            - button "Morelull, costs 2, grass fairy type" [ref=f2e832] [cursor=pointer]:
+              - generic [ref=f2e833]: "2"
+              - generic [ref=f2e834]: Morelull
+          - listitem [ref=f2e838]:
+            - button "Munna, costs 2, psychic type" [ref=f2e839] [cursor=pointer]:
+              - generic [ref=f2e840]: "2"
+              - generic [ref=f2e841]: Munna
+          - listitem [ref=f2e844]:
+            - button "Natu, costs 2, psychic flying type" [ref=f2e845] [cursor=pointer]:
+              - generic [ref=f2e846]: "2"
+              - generic [ref=f2e847]: Natu
+          - listitem [ref=f2e851]:
+            - button "Nosepass, costs 2, rock type" [ref=f2e852] [cursor=pointer]:
+              - generic [ref=f2e853]: "2"
+              - generic [ref=f2e854]: Nosepass
+          - listitem [ref=f2e857]:
+            - button "Numel, costs 2, fire ground type" [ref=f2e858] [cursor=pointer]:
+              - generic [ref=f2e859]: "2"
+              - generic [ref=f2e860]: Numel
+          - listitem [ref=f2e864]:
+            - button "Pachirisu, costs 2, electric type" [ref=f2e865] [cursor=pointer]:
+              - generic [ref=f2e866]: "2"
+              - generic [ref=f2e867]: Pachirisu
+          - listitem [ref=f2e870]:
+            - button "Panpour, costs 2, water type" [ref=f2e871] [cursor=pointer]:
+              - generic [ref=f2e872]: "2"
+              - generic [ref=f2e873]: Panpour
+          - listitem [ref=f2e876]:
+            - button "Pansage, costs 2, grass type" [ref=f2e877] [cursor=pointer]:
+              - generic [ref=f2e878]: "2"
+              - generic [ref=f2e879]: Pansage
+          - listitem [ref=f2e882]:
+            - button "Pansear, costs 2, fire type" [ref=f2e883] [cursor=pointer]:
+              - generic [ref=f2e884]: "2"
+              - generic [ref=f2e885]: Pansear
+          - listitem [ref=f2e888]:
+            - button "Paras, costs 2, bug grass type" [ref=f2e889] [cursor=pointer]:
+              - generic [ref=f2e890]: "2"
+              - generic [ref=f2e891]: Paras
+          - listitem [ref=f2e895]:
+            - button "Phantump, costs 2, ghost grass type" [ref=f2e896] [cursor=pointer]:
+              - generic [ref=f2e897]: "2"
+              - generic [ref=f2e898]: Phantump
+          - listitem [ref=f2e902]:
+            - button "Pidgey, costs 2, normal flying type" [ref=f2e903] [cursor=pointer]:
+              - generic [ref=f2e904]: "2"
+              - generic [ref=f2e905]: Pidgey
+          - listitem [ref=f2e909]:
+            - button "Pikipek, costs 2, normal flying type" [ref=f2e910] [cursor=pointer]:
+              - generic [ref=f2e911]: "2"
+              - generic [ref=f2e912]: Pikipek
+          - listitem [ref=f2e916]:
+            - button "Pineco, costs 2, bug type" [ref=f2e917] [cursor=pointer]:
+              - generic [ref=f2e918]: "2"
+              - generic [ref=f2e919]: Pineco
+          - listitem [ref=f2e922]:
+            - button "Plusle, costs 2, electric type" [ref=f2e923] [cursor=pointer]:
+              - generic [ref=f2e924]: "2"
+              - generic [ref=f2e925]: Plusle
+          - listitem [ref=f2e928]:
+            - button "Poliwag, costs 2, water type" [ref=f2e929] [cursor=pointer]:
+              - generic [ref=f2e930]: "2"
+              - generic [ref=f2e931]: Poliwag
+          - listitem [ref=f2e934]:
+            - button "Ponyta, costs 2, fire type" [ref=f2e935] [cursor=pointer]:
+              - generic [ref=f2e936]: "2"
+              - generic [ref=f2e937]: Ponyta
+          - listitem [ref=f2e940]:
+            - button "Poochyena, costs 2, dark type" [ref=f2e941] [cursor=pointer]:
+              - generic [ref=f2e942]: "2"
+              - generic [ref=f2e943]: Poochyena
+          - listitem [ref=f2e946]:
+            - button "Psyduck, costs 2, water type" [ref=f2e947] [cursor=pointer]:
+              - generic [ref=f2e948]: "2"
+              - generic [ref=f2e949]: Psyduck
+          - listitem [ref=f2e952]:
+            - button "Pumpkaboo, costs 2, ghost grass type" [ref=f2e953] [cursor=pointer]:
+              - generic [ref=f2e954]: "2"
+              - generic [ref=f2e955]: Pumpkaboo
+          - listitem [ref=f2e959]:
+            - button "Purrloin, costs 2, dark type" [ref=f2e960] [cursor=pointer]:
+              - generic [ref=f2e961]: "2"
+              - generic [ref=f2e962]: Purrloin
+          - listitem [ref=f2e965]:
+            - button "Pyukumuku, costs 2, water type" [ref=f2e966] [cursor=pointer]:
+              - generic [ref=f2e967]: "2"
+              - generic [ref=f2e968]: Pyukumuku
+          - listitem [ref=f2e971]:
+            - button "Rellor, costs 2, bug type" [ref=f2e972] [cursor=pointer]:
+              - generic [ref=f2e973]: "2"
+              - generic [ref=f2e974]: Rellor
+          - listitem [ref=f2e977]:
+            - button "Remoraid, costs 2, water type" [ref=f2e978] [cursor=pointer]:
+              - generic [ref=f2e979]: "2"
+              - generic [ref=f2e980]: Remoraid
+          - listitem [ref=f2e983]:
+            - button "Sableye, costs 2, dark ghost type" [ref=f2e984] [cursor=pointer]:
+              - generic [ref=f2e985]: "2"
+              - generic [ref=f2e986]: Sableye
+          - listitem [ref=f2e990]:
+            - button "Sandshrew, costs 2, ground type" [ref=f2e991] [cursor=pointer]:
+              - generic [ref=f2e992]: "2"
+              - generic [ref=f2e993]: Sandshrew
+          - listitem [ref=f2e996]:
+            - button "Scatterbug, costs 2, bug type" [ref=f2e997] [cursor=pointer]:
+              - generic [ref=f2e998]: "2"
+              - generic [ref=f2e999]: Scatterbug
+          - listitem [ref=f2e1002]:
+            - button "Seedot, costs 2, grass type" [ref=f2e1003] [cursor=pointer]:
+              - generic [ref=f2e1004]: "2"
+              - generic [ref=f2e1005]: Seedot
+          - listitem [ref=f2e1008]:
+            - button "Sewaddle, costs 2, bug grass type" [ref=f2e1009] [cursor=pointer]:
+              - generic [ref=f2e1010]: "2"
+              - generic [ref=f2e1011]: Sewaddle
+          - listitem [ref=f2e1015]:
+            - button "Shelmet, costs 2, bug type" [ref=f2e1016] [cursor=pointer]:
+              - generic [ref=f2e1017]: "2"
+              - generic [ref=f2e1018]: Shelmet
+          - listitem [ref=f2e1021]:
+            - button "Shieldon, costs 2, rock steel type" [ref=f2e1022] [cursor=pointer]:
+              - generic [ref=f2e1023]: "2"
+              - generic [ref=f2e1024]: Shieldon
+          - listitem [ref=f2e1028]:
+            - button "Shinx, costs 2, electric type" [ref=f2e1029] [cursor=pointer]:
+              - generic [ref=f2e1030]: "2"
+              - generic [ref=f2e1031]: Shinx
+          - listitem [ref=f2e1034]:
+            - button "Shroodle, costs 2, poison normal type" [ref=f2e1035] [cursor=pointer]:
+              - generic [ref=f2e1036]: "2"
+              - generic [ref=f2e1037]: Shroodle
+          - listitem [ref=f2e1041]:
+            - button "Shuppet, costs 2, ghost type" [ref=f2e1042] [cursor=pointer]:
+              - generic [ref=f2e1043]: "2"
+              - generic [ref=f2e1044]: Shuppet
+          - listitem [ref=f2e1047]:
+            - button "Skiddo, costs 2, grass type" [ref=f2e1048] [cursor=pointer]:
+              - generic [ref=f2e1049]: "2"
+              - generic [ref=f2e1050]: Skiddo
+          - listitem [ref=f2e1053]:
+            - button "Skrelp, costs 2, poison water type" [ref=f2e1054] [cursor=pointer]:
+              - generic [ref=f2e1055]: "2"
+              - generic [ref=f2e1056]: Skrelp
+          - listitem [ref=f2e1060]:
+            - button "Skwovet, costs 2, normal type" [ref=f2e1061] [cursor=pointer]:
+              - generic [ref=f2e1062]: "2"
+              - generic [ref=f2e1063]: Skwovet
+          - listitem [ref=f2e1066]:
+            - button "Slugma, costs 2, fire type" [ref=f2e1067] [cursor=pointer]:
+              - generic [ref=f2e1068]: "2"
+              - generic [ref=f2e1069]: Slugma
+          - listitem [ref=f2e1072]:
+            - button "Snorunt, costs 2, ice type" [ref=f2e1073] [cursor=pointer]:
+              - generic [ref=f2e1074]: "2"
+              - generic [ref=f2e1075]: Snorunt
+          - listitem [ref=f2e1078]:
+            - button "Snover, costs 2, grass ice type" [ref=f2e1079] [cursor=pointer]:
+              - generic [ref=f2e1080]: "2"
+              - generic [ref=f2e1081]: Snover
+          - listitem [ref=f2e1085]:
+            - button "Snubbull, costs 2, fairy type" [ref=f2e1086] [cursor=pointer]:
+              - generic [ref=f2e1087]: "2"
+              - generic [ref=f2e1088]: Snubbull
+          - listitem [ref=f2e1091]:
+            - button "Spheal, costs 2, ice water type" [ref=f2e1092] [cursor=pointer]:
+              - generic [ref=f2e1093]: "2"
+              - generic [ref=f2e1094]: Spheal
+          - listitem [ref=f2e1098]:
+            - button "Spoink, costs 2, psychic type" [ref=f2e1099] [cursor=pointer]:
+              - generic [ref=f2e1100]: "2"
+              - generic [ref=f2e1101]: Spoink
+          - listitem [ref=f2e1104]:
+            - button "Spritzee, costs 2, fairy type" [ref=f2e1105] [cursor=pointer]:
+              - generic [ref=f2e1106]: "2"
+              - generic [ref=f2e1107]: Spritzee
+          - listitem [ref=f2e1110]:
+            - button "Squawkabilly, costs 2, normal flying type" [ref=f2e1111] [cursor=pointer]:
+              - generic [ref=f2e1112]: "2"
+              - generic [ref=f2e1113]: Squawkabilly
+          - listitem [ref=f2e1117]:
+            - button "Stunky, costs 2, poison dark type" [ref=f2e1118] [cursor=pointer]:
+              - generic [ref=f2e1119]: "2"
+              - generic [ref=f2e1120]: Stunky
+          - listitem [ref=f2e1124]:
+            - button "Surskit, costs 2, bug water type" [ref=f2e1125] [cursor=pointer]:
+              - generic [ref=f2e1126]: "2"
+              - generic [ref=f2e1127]: Surskit
+          - listitem [ref=f2e1131]:
+            - button "Swablu, costs 2, normal flying type" [ref=f2e1132] [cursor=pointer]:
+              - generic [ref=f2e1133]: "2"
+              - generic [ref=f2e1134]: Swablu
+          - listitem [ref=f2e1138]:
+            - button "Trubbish, costs 2, poison type" [ref=f2e1139] [cursor=pointer]:
+              - generic [ref=f2e1140]: "2"
+              - generic [ref=f2e1141]: Trubbish
+          - listitem [ref=f2e1144]:
+            - button "Tynamo, costs 2, electric type" [ref=f2e1145] [cursor=pointer]:
+              - generic [ref=f2e1146]: "2"
+              - generic [ref=f2e1147]: Tynamo
+          - listitem [ref=f2e1150]:
+            - button "Venonat, costs 2, bug poison type" [ref=f2e1151] [cursor=pointer]:
+              - generic [ref=f2e1152]: "2"
+              - generic [ref=f2e1153]: Venonat
+          - listitem [ref=f2e1157]:
+            - button "Volbeat, costs 2, bug type" [ref=f2e1158] [cursor=pointer]:
+              - generic [ref=f2e1159]: "2"
+              - generic [ref=f2e1160]: Volbeat
+          - listitem [ref=f2e1163]:
+            - button "Voltorb, costs 2, electric type" [ref=f2e1164] [cursor=pointer]:
+              - generic [ref=f2e1165]: "2"
+              - generic [ref=f2e1166]: Voltorb
+          - listitem [ref=f2e1169]:
+            - button "Wailmer, costs 2, water type" [ref=f2e1170] [cursor=pointer]:
+              - generic [ref=f2e1171]: "2"
+              - generic [ref=f2e1172]: Wailmer
+          - listitem [ref=f2e1175]:
+            - button "Whismur, costs 2, normal type" [ref=f2e1176] [cursor=pointer]:
+              - generic [ref=f2e1177]: "2"
+              - generic [ref=f2e1178]: Whismur
+          - listitem [ref=f2e1181]:
+            - button "Wiglett, costs 2, water type" [ref=f2e1182] [cursor=pointer]:
+              - generic [ref=f2e1183]: "2"
+              - generic [ref=f2e1184]: Wiglett
+          - listitem [ref=f2e1187]:
+            - button "Wingull, costs 2, water flying type" [ref=f2e1188] [cursor=pointer]:
+              - generic [ref=f2e1189]: "2"
+              - generic [ref=f2e1190]: Wingull
+          - listitem [ref=f2e1194]:
+            - button "Wishiwashi, costs 2, water type" [ref=f2e1195] [cursor=pointer]:
+              - generic [ref=f2e1196]: "2"
+              - generic [ref=f2e1197]: Wishiwashi
+          - listitem [ref=f2e1200]:
+            - button "Wooloo, costs 2, normal type" [ref=f2e1201] [cursor=pointer]:
+              - generic [ref=f2e1202]: "2"
+              - generic [ref=f2e1203]: Wooloo
+          - listitem [ref=f2e1206]:
+            - button "Wooper, costs 2, water ground type" [ref=f2e1207] [cursor=pointer]:
+              - generic [ref=f2e1208]: "2"
+              - generic [ref=f2e1209]: Wooper
+          - listitem [ref=f2e1213]:
+            - button "Wynaut, costs 2, psychic type" [ref=f2e1214] [cursor=pointer]:
+              - generic [ref=f2e1215]: "2"
+              - generic [ref=f2e1216]: Wynaut
+          - listitem [ref=f2e1219]:
+            - button "Yamper, costs 2, electric type" [ref=f2e1220] [cursor=pointer]:
+              - generic [ref=f2e1221]: "2"
+              - generic [ref=f2e1222]: Yamper
+          - listitem [ref=f2e1225]:
+            - button "Yungoos, costs 2, normal type" [ref=f2e1226] [cursor=pointer]:
+              - generic [ref=f2e1227]: "2"
+              - generic [ref=f2e1228]: Yungoos
+          - listitem [ref=f2e1231]:
+            - button "Zigzagoon, costs 2, normal type" [ref=f2e1232] [cursor=pointer]:
+              - generic [ref=f2e1233]: "2"
+              - generic [ref=f2e1234]: Zigzagoon
+          - listitem [ref=f2e1237]:
+            - button "Alolan Geodude, costs 3, rock electric type" [ref=f2e1238] [cursor=pointer]:
+              - generic [ref=f2e1239]: "3"
+              - generic [ref=f2e1240]: Alolan Geodude
+          - listitem [ref=f2e1244]:
+            - button "Alolan Grimer, costs 3, poison dark type" [ref=f2e1245] [cursor=pointer]:
+              - generic [ref=f2e1246]: "3"
+              - generic [ref=f2e1247]: Alolan Grimer
+          - listitem [ref=f2e1251]:
+            - button "Alolan Meowth, costs 3, dark type" [ref=f2e1252] [cursor=pointer]:
+              - generic [ref=f2e1253]: "3"
+              - generic [ref=f2e1254]: Alolan Meowth
+          - listitem [ref=f2e1257]:
+            - button "Alolan Vulpix, costs 3, ice type" [ref=f2e1258] [cursor=pointer]:
+              - generic [ref=f2e1259]: "3"
+              - generic [ref=f2e1260]: Alolan Vulpix
+          - listitem [ref=f2e1263]:
+            - button "Alomomola, costs 3, water type" [ref=f2e1264] [cursor=pointer]:
+              - generic [ref=f2e1265]: "3"
+              - generic [ref=f2e1266]: Alomomola
+          - listitem [ref=f2e1269]:
+            - button "Anorith, costs 3, rock bug type" [ref=f2e1270] [cursor=pointer]:
+              - generic [ref=f2e1271]: "3"
+              - generic [ref=f2e1272]: Anorith
+          - listitem [ref=f2e1276]:
+            - button "Applin, costs 3, grass dragon type" [ref=f2e1277] [cursor=pointer]:
+              - generic [ref=f2e1278]: "3"
+              - generic [ref=f2e1279]: Applin
+          - listitem [ref=f2e1283]:
+            - button "Archen, costs 3, rock flying type" [ref=f2e1284] [cursor=pointer]:
+              - generic [ref=f2e1285]: "3"
+              - generic [ref=f2e1286]: Archen
+          - listitem [ref=f2e1290]:
+            - button "Aron, costs 3, steel rock type" [ref=f2e1291] [cursor=pointer]:
+              - generic [ref=f2e1292]: "3"
+              - generic [ref=f2e1293]: Aron
+          - listitem [ref=f2e1297]:
+            - button "Arrokuda, costs 3, water type" [ref=f2e1298] [cursor=pointer]:
+              - generic [ref=f2e1299]: "3"
+              - generic [ref=f2e1300]: Arrokuda
+          - listitem [ref=f2e1303]:
+            - button "Audino, costs 3, normal type" [ref=f2e1304] [cursor=pointer]:
+              - generic [ref=f2e1305]: "3"
+              - generic [ref=f2e1306]: Audino
+          - listitem [ref=f2e1309]:
+            - button "Basculin, costs 3, water type" [ref=f2e1310] [cursor=pointer]:
+              - generic [ref=f2e1311]: "3"
+              - generic [ref=f2e1312]: Basculin
+          - listitem [ref=f2e1315]:
+            - button "Bergmite, costs 3, ice type" [ref=f2e1316] [cursor=pointer]:
+              - generic [ref=f2e1317]: "3"
+              - generic [ref=f2e1318]: Bergmite
+          - listitem [ref=f2e1321]:
+            - button "Binacle, costs 3, rock water type" [ref=f2e1322] [cursor=pointer]:
+              - generic [ref=f2e1323]: "3"
+              - generic [ref=f2e1324]: Binacle
+          - listitem [ref=f2e1328]:
+            - button "Bounsweet, costs 3, grass type" [ref=f2e1329] [cursor=pointer]:
+              - generic [ref=f2e1330]: "3"
+              - generic [ref=f2e1331]: Bounsweet
+          - listitem [ref=f2e1334]:
+            - button "Bramblin, costs 3, grass ghost type" [ref=f2e1335] [cursor=pointer]:
+              - generic [ref=f2e1336]: "3"
+              - generic [ref=f2e1337]: Bramblin
+          - listitem [ref=f2e1341]:
+            - button "Bronzor, costs 3, steel psychic type" [ref=f2e1342] [cursor=pointer]:
+              - generic [ref=f2e1343]: "3"
+              - generic [ref=f2e1344]: Bronzor
+          - listitem [ref=f2e1348]:
+            - button "Budew, costs 3, grass poison type" [ref=f2e1349] [cursor=pointer]:
+              - generic [ref=f2e1350]: "3"
+              - generic [ref=f2e1351]: Budew
+          - listitem [ref=f2e1355]:
+            - button "Bulbasaur, costs 3, grass poison type" [ref=f2e1356] [cursor=pointer]:
+              - generic [ref=f2e1357]: "3"
+              - generic [ref=f2e1358]: Bulbasaur
+          - listitem [ref=f2e1362]:
+            - button "Bunnelby, costs 3, normal type" [ref=f2e1363] [cursor=pointer]:
+              - generic [ref=f2e1364]: "3"
+              - generic [ref=f2e1365]: Bunnelby
+          - listitem [ref=f2e1368]:
+            - button "Capsakid, costs 3, grass type" [ref=f2e1369] [cursor=pointer]:
+              - generic [ref=f2e1370]: "3"
+              - generic [ref=f2e1371]: Capsakid
+          - listitem [ref=f2e1374]:
+            - button "Carvanha, costs 3, water dark type" [ref=f2e1375] [cursor=pointer]:
+              - generic [ref=f2e1376]: "3"
+              - generic [ref=f2e1377]: Carvanha
+          - listitem [ref=f2e1381]:
+            - button "Cetoddle, costs 3, ice type" [ref=f2e1382] [cursor=pointer]:
+              - generic [ref=f2e1383]: "3"
+              - generic [ref=f2e1384]: Cetoddle
+          - listitem [ref=f2e1387]:
+            - button "Charmander, costs 3, fire type" [ref=f2e1388] [cursor=pointer]:
+              - generic [ref=f2e1389]: "3"
+              - generic [ref=f2e1390]: Charmander
+          - listitem [ref=f2e1393]:
+            - button "Chespin, costs 3, grass type" [ref=f2e1394] [cursor=pointer]:
+              - generic [ref=f2e1395]: "3"
+              - generic [ref=f2e1396]: Chespin
+          - listitem [ref=f2e1399]:
+            - button "Chewtle, costs 3, water type" [ref=f2e1400] [cursor=pointer]:
+              - generic [ref=f2e1401]: "3"
+              - generic [ref=f2e1402]: Chewtle
+          - listitem [ref=f2e1405]:
+            - button "Chikorita, costs 3, grass type" [ref=f2e1406] [cursor=pointer]:
+              - generic [ref=f2e1407]: "3"
+              - generic [ref=f2e1408]: Chikorita
+          - listitem [ref=f2e1411]:
+            - button "Chimchar, costs 3, fire type" [ref=f2e1412] [cursor=pointer]:
+              - generic [ref=f2e1413]: "3"
+              - generic [ref=f2e1414]: Chimchar
+          - listitem [ref=f2e1417]:
+            - button "Clamperl, costs 3, water type" [ref=f2e1418] [cursor=pointer]:
+              - generic [ref=f2e1419]: "3"
+              - generic [ref=f2e1420]: Clamperl
+          - listitem [ref=f2e1423]:
+            - button "Clauncher, costs 3, water type" [ref=f2e1424] [cursor=pointer]:
+              - generic [ref=f2e1425]: "3"
+              - generic [ref=f2e1426]: Clauncher
+          - listitem [ref=f2e1429]:
+            - button "Corphish, costs 3, water type" [ref=f2e1430] [cursor=pointer]:
+              - generic [ref=f2e1431]: "3"
+              - generic [ref=f2e1432]: Corphish
+          - listitem [ref=f2e1435]:
+            - button "Cottonee, costs 3, grass fairy type" [ref=f2e1436] [cursor=pointer]:
+              - generic [ref=f2e1437]: "3"
+              - generic [ref=f2e1438]: Cottonee
+          - listitem [ref=f2e1442]:
+            - button "Crabrawler, costs 3, fighting type" [ref=f2e1443] [cursor=pointer]:
+              - generic [ref=f2e1444]: "3"
+              - generic [ref=f2e1445]: Crabrawler
+          - listitem [ref=f2e1448]:
+            - button "Cramorant, costs 3, flying water type" [ref=f2e1449] [cursor=pointer]:
+              - generic [ref=f2e1450]: "3"
+              - generic [ref=f2e1451]: Cramorant
+          - listitem [ref=f2e1455]:
+            - button "Cubone, costs 3, ground type" [ref=f2e1456] [cursor=pointer]:
+              - generic [ref=f2e1457]: "3"
+              - generic [ref=f2e1458]: Cubone
+          - listitem [ref=f2e1461]:
+            - button "Cufant, costs 3, steel type" [ref=f2e1462] [cursor=pointer]:
+              - generic [ref=f2e1463]: "3"
+              - generic [ref=f2e1464]: Cufant
+          - listitem [ref=f2e1467]:
+            - button "Cutiefly, costs 3, bug fairy type" [ref=f2e1468] [cursor=pointer]:
+              - generic [ref=f2e1469]: "3"
+              - generic [ref=f2e1470]: Cutiefly
+          - listitem [ref=f2e1474]:
+            - button "Cyndaquil, costs 3, fire type" [ref=f2e1475] [cursor=pointer]:
+              - generic [ref=f2e1476]: "3"
+              - generic [ref=f2e1477]: Cyndaquil
+          - listitem [ref=f2e1480]:
+            - button "Dewpider, costs 3, water bug type" [ref=f2e1481] [cursor=pointer]:
+              - generic [ref=f2e1482]: "3"
+              - generic [ref=f2e1483]: Dewpider
+          - listitem [ref=f2e1487]:
+            - button "Doduo, costs 3, normal flying type" [ref=f2e1488] [cursor=pointer]:
+              - generic [ref=f2e1489]: "3"
+              - generic [ref=f2e1490]: Doduo
+          - listitem [ref=f2e1494]:
+            - button "Dunsparce, costs 3, normal type" [ref=f2e1495] [cursor=pointer]:
+              - generic [ref=f2e1496]: "3"
+              - generic [ref=f2e1497]: Dunsparce
+          - listitem [ref=f2e1500]:
+            - button "Duskull, costs 3, ghost type" [ref=f2e1501] [cursor=pointer]:
+              - generic [ref=f2e1502]: "3"
+              - generic [ref=f2e1503]: Duskull
+          - listitem [ref=f2e1506]:
+            - button "Dwebble, costs 3, bug rock type" [ref=f2e1507] [cursor=pointer]:
+              - generic [ref=f2e1508]: "3"
+              - generic [ref=f2e1509]: Dwebble
+          - listitem [ref=f2e1513]:
+            - button "Eevee, costs 3, normal type" [ref=f2e1514] [cursor=pointer]:
+              - generic [ref=f2e1515]: "3"
+              - generic [ref=f2e1516]: Eevee
+          - listitem [ref=f2e1519]:
+            - button "Eiscue, costs 3, ice type" [ref=f2e1520] [cursor=pointer]:
+              - generic [ref=f2e1521]: "3"
+              - generic [ref=f2e1522]: Eiscue
+          - listitem [ref=f2e1525]:
+            - button "Elekid, costs 3, electric type" [ref=f2e1526] [cursor=pointer]:
+              - generic [ref=f2e1527]: "3"
+              - generic [ref=f2e1528]: Elekid
+          - listitem [ref=f2e1531]:
+            - button "Exeggcute, costs 3, grass psychic type" [ref=f2e1532] [cursor=pointer]:
+              - generic [ref=f2e1533]: "3"
+              - generic [ref=f2e1534]: Exeggcute
+          - listitem [ref=f2e1538]:
+            - button "Fennekin, costs 3, fire type" [ref=f2e1539] [cursor=pointer]:
+              - generic [ref=f2e1540]: "3"
+              - generic [ref=f2e1541]: Fennekin
+          - listitem [ref=f2e1544]:
+            - button "Ferroseed, costs 3, grass steel type" [ref=f2e1545] [cursor=pointer]:
+              - generic [ref=f2e1546]: "3"
+              - generic [ref=f2e1547]: Ferroseed
+          - listitem [ref=f2e1551]:
+            - button "Finizen, costs 3, water type" [ref=f2e1552] [cursor=pointer]:
+              - generic [ref=f2e1553]: "3"
+              - generic [ref=f2e1554]: Finizen
+          - listitem [ref=f2e1557]:
+            - button "Flabébé, costs 3, fairy type" [ref=f2e1558] [cursor=pointer]:
+              - generic [ref=f2e1559]: "3"
+              - generic [ref=f2e1560]: Flabébé
+          - listitem [ref=f2e1563]:
+            - button "Fletchling, costs 3, normal flying type" [ref=f2e1564] [cursor=pointer]:
+              - generic [ref=f2e1565]: "3"
+              - generic [ref=f2e1566]: Fletchling
+          - listitem [ref=f2e1570]:
+            - button "Flittle, costs 3, psychic type" [ref=f2e1571] [cursor=pointer]:
+              - generic [ref=f2e1572]: "3"
+              - generic [ref=f2e1573]: Flittle
+          - listitem [ref=f2e1576]:
+            - button "Foongus, costs 3, grass poison type" [ref=f2e1577] [cursor=pointer]:
+              - generic [ref=f2e1578]: "3"
+              - generic [ref=f2e1579]: Foongus
+          - listitem [ref=f2e1583]:
+            - button "Frillish, costs 3, water ghost type" [ref=f2e1584] [cursor=pointer]:
+              - generic [ref=f2e1585]: "3"
+              - generic [ref=f2e1586]: Frillish
+          - listitem [ref=f2e1590]:
+            - button "Furfrou, costs 3, normal type" [ref=f2e1591] [cursor=pointer]:
+              - generic [ref=f2e1592]: "3"
+              - generic [ref=f2e1593]: Furfrou
+          - listitem [ref=f2e1596]:
+            - button "Galarian Corsola, costs 3, ghost type" [ref=f2e1597] [cursor=pointer]:
+              - generic [ref=f2e1598]: "3"
+              - generic [ref=f2e1599]: Galarian Corsola
+          - listitem [ref=f2e1602]:
+            - button "Galarian Farfetch'd, costs 3, fighting type" [ref=f2e1603] [cursor=pointer]:
+              - generic [ref=f2e1604]: "3"
+              - generic [ref=f2e1605]: Galarian Farfetch'd
+          - listitem [ref=f2e1608]:
+            - button "Galarian Meowth, costs 3, steel type" [ref=f2e1609] [cursor=pointer]:
+              - generic [ref=f2e1610]: "3"
+              - generic [ref=f2e1611]: Galarian Meowth
+          - listitem [ref=f2e1614]:
+            - button "Galarian Slowpoke, costs 3, psychic type" [ref=f2e1615] [cursor=pointer]:
+              - generic [ref=f2e1616]: "3"
+              - generic [ref=f2e1617]: Galarian Slowpoke
+          - listitem [ref=f2e1620]:
+            - button "Galarian Yamask, costs 3, ground ghost type" [ref=f2e1621] [cursor=pointer]:
+              - generic [ref=f2e1622]: "3"
+              - generic [ref=f2e1623]: Galarian Yamask
+          - listitem [ref=f2e1627]:
+            - button "Galarian Zigzagoon, costs 3, dark normal type" [ref=f2e1628] [cursor=pointer]:
+              - generic [ref=f2e1629]: "3"
+              - generic [ref=f2e1630]: Galarian Zigzagoon
+          - listitem [ref=f2e1634]:
+            - button "Geodude, costs 3, rock ground type" [ref=f2e1635] [cursor=pointer]:
+              - generic [ref=f2e1636]: "3"
+              - generic [ref=f2e1637]: Geodude
+          - listitem [ref=f2e1641]:
+            - button "Girafarig, costs 3, normal psychic type" [ref=f2e1642] [cursor=pointer]:
+              - generic [ref=f2e1643]: "3"
+              - generic [ref=f2e1644]: Girafarig
+          - listitem [ref=f2e1648]:
+            - button "Golett, costs 3, ground ghost type" [ref=f2e1649] [cursor=pointer]:
+              - generic [ref=f2e1650]: "3"
+              - generic [ref=f2e1651]: Golett
+          - listitem [ref=f2e1655]:
+            - button "Gothita, costs 3, psychic type" [ref=f2e1656] [cursor=pointer]:
+              - generic [ref=f2e1657]: "3"
+              - generic [ref=f2e1658]: Gothita
+          - listitem [ref=f2e1661]:
+            - button "Greavard, costs 3, ghost type" [ref=f2e1662] [cursor=pointer]:
+              - generic [ref=f2e1663]: "3"
+              - generic [ref=f2e1664]: Greavard
+          - listitem [ref=f2e1667]:
+            - button "Grookey, costs 3, grass type" [ref=f2e1668] [cursor=pointer]:
+              - generic [ref=f2e1669]: "3"
+              - generic [ref=f2e1670]: Grookey
+          - listitem [ref=f2e1673]:
+            - button "Growlithe, costs 3, fire type" [ref=f2e1674] [cursor=pointer]:
+              - generic [ref=f2e1675]: "3"
+              - generic [ref=f2e1676]: Growlithe
+          - listitem [ref=f2e1679]:
+            - button "Grubbin, costs 3, bug type" [ref=f2e1680] [cursor=pointer]:
+              - generic [ref=f2e1681]: "3"
+              - generic [ref=f2e1682]: Grubbin
+          - listitem [ref=f2e1685]:
+            - button "Hatenna, costs 3, psychic type" [ref=f2e1686] [cursor=pointer]:
+              - generic [ref=f2e1687]: "3"
+              - generic [ref=f2e1688]: Hatenna
+          - listitem [ref=f2e1691]:
+            - button "Heatmor, costs 3, fire type" [ref=f2e1692] [cursor=pointer]:
+              - generic [ref=f2e1693]: "3"
+              - generic [ref=f2e1694]: Heatmor
+          - listitem [ref=f2e1697]:
+            - button "Helioptile, costs 3, electric normal type" [ref=f2e1698] [cursor=pointer]:
+              - generic [ref=f2e1699]: "3"
+              - generic [ref=f2e1700]: Helioptile
+          - listitem [ref=f2e1704]:
+            - button "Hippopotas, costs 3, ground type" [ref=f2e1705] [cursor=pointer]:
+              - generic [ref=f2e1706]: "3"
+              - generic [ref=f2e1707]: Hippopotas
+          - listitem [ref=f2e1710]:
+            - button "Hisuian Voltorb, costs 3, electric grass type" [ref=f2e1711] [cursor=pointer]:
+              - generic [ref=f2e1712]: "3"
+              - generic [ref=f2e1713]: Hisuian Voltorb
+          - listitem [ref=f2e1717]:
+            - button "Hisuian Zorua, costs 3, normal ghost type" [ref=f2e1718] [cursor=pointer]:
+              - generic [ref=f2e1719]: "3"
+              - generic [ref=f2e1720]: Hisuian Zorua
+          - listitem [ref=f2e1724]:
+            - button "Horsea, costs 3, water type" [ref=f2e1725] [cursor=pointer]:
+              - generic [ref=f2e1726]: "3"
+              - generic [ref=f2e1727]: Horsea
+          - listitem [ref=f2e1730]:
+            - button "Houndour, costs 3, dark fire type" [ref=f2e1731] [cursor=pointer]:
+              - generic [ref=f2e1732]: "3"
+              - generic [ref=f2e1733]: Houndour
+          - listitem [ref=f2e1737]:
+            - button "Impidimp, costs 3, dark fairy type" [ref=f2e1738] [cursor=pointer]:
+              - generic [ref=f2e1739]: "3"
+              - generic [ref=f2e1740]: Impidimp
+          - listitem [ref=f2e1744]:
+            - button "Inkay, costs 3, dark psychic type" [ref=f2e1745] [cursor=pointer]:
+              - generic [ref=f2e1746]: "3"
+              - generic [ref=f2e1747]: Inkay
+          - listitem [ref=f2e1751]:
+            - button "Joltik, costs 3, bug electric type" [ref=f2e1752] [cursor=pointer]:
+              - generic [ref=f2e1753]: "3"
+              - generic [ref=f2e1754]: Joltik
+          - listitem [ref=f2e1758]:
+            - button "Kabuto, costs 3, rock water type" [ref=f2e1759] [cursor=pointer]:
+              - generic [ref=f2e1760]: "3"
+              - generic [ref=f2e1761]: Kabuto
+          - listitem [ref=f2e1765]:
+            - button "Karrablast, costs 3, bug type" [ref=f2e1766] [cursor=pointer]:
+              - generic [ref=f2e1767]: "3"
+              - generic [ref=f2e1768]: Karrablast
+          - listitem [ref=f2e1771]:
+            - button "Klawf, costs 3, rock type" [ref=f2e1772] [cursor=pointer]:
+              - generic [ref=f2e1773]: "3"
+              - generic [ref=f2e1774]: Klawf
+          - listitem [ref=f2e1777]:
+            - button "Klefki, costs 3, steel fairy type" [ref=f2e1778] [cursor=pointer]:
+              - generic [ref=f2e1779]: "3"
+              - generic [ref=f2e1780]: Klefki
+          - listitem [ref=f2e1784]:
+            - button "Klink, costs 3, steel type" [ref=f2e1785] [cursor=pointer]:
+              - generic [ref=f2e1786]: "3"
+              - generic [ref=f2e1787]: Klink
+          - listitem [ref=f2e1790]:
+            - button "Komala, costs 3, normal type" [ref=f2e1791] [cursor=pointer]:
+              - generic [ref=f2e1792]: "3"
+              - generic [ref=f2e1793]: Komala
+          - listitem [ref=f2e1796]:
+            - button "Krabby, costs 3, water type" [ref=f2e1797] [cursor=pointer]:
+              - generic [ref=f2e1798]: "3"
+              - generic [ref=f2e1799]: Krabby
+          - listitem [ref=f2e1802]:
+            - button "Lickitung, costs 3, normal type" [ref=f2e1803] [cursor=pointer]:
+              - generic [ref=f2e1804]: "3"
+              - generic [ref=f2e1805]: Lickitung
+          - listitem [ref=f2e1808]:
+            - button "Lileep, costs 3, rock grass type" [ref=f2e1809] [cursor=pointer]:
+              - generic [ref=f2e1810]: "3"
+              - generic [ref=f2e1811]: Lileep
+          - listitem [ref=f2e1815]:
+            - button "Lillipup, costs 3, normal type" [ref=f2e1816] [cursor=pointer]:
+              - generic [ref=f2e1817]: "3"
+              - generic [ref=f2e1818]: Lillipup
+          - listitem [ref=f2e1821]:
+            - button "Litten, costs 3, fire type" [ref=f2e1822] [cursor=pointer]:
+              - generic [ref=f2e1823]: "3"
+              - generic [ref=f2e1824]: Litten
+          - listitem [ref=f2e1827]:
+            - button "Litwick, costs 3, ghost fire type" [ref=f2e1828] [cursor=pointer]:
+              - generic [ref=f2e1829]: "3"
+              - generic [ref=f2e1830]: Litwick
+          - listitem [ref=f2e1834]:
+            - button "Lotad, costs 3, water grass type" [ref=f2e1835] [cursor=pointer]:
+              - generic [ref=f2e1836]: "3"
+              - generic [ref=f2e1837]: Lotad
+          - listitem [ref=f2e1841]:
+            - button "Lunatone, costs 3, rock psychic type" [ref=f2e1842] [cursor=pointer]:
+              - generic [ref=f2e1843]: "3"
+              - generic [ref=f2e1844]: Lunatone
+          - listitem [ref=f2e1848]:
+            - button "Machop, costs 3, fighting type" [ref=f2e1849] [cursor=pointer]:
+              - generic [ref=f2e1850]: "3"
+              - generic [ref=f2e1851]: Machop
+          - listitem [ref=f2e1854]:
+            - button "Magby, costs 3, fire type" [ref=f2e1855] [cursor=pointer]:
+              - generic [ref=f2e1856]: "3"
+              - generic [ref=f2e1857]: Magby
+          - listitem [ref=f2e1860]:
+            - button "Makuhita, costs 3, fighting type" [ref=f2e1861] [cursor=pointer]:
+              - generic [ref=f2e1862]: "3"
+              - generic [ref=f2e1863]: Makuhita
+          - listitem [ref=f2e1866]:
+            - button "Maschiff, costs 3, dark type" [ref=f2e1867] [cursor=pointer]:
+              - generic [ref=f2e1868]: "3"
+              - generic [ref=f2e1869]: Maschiff
+          - listitem [ref=f2e1872]:
+            - button "Meditite, costs 3, fighting psychic type" [ref=f2e1873] [cursor=pointer]:
+              - generic [ref=f2e1874]: "3"
+              - generic [ref=f2e1875]: Meditite
+          - listitem [ref=f2e1879]:
+            - button "Meowth, costs 3, normal type" [ref=f2e1880] [cursor=pointer]:
+              - generic [ref=f2e1881]: "3"
+              - generic [ref=f2e1882]: Meowth
+          - listitem [ref=f2e1885]:
+            - button "Mienfoo, costs 3, fighting type" [ref=f2e1886] [cursor=pointer]:
+              - generic [ref=f2e1887]: "3"
+              - generic [ref=f2e1888]: Mienfoo
+          - listitem [ref=f2e1891]:
+            - button "Milcery, costs 3, fairy type" [ref=f2e1892] [cursor=pointer]:
+              - generic [ref=f2e1893]: "3"
+              - generic [ref=f2e1894]: Milcery
+          - listitem [ref=f2e1897]:
+            - button "Minccino, costs 3, normal type" [ref=f2e1898] [cursor=pointer]:
+              - generic [ref=f2e1899]: "3"
+              - generic [ref=f2e1900]: Minccino
+          - listitem [ref=f2e1903]:
+            - button "Misdreavus, costs 3, ghost type" [ref=f2e1904] [cursor=pointer]:
+              - generic [ref=f2e1905]: "3"
+              - generic [ref=f2e1906]: Misdreavus
+          - listitem [ref=f2e1909]:
+            - button "Morpeko, costs 3, electric dark type" [ref=f2e1910] [cursor=pointer]:
+              - generic [ref=f2e1911]: "3"
+              - generic [ref=f2e1912]: Morpeko
+          - listitem [ref=f2e1916]:
+            - button "Mudbray, costs 3, ground type" [ref=f2e1917] [cursor=pointer]:
+              - generic [ref=f2e1918]: "3"
+              - generic [ref=f2e1919]: Mudbray
+          - listitem [ref=f2e1922]:
+            - button "Mudkip, costs 3, water type" [ref=f2e1923] [cursor=pointer]:
+              - generic [ref=f2e1924]: "3"
+              - generic [ref=f2e1925]: Mudkip
+          - listitem [ref=f2e1928]:
+            - button "Murkrow, costs 3, dark flying type" [ref=f2e1929] [cursor=pointer]:
+              - generic [ref=f2e1930]: "3"
+              - generic [ref=f2e1931]: Murkrow
+          - listitem [ref=f2e1935]:
+            - button "Nidoran (female), costs 3, poison type" [ref=f2e1936] [cursor=pointer]:
+              - generic [ref=f2e1937]: "3"
+              - generic [ref=f2e1938]: Nidoran (female)
+          - listitem [ref=f2e1941]:
+            - button "Nidoran (male), costs 3, poison type" [ref=f2e1942] [cursor=pointer]:
+              - generic [ref=f2e1943]: "3"
+              - generic [ref=f2e1944]: Nidoran (male)
+          - listitem [ref=f2e1947]:
+            - button "Noibat, costs 3, flying dragon type" [ref=f2e1948] [cursor=pointer]:
+              - generic [ref=f2e1949]: "3"
+              - generic [ref=f2e1950]: Noibat
+          - listitem [ref=f2e1954]:
+            - button "Nymble, costs 3, bug type" [ref=f2e1955] [cursor=pointer]:
+              - generic [ref=f2e1956]: "3"
+              - generic [ref=f2e1957]: Nymble
+          - listitem [ref=f2e1960]:
+            - button "Oddish, costs 3, grass poison type" [ref=f2e1961] [cursor=pointer]:
+              - generic [ref=f2e1962]: "3"
+              - generic [ref=f2e1963]: Oddish
+          - listitem [ref=f2e1967]:
+            - button "Omanyte, costs 3, rock water type" [ref=f2e1968] [cursor=pointer]:
+              - generic [ref=f2e1969]: "3"
+              - generic [ref=f2e1970]: Omanyte
+          - listitem [ref=f2e1974]:
+            - button "Onix, costs 3, rock ground type" [ref=f2e1975] [cursor=pointer]:
+              - generic [ref=f2e1976]: "3"
+              - generic [ref=f2e1977]: Onix
+          - listitem [ref=f2e1981]:
+            - button "Oricorio, costs 3, fire flying type" [ref=f2e1982] [cursor=pointer]:
+              - generic [ref=f2e1983]: "3"
+              - generic [ref=f2e1984]: Oricorio
+          - listitem [ref=f2e1988]:
+            - button "Oshawott, costs 3, water type" [ref=f2e1989] [cursor=pointer]:
+              - generic [ref=f2e1990]: "3"
+              - generic [ref=f2e1991]: Oshawott
+          - listitem [ref=f2e1994]:
+            - button "Paldean Wooper, costs 3, poison ground type" [ref=f2e1995] [cursor=pointer]:
+              - generic [ref=f2e1996]: "3"
+              - generic [ref=f2e1997]: Paldean Wooper
+          - listitem [ref=f2e2001]:
+            - button "Pancham, costs 3, fighting type" [ref=f2e2002] [cursor=pointer]:
+              - generic [ref=f2e2003]: "3"
+              - generic [ref=f2e2004]: Pancham
+          - listitem [ref=f2e2007]:
+            - button "Pawmi, costs 3, electric type" [ref=f2e2008] [cursor=pointer]:
+              - generic [ref=f2e2009]: "3"
+              - generic [ref=f2e2010]: Pawmi
+          - listitem [ref=f2e2013]:
+            - button "Petilil, costs 3, grass type" [ref=f2e2014] [cursor=pointer]:
+              - generic [ref=f2e2015]: "3"
+              - generic [ref=f2e2016]: Petilil
+          - listitem [ref=f2e2019]:
+            - button "Phanpy, costs 3, ground type" [ref=f2e2020] [cursor=pointer]:
+              - generic [ref=f2e2021]: "3"
+              - generic [ref=f2e2022]: Phanpy
+          - listitem [ref=f2e2025]:
+            - button "Pincurchin, costs 3, electric type" [ref=f2e2026] [cursor=pointer]:
+              - generic [ref=f2e2027]: "3"
+              - generic [ref=f2e2028]: Pincurchin
+          - listitem [ref=f2e2031]:
+            - button "Piplup, costs 3, water type" [ref=f2e2032] [cursor=pointer]:
+              - generic [ref=f2e2033]: "3"
+              - generic [ref=f2e2034]: Piplup
+          - listitem [ref=f2e2037]:
+            - button "Qwilfish, costs 3, water poison type" [ref=f2e2038] [cursor=pointer]:
+              - generic [ref=f2e2039]: "3"
+              - generic [ref=f2e2040]: Qwilfish
+          - listitem [ref=f2e2044]:
+            - button "Relicanth, costs 3, water rock type" [ref=f2e2045] [cursor=pointer]:
+              - generic [ref=f2e2046]: "3"
+              - generic [ref=f2e2047]: Relicanth
+          - listitem [ref=f2e2051]:
+            - button "Riolu, costs 3, fighting type" [ref=f2e2052] [cursor=pointer]:
+              - generic [ref=f2e2053]: "3"
+              - generic [ref=f2e2054]: Riolu
+          - listitem [ref=f2e2057]:
+            - button "Rockruff, costs 3, rock type" [ref=f2e2058] [cursor=pointer]:
+              - generic [ref=f2e2059]: "3"
+              - generic [ref=f2e2060]: Rockruff
+          - listitem [ref=f2e2063]:
+            - button "Roggenrola, costs 3, rock type" [ref=f2e2064] [cursor=pointer]:
+              - generic [ref=f2e2065]: "3"
+              - generic [ref=f2e2066]: Roggenrola
+          - listitem [ref=f2e2069]:
+            - button "Rolycoly, costs 3, rock type" [ref=f2e2070] [cursor=pointer]:
+              - generic [ref=f2e2071]: "3"
+              - generic [ref=f2e2072]: Rolycoly
+          - listitem [ref=f2e2075]:
+            - button "Rookidee, costs 3, flying type" [ref=f2e2076] [cursor=pointer]:
+              - generic [ref=f2e2077]: "3"
+              - generic [ref=f2e2078]: Rookidee
+          - listitem [ref=f2e2081]:
+            - button "Rowlet, costs 3, grass flying type" [ref=f2e2082] [cursor=pointer]:
+              - generic [ref=f2e2083]: "3"
+              - generic [ref=f2e2084]: Rowlet
+          - listitem [ref=f2e2088]:
+            - button "Rufflet, costs 3, normal flying type" [ref=f2e2089] [cursor=pointer]:
+              - generic [ref=f2e2090]: "3"
+              - generic [ref=f2e2091]: Rufflet
+          - listitem [ref=f2e2095]:
+            - button "Salandit, costs 3, poison fire type" [ref=f2e2096] [cursor=pointer]:
+              - generic [ref=f2e2097]: "3"
+              - generic [ref=f2e2098]: Salandit
+          - listitem [ref=f2e2102]:
+            - button "Sandygast, costs 3, ghost ground type" [ref=f2e2103] [cursor=pointer]:
+              - generic [ref=f2e2104]: "3"
+              - generic [ref=f2e2105]: Sandygast
+          - listitem [ref=f2e2109]:
+            - button "Scraggy, costs 3, dark fighting type" [ref=f2e2110] [cursor=pointer]:
+              - generic [ref=f2e2111]: "3"
+              - generic [ref=f2e2112]: Scraggy
+          - listitem [ref=f2e2116]:
+            - button "Seviper, costs 3, poison type" [ref=f2e2117] [cursor=pointer]:
+              - generic [ref=f2e2118]: "3"
+              - generic [ref=f2e2119]: Seviper
+          - listitem [ref=f2e2122]:
+            - button "Shellos, costs 3, water type" [ref=f2e2123] [cursor=pointer]:
+              - generic [ref=f2e2124]: "3"
+              - generic [ref=f2e2125]: Shellos
+          - listitem [ref=f2e2128]:
+            - button "Shroomish, costs 3, grass type" [ref=f2e2129] [cursor=pointer]:
+              - generic [ref=f2e2130]: "3"
+              - generic [ref=f2e2131]: Shroomish
+          - listitem [ref=f2e2134]:
+            - button "Shuckle, costs 3, bug rock type" [ref=f2e2135] [cursor=pointer]:
+              - generic [ref=f2e2136]: "3"
+              - generic [ref=f2e2137]: Shuckle
+          - listitem [ref=f2e2141]:
+            - button "Silicobra, costs 3, ground type" [ref=f2e2142] [cursor=pointer]:
+              - generic [ref=f2e2143]: "3"
+              - generic [ref=f2e2144]: Silicobra
+          - listitem [ref=f2e2147]:
+            - button "Sinistea, costs 3, ghost type" [ref=f2e2148] [cursor=pointer]:
+              - generic [ref=f2e2149]: "3"
+              - generic [ref=f2e2150]: Sinistea
+          - listitem [ref=f2e2153]:
+            - button "Sizzlipede, costs 3, fire bug type" [ref=f2e2154] [cursor=pointer]:
+              - generic [ref=f2e2155]: "3"
+              - generic [ref=f2e2156]: Sizzlipede
+          - listitem [ref=f2e2160]:
+            - button "Skorupi, costs 3, poison bug type" [ref=f2e2161] [cursor=pointer]:
+              - generic [ref=f2e2162]: "3"
+              - generic [ref=f2e2163]: Skorupi
+          - listitem [ref=f2e2167]:
+            - button "Slowpoke, costs 3, water psychic type" [ref=f2e2168] [cursor=pointer]:
+              - generic [ref=f2e2169]: "3"
+              - generic [ref=f2e2170]: Slowpoke
+          - listitem [ref=f2e2174]:
+            - button "Smoliv, costs 3, grass normal type" [ref=f2e2175] [cursor=pointer]:
+              - generic [ref=f2e2176]: "3"
+              - generic [ref=f2e2177]: Smoliv
+          - listitem [ref=f2e2181]:
+            - button "Smoochum, costs 3, ice psychic type" [ref=f2e2182] [cursor=pointer]:
+              - generic [ref=f2e2183]: "3"
+              - generic [ref=f2e2184]: Smoochum
+          - listitem [ref=f2e2188]:
+            - button "Snivy, costs 3, grass type" [ref=f2e2189] [cursor=pointer]:
+              - generic [ref=f2e2190]: "3"
+              - generic [ref=f2e2191]: Snivy
+          - listitem [ref=f2e2194]:
+            - button "Snom, costs 3, ice bug type" [ref=f2e2195] [cursor=pointer]:
+              - generic [ref=f2e2196]: "3"
+              - generic [ref=f2e2197]: Snom
+          - listitem [ref=f2e2201]:
+            - button "Sobble, costs 3, water type" [ref=f2e2202] [cursor=pointer]:
+              - generic [ref=f2e2203]: "3"
+              - generic [ref=f2e2204]: Sobble
+          - listitem [ref=f2e2207]:
+            - button "Solosis, costs 3, psychic type" [ref=f2e2208] [cursor=pointer]:
+              - generic [ref=f2e2209]: "3"
+              - generic [ref=f2e2210]: Solosis
+          - listitem [ref=f2e2213]:
+            - button "Solrock, costs 3, rock psychic type" [ref=f2e2214] [cursor=pointer]:
+              - generic [ref=f2e2215]: "3"
+              - generic [ref=f2e2216]: Solrock
+          - listitem [ref=f2e2220]:
+            - button "Squirtle, costs 3, water type" [ref=f2e2221] [cursor=pointer]:
+              - generic [ref=f2e2222]: "3"
+              - generic [ref=f2e2223]: Squirtle
+          - listitem [ref=f2e2226]:
+            - button "Stantler, costs 3, normal type" [ref=f2e2227] [cursor=pointer]:
+              - generic [ref=f2e2228]: "3"
+              - generic [ref=f2e2229]: Stantler
+          - listitem [ref=f2e2232]:
+            - button "Starly, costs 3, normal flying type" [ref=f2e2233] [cursor=pointer]:
+              - generic [ref=f2e2234]: "3"
+              - generic [ref=f2e2235]: Starly
+          - listitem [ref=f2e2239]:
+            - button "Staryu, costs 3, water type" [ref=f2e2240] [cursor=pointer]:
+              - generic [ref=f2e2241]: "3"
+              - generic [ref=f2e2242]: Staryu
+          - listitem [ref=f2e2245]:
+            - button "Stonjourner, costs 3, rock type" [ref=f2e2246] [cursor=pointer]:
+              - generic [ref=f2e2247]: "3"
+              - generic [ref=f2e2248]: Stonjourner
+          - listitem [ref=f2e2251]:
+            - button "Stufful, costs 3, normal fighting type" [ref=f2e2252] [cursor=pointer]:
+              - generic [ref=f2e2253]: "3"
+              - generic [ref=f2e2254]: Stufful
+          - listitem [ref=f2e2258]:
+            - button "Stunfisk, costs 3, ground electric type" [ref=f2e2259] [cursor=pointer]:
+              - generic [ref=f2e2260]: "3"
+              - generic [ref=f2e2261]: Stunfisk
+          - listitem [ref=f2e2265]:
+            - button "Swinub, costs 3, ice ground type" [ref=f2e2266] [cursor=pointer]:
+              - generic [ref=f2e2267]: "3"
+              - generic [ref=f2e2268]: Swinub
+          - listitem [ref=f2e2272]:
+            - button "Swirlix, costs 3, fairy type" [ref=f2e2273] [cursor=pointer]:
+              - generic [ref=f2e2274]: "3"
+              - generic [ref=f2e2275]: Swirlix
+          - listitem [ref=f2e2278]:
+            - button "Tadbulb, costs 3, electric type" [ref=f2e2279] [cursor=pointer]:
+              - generic [ref=f2e2280]: "3"
+              - generic [ref=f2e2281]: Tadbulb
+          - listitem [ref=f2e2284]:
+            - button "Taillow, costs 3, normal flying type" [ref=f2e2285] [cursor=pointer]:
+              - generic [ref=f2e2286]: "3"
+              - generic [ref=f2e2287]: Taillow
+          - listitem [ref=f2e2291]:
+            - button "Tangela, costs 3, grass type" [ref=f2e2292] [cursor=pointer]:
+              - generic [ref=f2e2293]: "3"
+              - generic [ref=f2e2294]: Tangela
+          - listitem [ref=f2e2297]:
+            - button "Tentacool, costs 3, water poison type" [ref=f2e2298] [cursor=pointer]:
+              - generic [ref=f2e2299]: "3"
+              - generic [ref=f2e2300]: Tentacool
+          - listitem [ref=f2e2304]:
+            - button "Tepig, costs 3, fire type" [ref=f2e2305] [cursor=pointer]:
+              - generic [ref=f2e2306]: "3"
+              - generic [ref=f2e2307]: Tepig
+          - listitem [ref=f2e2310]:
+            - button "Tirtouga, costs 3, water rock type" [ref=f2e2311] [cursor=pointer]:
+              - generic [ref=f2e2312]: "3"
+              - generic [ref=f2e2313]: Tirtouga
+          - listitem [ref=f2e2317]:
+            - button "Toedscool, costs 3, ground grass type" [ref=f2e2318] [cursor=pointer]:
+              - generic [ref=f2e2319]: "3"
+              - generic [ref=f2e2320]: Toedscool
+          - listitem [ref=f2e2324]:
+            - button "Togedemaru, costs 3, electric steel type" [ref=f2e2325] [cursor=pointer]:
+              - generic [ref=f2e2326]: "3"
+              - generic [ref=f2e2327]: Togedemaru
+          - listitem [ref=f2e2331]:
+            - button "Togepi, costs 3, fairy type" [ref=f2e2332] [cursor=pointer]:
+              - generic [ref=f2e2333]: "3"
+              - generic [ref=f2e2334]: Togepi
+          - listitem [ref=f2e2337]:
+            - button "Torkoal, costs 3, fire type" [ref=f2e2338] [cursor=pointer]:
+              - generic [ref=f2e2339]: "3"
+              - generic [ref=f2e2340]: Torkoal
+          - listitem [ref=f2e2343]:
+            - button "Totodile, costs 3, water type" [ref=f2e2344] [cursor=pointer]:
+              - generic [ref=f2e2345]: "3"
+              - generic [ref=f2e2346]: Totodile
+          - listitem [ref=f2e2349]:
+            - button "Toxel, costs 3, electric poison type" [ref=f2e2350] [cursor=pointer]:
+              - generic [ref=f2e2351]: "3"
+              - generic [ref=f2e2352]: Toxel
+          - listitem [ref=f2e2356]:
+            - button "Trapinch, costs 3, ground type" [ref=f2e2357] [cursor=pointer]:
+              - generic [ref=f2e2358]: "3"
+              - generic [ref=f2e2359]: Trapinch
+          - listitem [ref=f2e2362]:
+            - button "Treecko, costs 3, grass type" [ref=f2e2363] [cursor=pointer]:
+              - generic [ref=f2e2364]: "3"
+              - generic [ref=f2e2365]: Treecko
+          - listitem [ref=f2e2368]:
+            - button "Tropius, costs 3, grass flying type" [ref=f2e2369] [cursor=pointer]:
+              - generic [ref=f2e2370]: "3"
+              - generic [ref=f2e2371]: Tropius
+          - listitem [ref=f2e2375]:
+            - button "Turtwig, costs 3, grass type" [ref=f2e2376] [cursor=pointer]:
+              - generic [ref=f2e2377]: "3"
+              - generic [ref=f2e2378]: Turtwig
+          - listitem [ref=f2e2381]:
+            - button "Tympole, costs 3, water type" [ref=f2e2382] [cursor=pointer]:
+              - generic [ref=f2e2383]: "3"
+              - generic [ref=f2e2384]: Tympole
+          - listitem [ref=f2e2387]:
+            - button "Tyrogue, costs 3, fighting type" [ref=f2e2388] [cursor=pointer]:
+              - generic [ref=f2e2389]: "3"
+              - generic [ref=f2e2390]: Tyrogue
+          - listitem [ref=f2e2393]:
+            - button "Tyrunt, costs 3, rock dragon type" [ref=f2e2394] [cursor=pointer]:
+              - generic [ref=f2e2395]: "3"
+              - generic [ref=f2e2396]: Tyrunt
+          - listitem [ref=f2e2400]:
+            - button "Vanillite, costs 3, ice type" [ref=f2e2401] [cursor=pointer]:
+              - generic [ref=f2e2402]: "3"
+              - generic [ref=f2e2403]: Vanillite
+          - listitem [ref=f2e2406]:
+            - button "Venipede, costs 3, bug poison type" [ref=f2e2407] [cursor=pointer]:
+              - generic [ref=f2e2408]: "3"
+              - generic [ref=f2e2409]: Venipede
+          - listitem [ref=f2e2413]:
+            - button "Vullaby, costs 3, dark flying type" [ref=f2e2414] [cursor=pointer]:
+              - generic [ref=f2e2415]: "3"
+              - generic [ref=f2e2416]: Vullaby
+          - listitem [ref=f2e2420]:
+            - button "Vulpix, costs 3, fire type" [ref=f2e2421] [cursor=pointer]:
+              - generic [ref=f2e2422]: "3"
+              - generic [ref=f2e2423]: Vulpix
+          - listitem [ref=f2e2426]:
+            - button "Wattrel, costs 3, electric flying type" [ref=f2e2427] [cursor=pointer]:
+              - generic [ref=f2e2428]: "3"
+              - generic [ref=f2e2429]: Wattrel
+          - listitem [ref=f2e2433]:
+            - button "Wimpod, costs 3, bug water type" [ref=f2e2434] [cursor=pointer]:
+              - generic [ref=f2e2435]: "3"
+              - generic [ref=f2e2436]: Wimpod
+          - listitem [ref=f2e2440]:
+            - button "Woobat, costs 3, psychic flying type" [ref=f2e2441] [cursor=pointer]:
+              - generic [ref=f2e2442]: "3"
+              - generic [ref=f2e2443]: Woobat
+          - listitem [ref=f2e2447]:
+            - button "Yamask, costs 3, ghost type" [ref=f2e2448] [cursor=pointer]:
+              - generic [ref=f2e2449]: "3"
+              - generic [ref=f2e2450]: Yamask
+          - listitem [ref=f2e2453]:
+            - button "Yanma, costs 3, bug flying type" [ref=f2e2454] [cursor=pointer]:
+              - generic [ref=f2e2455]: "3"
+              - generic [ref=f2e2456]: Yanma
+          - listitem [ref=f2e2460]:
+            - button "Zorua, costs 3, dark type" [ref=f2e2461] [cursor=pointer]:
+              - generic [ref=f2e2462]: "3"
+              - generic [ref=f2e2463]: Zorua
+          - listitem [ref=f2e2466]:
+            - button "Zubat, costs 3, poison flying type" [ref=f2e2467] [cursor=pointer]:
+              - generic [ref=f2e2468]: "3"
+              - generic [ref=f2e2469]: Zubat
+          - listitem [ref=f2e2473]:
+            - button "Abra, costs 4, psychic type" [ref=f2e2474] [cursor=pointer]:
+              - generic [ref=f2e2475]: "4"
+              - generic [ref=f2e2476]: Abra
+          - listitem [ref=f2e2479]:
+            - button "Absol, costs 4, dark type" [ref=f2e2480] [cursor=pointer]:
+              - generic [ref=f2e2481]: "4"
+              - generic [ref=f2e2482]: Absol
+          - listitem [ref=f2e2485]:
+            - button "Arctovish, costs 4, water ice type" [ref=f2e2486] [cursor=pointer]:
+              - generic [ref=f2e2487]: "4"
+              - generic [ref=f2e2488]: Arctovish
+          - listitem [ref=f2e2492]:
+            - button "Arctozolt, costs 4, electric ice type" [ref=f2e2493] [cursor=pointer]:
+              - generic [ref=f2e2494]: "4"
+              - generic [ref=f2e2495]: Arctozolt
+          - listitem [ref=f2e2499]:
+            - button "Axew, costs 4, dragon type" [ref=f2e2500] [cursor=pointer]:
+              - generic [ref=f2e2501]: "4"
+              - generic [ref=f2e2502]: Axew
+          - listitem [ref=f2e2505]:
+            - button "Azurill, costs 4, normal fairy type" [ref=f2e2506] [cursor=pointer]:
+              - generic [ref=f2e2507]: "4"
+              - generic [ref=f2e2508]: Azurill
+          - listitem [ref=f2e2512]:
+            - button "Bagon, costs 4, dragon type" [ref=f2e2513] [cursor=pointer]:
+              - generic [ref=f2e2514]: "4"
+              - generic [ref=f2e2515]: Bagon
+          - listitem [ref=f2e2518]:
+            - button "Beldum, costs 4, steel psychic type" [ref=f2e2519] [cursor=pointer]:
+              - generic [ref=f2e2520]: "4"
+              - generic [ref=f2e2521]: Beldum
+          - listitem [ref=f2e2525]:
+            - button "Bombirdier, costs 4, flying dark type" [ref=f2e2526] [cursor=pointer]:
+              - generic [ref=f2e2527]: "4"
+              - generic [ref=f2e2528]: Bombirdier
+          - listitem [ref=f2e2532]:
+            - button "Bouffalant, costs 4, normal type" [ref=f2e2533] [cursor=pointer]:
+              - generic [ref=f2e2534]: "4"
+              - generic [ref=f2e2535]: Bouffalant
+          - listitem [ref=f2e2538]:
+            - button "Bruxish, costs 4, water psychic type" [ref=f2e2539] [cursor=pointer]:
+              - generic [ref=f2e2540]: "4"
+              - generic [ref=f2e2541]: Bruxish
+          - listitem [ref=f2e2545]:
+            - button "Charcadet, costs 4, fire type" [ref=f2e2546] [cursor=pointer]:
+              - generic [ref=f2e2547]: "4"
+              - generic [ref=f2e2548]: Charcadet
+          - listitem [ref=f2e2551]:
+            - button "Comfey, costs 4, fairy type" [ref=f2e2552] [cursor=pointer]:
+              - generic [ref=f2e2553]: "4"
+              - generic [ref=f2e2554]: Comfey
+          - listitem [ref=f2e2557]:
+            - button "Cryogonal, costs 4, ice type" [ref=f2e2558] [cursor=pointer]:
+              - generic [ref=f2e2559]: "4"
+              - generic [ref=f2e2560]: Cryogonal
+          - listitem [ref=f2e2563]:
+            - button "Cyclizar, costs 4, dragon normal type" [ref=f2e2564] [cursor=pointer]:
+              - generic [ref=f2e2565]: "4"
+              - generic [ref=f2e2566]: Cyclizar
+          - listitem [ref=f2e2570]:
+            - button "Darumaka, costs 4, fire type" [ref=f2e2571] [cursor=pointer]:
+              - generic [ref=f2e2572]: "4"
+              - generic [ref=f2e2573]: Darumaka
+          - listitem [ref=f2e2576]:
+            - button "Deino, costs 4, dark dragon type" [ref=f2e2577] [cursor=pointer]:
+              - generic [ref=f2e2578]: "4"
+              - generic [ref=f2e2579]: Deino
+          - listitem [ref=f2e2583]:
+            - button "Dhelmise, costs 4, ghost grass type" [ref=f2e2584] [cursor=pointer]:
+              - generic [ref=f2e2585]: "4"
+              - generic [ref=f2e2586]: Dhelmise
+          - listitem [ref=f2e2590]:
+            - button "Dondozo, costs 4, water type" [ref=f2e2591] [cursor=pointer]:
+              - generic [ref=f2e2592]: "4"
+              - generic [ref=f2e2593]: Dondozo
+          - listitem [ref=f2e2596]:
+            - button "Drampa, costs 4, normal dragon type" [ref=f2e2597] [cursor=pointer]:
+              - generic [ref=f2e2598]: "4"
+              - generic [ref=f2e2599]: Drampa
+          - listitem [ref=f2e2603]:
+            - button "Dratini, costs 4, dragon type" [ref=f2e2604] [cursor=pointer]:
+              - generic [ref=f2e2605]: "4"
+              - generic [ref=f2e2606]: Dratini
+          - listitem [ref=f2e2609]:
+            - button "Dreepy, costs 4, dragon ghost type" [ref=f2e2610] [cursor=pointer]:
+              - generic [ref=f2e2611]: "4"
+              - generic [ref=f2e2612]: Dreepy
+          - listitem [ref=f2e2616]:
+            - button "Drilbur, costs 4, ground type" [ref=f2e2617] [cursor=pointer]:
+              - generic [ref=f2e2618]: "4"
+              - generic [ref=f2e2619]: Drilbur
+          - listitem [ref=f2e2622]:
+            - button "Druddigon, costs 4, dragon type" [ref=f2e2623] [cursor=pointer]:
+              - generic [ref=f2e2624]: "4"
+              - generic [ref=f2e2625]: Druddigon
+          - listitem [ref=f2e2628]:
+            - button "Durant, costs 4, bug steel type" [ref=f2e2629] [cursor=pointer]:
+              - generic [ref=f2e2630]: "4"
+              - generic [ref=f2e2631]: Durant
+          - listitem [ref=f2e2635]:
+            - button "Falinks, costs 4, fighting type" [ref=f2e2636] [cursor=pointer]:
+              - generic [ref=f2e2637]: "4"
+              - generic [ref=f2e2638]: Falinks
+          - listitem [ref=f2e2641]:
+            - button "Feebas, costs 4, water type" [ref=f2e2642] [cursor=pointer]:
+              - generic [ref=f2e2643]: "4"
+              - generic [ref=f2e2644]: Feebas
+          - listitem [ref=f2e2647]:
+            - button "Flamigo, costs 4, flying fighting type" [ref=f2e2648] [cursor=pointer]:
+              - generic [ref=f2e2649]: "4"
+              - generic [ref=f2e2650]: Flamigo
+          - listitem [ref=f2e2654]:
+            - button "Frigibax, costs 4, dragon ice type" [ref=f2e2655] [cursor=pointer]:
+              - generic [ref=f2e2656]: "4"
+              - generic [ref=f2e2657]: Frigibax
+          - listitem [ref=f2e2661]:
+            - button "Froakie, costs 4, water type" [ref=f2e2662] [cursor=pointer]:
+              - generic [ref=f2e2663]: "4"
+              - generic [ref=f2e2664]: Froakie
+          - listitem [ref=f2e2667]:
+            - button "Fuecoco, costs 4, fire type" [ref=f2e2668] [cursor=pointer]:
+              - generic [ref=f2e2669]: "4"
+              - generic [ref=f2e2670]: Fuecoco
+          - listitem [ref=f2e2673]:
+            - button "Galarian Darumaka, costs 4, ice type" [ref=f2e2674] [cursor=pointer]:
+              - generic [ref=f2e2675]: "4"
+              - generic [ref=f2e2676]: Galarian Darumaka
+          - listitem [ref=f2e2679]:
+            - button "Gastly, costs 4, ghost poison type" [ref=f2e2680] [cursor=pointer]:
+              - generic [ref=f2e2681]: "4"
+              - generic [ref=f2e2682]: Gastly
+          - listitem [ref=f2e2686]:
+            - button "Gible, costs 4, dragon ground type" [ref=f2e2687] [cursor=pointer]:
+              - generic [ref=f2e2688]: "4"
+              - generic [ref=f2e2689]: Gible
+          - listitem [ref=f2e2693]:
+            - button "Gimmighoul, costs 4, ghost type" [ref=f2e2694] [cursor=pointer]:
+              - generic [ref=f2e2695]: "4"
+              - generic [ref=f2e2696]: Gimmighoul
+          - listitem [ref=f2e2699]:
+            - button "Gligar, costs 4, ground flying type" [ref=f2e2700] [cursor=pointer]:
+              - generic [ref=f2e2701]: "4"
+              - generic [ref=f2e2702]: Gligar
+          - listitem [ref=f2e2706]:
+            - button "Glimmet, costs 4, rock poison type" [ref=f2e2707] [cursor=pointer]:
+              - generic [ref=f2e2708]: "4"
+              - generic [ref=f2e2709]: Glimmet
+          - listitem [ref=f2e2713]:
+            - button "Goomy, costs 4, dragon type" [ref=f2e2714] [cursor=pointer]:
+              - generic [ref=f2e2715]: "4"
+              - generic [ref=f2e2716]: Goomy
+          - listitem [ref=f2e2719]:
+            - button "Hawlucha, costs 4, fighting flying type" [ref=f2e2720] [cursor=pointer]:
+              - generic [ref=f2e2721]: "4"
+              - generic [ref=f2e2722]: Hawlucha
+          - listitem [ref=f2e2726]:
+            - button "Hisuian Basculin, costs 4, water type" [ref=f2e2727] [cursor=pointer]:
+              - generic [ref=f2e2728]: "4"
+              - generic [ref=f2e2729]: Hisuian Basculin
+          - listitem [ref=f2e2732]:
+            - button "Hisuian Growlithe, costs 4, fire rock type" [ref=f2e2733] [cursor=pointer]:
+              - generic [ref=f2e2734]: "4"
+              - generic [ref=f2e2735]: Hisuian Growlithe
+          - listitem [ref=f2e2739]:
+            - button "Hisuian Qwilfish, costs 4, dark poison type" [ref=f2e2740] [cursor=pointer]:
+              - generic [ref=f2e2741]: "4"
+              - generic [ref=f2e2742]: Hisuian Qwilfish
+          - listitem [ref=f2e2746]:
+            - button "Honedge, costs 4, steel ghost type" [ref=f2e2747] [cursor=pointer]:
+              - generic [ref=f2e2748]: "4"
+              - generic [ref=f2e2749]: Honedge
+          - listitem [ref=f2e2753]:
+            - button "Indeedee, costs 4, psychic normal type" [ref=f2e2754] [cursor=pointer]:
+              - generic [ref=f2e2755]: "4"
+              - generic [ref=f2e2756]: Indeedee
+          - listitem [ref=f2e2760]:
+            - button "Jangmo-o, costs 4, dragon type" [ref=f2e2761] [cursor=pointer]:
+              - generic [ref=f2e2762]: "4"
+              - generic [ref=f2e2763]: Jangmo-o
+          - listitem [ref=f2e2766]:
+            - button "Kangaskhan, costs 4, normal type" [ref=f2e2767] [cursor=pointer]:
+              - generic [ref=f2e2768]: "4"
+              - generic [ref=f2e2769]: Kangaskhan
+          - listitem [ref=f2e2772]:
+            - button "Lapras, costs 4, water ice type" [ref=f2e2773] [cursor=pointer]:
+              - generic [ref=f2e2774]: "4"
+              - generic [ref=f2e2775]: Lapras
+          - listitem [ref=f2e2779]:
+            - button "Larvesta, costs 4, bug fire type" [ref=f2e2780] [cursor=pointer]:
+              - generic [ref=f2e2781]: "4"
+              - generic [ref=f2e2782]: Larvesta
+          - listitem [ref=f2e2786]:
+            - button "Larvitar, costs 4, rock ground type" [ref=f2e2787] [cursor=pointer]:
+              - generic [ref=f2e2788]: "4"
+              - generic [ref=f2e2789]: Larvitar
+          - listitem [ref=f2e2793]:
+            - button "Magikarp, costs 4, water type" [ref=f2e2794] [cursor=pointer]:
+              - generic [ref=f2e2795]: "4"
+              - generic [ref=f2e2796]: Magikarp
+          - listitem [ref=f2e2799]:
+            - button "Magnemite, costs 4, electric steel type" [ref=f2e2800] [cursor=pointer]:
+              - generic [ref=f2e2801]: "4"
+              - generic [ref=f2e2802]: Magnemite
+          - listitem [ref=f2e2806]:
+            - button "Mankey, costs 4, fighting type" [ref=f2e2807] [cursor=pointer]:
+              - generic [ref=f2e2808]: "4"
+              - generic [ref=f2e2809]: Mankey
+          - listitem [ref=f2e2812]:
+            - button "Miltank, costs 4, normal type" [ref=f2e2813] [cursor=pointer]:
+              - generic [ref=f2e2814]: "4"
+              - generic [ref=f2e2815]: Miltank
+          - listitem [ref=f2e2818]:
+            - button "Mimikyu, costs 4, ghost fairy type" [ref=f2e2819] [cursor=pointer]:
+              - generic [ref=f2e2820]: "4"
+              - generic [ref=f2e2821]: Mimikyu
+          - listitem [ref=f2e2825]:
+            - button "Minior, costs 4, rock flying type" [ref=f2e2826] [cursor=pointer]:
+              - generic [ref=f2e2827]: "4"
+              - generic [ref=f2e2828]: Minior
+          - listitem [ref=f2e2832]:
+            - button "Munchlax, costs 4, normal type" [ref=f2e2833] [cursor=pointer]:
+              - generic [ref=f2e2834]: "4"
+              - generic [ref=f2e2835]: Munchlax
+          - listitem [ref=f2e2838]:
+            - button "Nacli, costs 4, rock type" [ref=f2e2839] [cursor=pointer]:
+              - generic [ref=f2e2840]: "4"
+              - generic [ref=f2e2841]: Nacli
+          - listitem [ref=f2e2844]:
+            - button "Nincada, costs 4, bug ground type" [ref=f2e2845] [cursor=pointer]:
+              - generic [ref=f2e2846]: "4"
+              - generic [ref=f2e2847]: Nincada
+          - listitem [ref=f2e2851]:
+            - button "Oranguru, costs 4, normal psychic type" [ref=f2e2852] [cursor=pointer]:
+              - generic [ref=f2e2853]: "4"
+              - generic [ref=f2e2854]: Oranguru
+          - listitem [ref=f2e2858]:
+            - button "Orthworm, costs 4, steel type" [ref=f2e2859] [cursor=pointer]:
+              - generic [ref=f2e2860]: "4"
+              - generic [ref=f2e2861]: Orthworm
+          - listitem [ref=f2e2864]:
+            - button "Passimian, costs 4, fighting type" [ref=f2e2865] [cursor=pointer]:
+              - generic [ref=f2e2866]: "4"
+              - generic [ref=f2e2867]: Passimian
+          - listitem [ref=f2e2870]:
+            - button "Pawniard, costs 4, dark steel type" [ref=f2e2871] [cursor=pointer]:
+              - generic [ref=f2e2872]: "4"
+              - generic [ref=f2e2873]: Pawniard
+          - listitem [ref=f2e2877]:
+            - button "Phione, costs 4, water type" [ref=f2e2878] [cursor=pointer]:
+              - generic [ref=f2e2879]: "4"
+              - generic [ref=f2e2880]: Phione
+          - listitem [ref=f2e2883]:
+            - button "Pikachu, costs 4, electric type" [ref=f2e2884] [cursor=pointer]:
+              - generic [ref=f2e2885]: "4"
+              - generic [ref=f2e2886]: Pikachu
+          - listitem [ref=f2e2889]:
+            - button "Pichu, costs 4, electric type" [ref=f2e2890] [cursor=pointer]:
+              - generic [ref=f2e2891]: "4"
+              - generic [ref=f2e2892]: Pichu
+          - listitem [ref=f2e2895]:
+            - button "Pinsir, costs 4, bug type" [ref=f2e2896] [cursor=pointer]:
+              - generic [ref=f2e2897]: "4"
+              - generic [ref=f2e2898]: Pinsir
+          - listitem [ref=f2e2901]:
+            - button "Poltchageist, costs 4, grass ghost type" [ref=f2e2902] [cursor=pointer]:
+              - generic [ref=f2e2903]: "4"
+              - generic [ref=f2e2904]: Poltchageist
+          - listitem [ref=f2e2908]:
+            - button "Popplio, costs 4, water type" [ref=f2e2909] [cursor=pointer]:
+              - generic [ref=f2e2910]: "4"
+              - generic [ref=f2e2911]: Popplio
+          - listitem [ref=f2e2914]:
+            - button "Porygon, costs 4, normal type" [ref=f2e2915] [cursor=pointer]:
+              - generic [ref=f2e2916]: "4"
+              - generic [ref=f2e2917]: Porygon
+          - listitem [ref=f2e2920]:
+            - button "Quaxly, costs 4, water type" [ref=f2e2921] [cursor=pointer]:
+              - generic [ref=f2e2922]: "4"
+              - generic [ref=f2e2923]: Quaxly
+          - listitem [ref=f2e2926]:
+            - button "Ralts, costs 4, psychic fairy type" [ref=f2e2927] [cursor=pointer]:
+              - generic [ref=f2e2928]: "4"
+              - generic [ref=f2e2929]: Ralts
+          - listitem [ref=f2e2933]:
+            - button "Rhyhorn, costs 4, ground rock type" [ref=f2e2934] [cursor=pointer]:
+              - generic [ref=f2e2935]: "4"
+              - generic [ref=f2e2936]: Rhyhorn
+          - listitem [ref=f2e2940]:
+            - button "Rotom, costs 4, electric ghost type" [ref=f2e2941] [cursor=pointer]:
+              - generic [ref=f2e2942]: "4"
+              - generic [ref=f2e2943]: Rotom
+          - listitem [ref=f2e2947]:
+            - button "Sandile, costs 4, ground dark type" [ref=f2e2948] [cursor=pointer]:
+              - generic [ref=f2e2949]: "4"
+              - generic [ref=f2e2950]: Sandile
+          - listitem [ref=f2e2954]:
+            - button "Sawk, costs 4, fighting type" [ref=f2e2955] [cursor=pointer]:
+              - generic [ref=f2e2956]: "4"
+              - generic [ref=f2e2957]: Sawk
+          - listitem [ref=f2e2960]:
+            - button "Scorbunny, costs 4, fire type" [ref=f2e2961] [cursor=pointer]:
+              - generic [ref=f2e2962]: "4"
+              - generic [ref=f2e2963]: Scorbunny
+          - listitem [ref=f2e2966]:
+            - button "Sigilyph, costs 4, psychic flying type" [ref=f2e2967] [cursor=pointer]:
+              - generic [ref=f2e2968]: "4"
+              - generic [ref=f2e2969]: Sigilyph
+          - listitem [ref=f2e2973]:
+            - button "Skarmory, costs 4, steel flying type" [ref=f2e2974] [cursor=pointer]:
+              - generic [ref=f2e2975]: "4"
+              - generic [ref=f2e2976]: Skarmory
+          - listitem [ref=f2e2980]:
+            - button "Slakoth, costs 4, normal type" [ref=f2e2981] [cursor=pointer]:
+              - generic [ref=f2e2982]: "4"
+              - generic [ref=f2e2983]: Slakoth
+          - listitem [ref=f2e2986]:
+            - button "Sneasel, costs 4, dark ice type" [ref=f2e2987] [cursor=pointer]:
+              - generic [ref=f2e2988]: "4"
+              - generic [ref=f2e2989]: Sneasel
+          - listitem [ref=f2e2993]:
+            - button "Spiritomb, costs 4, ghost dark type" [ref=f2e2994] [cursor=pointer]:
+              - generic [ref=f2e2995]: "4"
+              - generic [ref=f2e2996]: Spiritomb
+          - listitem [ref=f2e3000]:
+            - button "Sprigatito, costs 4, grass type" [ref=f2e3001] [cursor=pointer]:
+              - generic [ref=f2e3002]: "4"
+              - generic [ref=f2e3003]: Sprigatito
+          - listitem [ref=f2e3006]:
+            - button "Tandemaus, costs 4, normal type" [ref=f2e3007] [cursor=pointer]:
+              - generic [ref=f2e3008]: "4"
+              - generic [ref=f2e3009]: Tandemaus
+          - listitem [ref=f2e3012]:
+            - button "Tatsugiri, costs 4, dragon water type" [ref=f2e3013] [cursor=pointer]:
+              - generic [ref=f2e3014]: "4"
+              - generic [ref=f2e3015]: Tatsugiri
+          - listitem [ref=f2e3019]:
+            - button "Tauros, costs 4, normal type" [ref=f2e3020] [cursor=pointer]:
+              - generic [ref=f2e3021]: "4"
+              - generic [ref=f2e3022]: Tauros
+          - listitem [ref=f2e3025]:
+            - button "Teddiursa, costs 4, normal type" [ref=f2e3026] [cursor=pointer]:
+              - generic [ref=f2e3027]: "4"
+              - generic [ref=f2e3028]: Teddiursa
+          - listitem [ref=f2e3031]:
+            - button "Throh, costs 4, fighting type" [ref=f2e3032] [cursor=pointer]:
+              - generic [ref=f2e3033]: "4"
+              - generic [ref=f2e3034]: Throh
+          - listitem [ref=f2e3037]:
+            - button "Timburr, costs 4, fighting type" [ref=f2e3038] [cursor=pointer]:
+              - generic [ref=f2e3039]: "4"
+              - generic [ref=f2e3040]: Timburr
+          - listitem [ref=f2e3043]:
+            - button "Tinkatink, costs 4, fairy steel type" [ref=f2e3044] [cursor=pointer]:
+              - generic [ref=f2e3045]: "4"
+              - generic [ref=f2e3046]: Tinkatink
+          - listitem [ref=f2e3050]:
+            - button "Torchic, costs 4, fire type" [ref=f2e3051] [cursor=pointer]:
+              - generic [ref=f2e3052]: "4"
+              - generic [ref=f2e3053]: Torchic
+          - listitem [ref=f2e3056]:
+            - button "Turtonator, costs 4, fire dragon type" [ref=f2e3057] [cursor=pointer]:
+              - generic [ref=f2e3058]: "4"
+              - generic [ref=f2e3059]: Turtonator
+          - listitem [ref=f2e3063]:
+            - button "Varoom, costs 4, steel poison type" [ref=f2e3064] [cursor=pointer]:
+              - generic [ref=f2e3065]: "4"
+              - generic [ref=f2e3066]: Varoom
+          - listitem [ref=f2e3070]:
+            - button "Veluza, costs 4, water psychic type" [ref=f2e3071] [cursor=pointer]:
+              - generic [ref=f2e3072]: "4"
+              - generic [ref=f2e3073]: Veluza
+          - listitem [ref=f2e3077]:
+            - button "Zangoose, costs 4, normal type" [ref=f2e3078] [cursor=pointer]:
+              - generic [ref=f2e3079]: "4"
+              - generic [ref=f2e3080]: Zangoose
+          - listitem [ref=f2e3083]:
+            - button "Aerodactyl, costs 5, rock flying type" [ref=f2e3084] [cursor=pointer]:
+              - generic [ref=f2e3085]: "5"
+              - generic [ref=f2e3086]: Aerodactyl
+          - listitem [ref=f2e3090]:
+            - button "Articuno, costs 5, ice flying type" [ref=f2e3091] [cursor=pointer]:
+              - generic [ref=f2e3092]: "5"
+              - generic [ref=f2e3093]: Articuno
+          - listitem [ref=f2e3097]:
+            - button "Bloodmoon Ursaluna, costs 5, ground normal type" [ref=f2e3098] [cursor=pointer]:
+              - generic [ref=f2e3099]: "5"
+              - generic [ref=f2e3100]: Bloodmoon Ursaluna
+          - listitem [ref=f2e3104]:
+            - button "Brute Bonnet, costs 5, grass dark type" [ref=f2e3105] [cursor=pointer]:
+              - generic [ref=f2e3106]: "5"
+              - generic [ref=f2e3107]: Brute Bonnet
+          - listitem [ref=f2e3111]:
+            - button "Celebi, costs 5, psychic grass type" [ref=f2e3112] [cursor=pointer]:
+              - generic [ref=f2e3113]: "5"
+              - generic [ref=f2e3114]: Celebi
+          - listitem [ref=f2e3118]:
+            - button "Dracovish, costs 5, water dragon type" [ref=f2e3119] [cursor=pointer]:
+              - generic [ref=f2e3120]: "5"
+              - generic [ref=f2e3121]: Dracovish
+          - listitem [ref=f2e3125]:
+            - button "Dracozolt, costs 5, electric dragon type" [ref=f2e3126] [cursor=pointer]:
+              - generic [ref=f2e3127]: "5"
+              - generic [ref=f2e3128]: Dracozolt
+          - listitem [ref=f2e3132]:
+            - button "Duraludon, costs 5, steel dragon type" [ref=f2e3133] [cursor=pointer]:
+              - generic [ref=f2e3134]: "5"
+              - generic [ref=f2e3135]: Duraludon
+          - listitem [ref=f2e3139]:
+            - button "Fezandipiti, costs 5, poison fairy type" [ref=f2e3140] [cursor=pointer]:
+              - generic [ref=f2e3141]: "5"
+              - generic [ref=f2e3142]: Fezandipiti
+          - listitem [ref=f2e3146]:
+            - button "Heracross, costs 5, bug fighting type" [ref=f2e3147] [cursor=pointer]:
+              - generic [ref=f2e3148]: "5"
+              - generic [ref=f2e3149]: Heracross
+          - listitem [ref=f2e3153]:
+            - button "Hisuian Sneasel, costs 5, fighting poison type" [ref=f2e3154] [cursor=pointer]:
+              - generic [ref=f2e3155]: "5"
+              - generic [ref=f2e3156]: Hisuian Sneasel
+          - listitem [ref=f2e3160]:
+            - button "Iron Thorns, costs 5, rock electric type" [ref=f2e3161] [cursor=pointer]:
+              - generic [ref=f2e3162]: "5"
+              - generic [ref=f2e3163]: Iron Thorns
+          - listitem [ref=f2e3167]:
+            - button "Mesprit, costs 5, psychic type" [ref=f2e3168] [cursor=pointer]:
+              - generic [ref=f2e3169]: "5"
+              - generic [ref=f2e3170]: Mesprit
+          - listitem [ref=f2e3173]:
+            - button "Mew, costs 5, psychic type" [ref=f2e3174] [cursor=pointer]:
+              - generic [ref=f2e3175]: "5"
+              - generic [ref=f2e3176]: Mew
+          - listitem [ref=f2e3179]:
+            - button "Paldean Tauros, costs 5, fighting type" [ref=f2e3180] [cursor=pointer]:
+              - generic [ref=f2e3181]: "5"
+              - generic [ref=f2e3182]: Paldean Tauros
+          - listitem [ref=f2e3185]:
+            - button "Pecharunt, costs 5, poison ghost type" [ref=f2e3186] [cursor=pointer]:
+              - generic [ref=f2e3187]: "5"
+              - generic [ref=f2e3188]: Pecharunt
+          - listitem [ref=f2e3192]:
+            - button "Regice, costs 5, ice type" [ref=f2e3193] [cursor=pointer]:
+              - generic [ref=f2e3194]: "5"
+              - generic [ref=f2e3195]: Regice
+          - listitem [ref=f2e3198]:
+            - button "Scream Tail, costs 5, fairy psychic type" [ref=f2e3199] [cursor=pointer]:
+              - generic [ref=f2e3200]: "5"
+              - generic [ref=f2e3201]: Scream Tail
+          - listitem [ref=f2e3205]:
+            - button "Scyther, costs 5, bug flying type" [ref=f2e3206] [cursor=pointer]:
+              - generic [ref=f2e3207]: "5"
+              - generic [ref=f2e3208]: Scyther
+          - listitem [ref=f2e3212]:
+            - button "Shellder, costs 5, water type" [ref=f2e3213] [cursor=pointer]:
+              - generic [ref=f2e3214]: "5"
+              - generic [ref=f2e3215]: Shellder
+          - listitem [ref=f2e3218]:
+            - 'button "Type: Null, costs 5, normal type" [ref=f2e3219] [cursor=pointer]':
+              - generic [ref=f2e3220]: "5"
+              - generic [ref=f2e3221]: "Type: Null"
+          - listitem [ref=f2e3224]:
+            - button "Uxie, costs 5, psychic type" [ref=f2e3225] [cursor=pointer]:
+              - generic [ref=f2e3226]: "5"
+              - generic [ref=f2e3227]: Uxie
+          - listitem [ref=f2e3230]:
+            - button "Wo-Chien, costs 5, dark grass type" [ref=f2e3231] [cursor=pointer]:
+              - generic [ref=f2e3232]: "5"
+              - generic [ref=f2e3233]: Wo-Chien
+          - listitem [ref=f2e3237]:
+            - button "Azelf, costs 6, psychic type" [ref=f2e3238] [cursor=pointer]:
+              - generic [ref=f2e3239]: "6"
+              - generic [ref=f2e3240]: Azelf
+          - listitem [ref=f2e3243]:
+            - button "Battle Bond Greninja, costs 6, water dark type" [ref=f2e3244] [cursor=pointer]:
+              - generic [ref=f2e3245]: "6"
+              - generic [ref=f2e3246]: Battle Bond Greninja
+          - listitem [ref=f2e3250]:
+            - button "Buzzwole, costs 6, bug fighting type" [ref=f2e3251] [cursor=pointer]:
+              - generic [ref=f2e3252]: "6"
+              - generic [ref=f2e3253]: Buzzwole
+          - listitem [ref=f2e3257]:
+            - button "Celesteela, costs 6, steel flying type" [ref=f2e3258] [cursor=pointer]:
+              - generic [ref=f2e3259]: "6"
+              - generic [ref=f2e3260]: Celesteela
+          - listitem [ref=f2e3264]:
+            - button "Cobalion, costs 6, steel fighting type" [ref=f2e3265] [cursor=pointer]:
+              - generic [ref=f2e3266]: "6"
+              - generic [ref=f2e3267]: Cobalion
+          - listitem [ref=f2e3271]:
+            - button "Cresselia, costs 6, psychic type" [ref=f2e3272] [cursor=pointer]:
+              - generic [ref=f2e3273]: "6"
+              - generic [ref=f2e3274]: Cresselia
+          - listitem [ref=f2e3277]:
+            - button "Deoxys, costs 6, psychic type" [ref=f2e3278] [cursor=pointer]:
+              - generic [ref=f2e3279]: "6"
+              - generic [ref=f2e3280]: Deoxys
+          - listitem [ref=f2e3283]:
+            - button "Enamorus, costs 6, fairy flying type" [ref=f2e3284] [cursor=pointer]:
+              - generic [ref=f2e3285]: "6"
+              - generic [ref=f2e3286]: Enamorus
+          - listitem [ref=f2e3290]:
+            - button "Entei, costs 6, fire type" [ref=f2e3291] [cursor=pointer]:
+              - generic [ref=f2e3292]: "6"
+              - generic [ref=f2e3293]: Entei
+          - listitem [ref=f2e3296]:
+            - button "Eternal Floette, costs 6, fairy type" [ref=f2e3297] [cursor=pointer]:
+              - generic [ref=f2e3298]: "6"
+              - generic [ref=f2e3299]: Eternal Floette
+          - listitem [ref=f2e3302]:
+            - button "Galarian Articuno, costs 6, psychic flying type" [ref=f2e3303] [cursor=pointer]:
+              - generic [ref=f2e3304]: "6"
+              - generic [ref=f2e3305]: Galarian Articuno
+          - listitem [ref=f2e3309]:
+            - button "Galarian Moltres, costs 6, dark flying type" [ref=f2e3310] [cursor=pointer]:
+              - generic [ref=f2e3311]: "6"
+              - generic [ref=f2e3312]: Galarian Moltres
+          - listitem [ref=f2e3316]:
+            - button "Galarian Zapdos, costs 6, fighting flying type" [ref=f2e3317] [cursor=pointer]:
+              - generic [ref=f2e3318]: "6"
+              - generic [ref=f2e3319]: Galarian Zapdos
+          - listitem [ref=f2e3323]:
+            - button "Glastrier, costs 6, ice type" [ref=f2e3324] [cursor=pointer]:
+              - generic [ref=f2e3325]: "6"
+              - generic [ref=f2e3326]: Glastrier
+          - listitem [ref=f2e3329]:
+            - button "Guzzlord, costs 6, dark dragon type" [ref=f2e3330] [cursor=pointer]:
+              - generic [ref=f2e3331]: "6"
+              - generic [ref=f2e3332]: Guzzlord
+          - listitem [ref=f2e3336]:
+            - button "Iron Bundle, costs 6, ice water type" [ref=f2e3337] [cursor=pointer]:
+              - generic [ref=f2e3338]: "6"
+              - generic [ref=f2e3339]: Iron Bundle
+          - listitem [ref=f2e3343]:
+            - button "Iron Hands, costs 6, fighting electric type" [ref=f2e3344] [cursor=pointer]:
+              - generic [ref=f2e3345]: "6"
+              - generic [ref=f2e3346]: Iron Hands
+          - listitem [ref=f2e3350]:
+            - button "Iron Jugulis, costs 6, dark flying type" [ref=f2e3351] [cursor=pointer]:
+              - generic [ref=f2e3352]: "6"
+              - generic [ref=f2e3353]: Iron Jugulis
+          - listitem [ref=f2e3357]:
+            - button "Iron Leaves, costs 6, grass psychic type" [ref=f2e3358] [cursor=pointer]:
+              - generic [ref=f2e3359]: "6"
+              - generic [ref=f2e3360]: Iron Leaves
+          - listitem [ref=f2e3364]:
+            - button "Iron Moth, costs 6, fire poison type" [ref=f2e3365] [cursor=pointer]:
+              - generic [ref=f2e3366]: "6"
+              - generic [ref=f2e3367]: Iron Moth
+          - listitem [ref=f2e3371]:
+            - button "Iron Treads, costs 6, ground steel type" [ref=f2e3372] [cursor=pointer]:
+              - generic [ref=f2e3373]: "6"
+              - generic [ref=f2e3374]: Iron Treads
+          - listitem [ref=f2e3378]:
+            - button "Iron Valiant, costs 6, fairy fighting type" [ref=f2e3379] [cursor=pointer]:
+              - generic [ref=f2e3380]: "6"
+              - generic [ref=f2e3381]: Iron Valiant
+          - listitem [ref=f2e3385]:
+            - button "Jirachi, costs 6, steel psychic type" [ref=f2e3386] [cursor=pointer]:
+              - generic [ref=f2e3387]: "6"
+              - generic [ref=f2e3388]: Jirachi
+          - listitem [ref=f2e3392]:
+            - button "Keldeo, costs 6, water fighting type" [ref=f2e3393] [cursor=pointer]:
+              - generic [ref=f2e3394]: "6"
+              - generic [ref=f2e3395]: Keldeo
+          - listitem [ref=f2e3399]:
+            - button "Kubfu, costs 6, fighting type" [ref=f2e3400] [cursor=pointer]:
+              - generic [ref=f2e3401]: "6"
+              - generic [ref=f2e3402]: Kubfu
+          - listitem [ref=f2e3405]:
+            - button "Manaphy, costs 6, water type" [ref=f2e3406] [cursor=pointer]:
+              - generic [ref=f2e3407]: "6"
+              - generic [ref=f2e3408]: Manaphy
+          - listitem [ref=f2e3411]:
+            - button "Meltan, costs 6, steel type" [ref=f2e3412] [cursor=pointer]:
+              - generic [ref=f2e3413]: "6"
+              - generic [ref=f2e3414]: Meltan
+          - listitem [ref=f2e3417]:
+            - button "Moltres, costs 6, fire flying type" [ref=f2e3418] [cursor=pointer]:
+              - generic [ref=f2e3419]: "6"
+              - generic [ref=f2e3420]: Moltres
+          - listitem [ref=f2e3424]:
+            - button "Munkidori, costs 6, poison psychic type" [ref=f2e3425] [cursor=pointer]:
+              - generic [ref=f2e3426]: "6"
+              - generic [ref=f2e3427]: Munkidori
+          - listitem [ref=f2e3431]:
+            - button "Nihilego, costs 6, rock poison type" [ref=f2e3432] [cursor=pointer]:
+              - generic [ref=f2e3433]: "6"
+              - generic [ref=f2e3434]: Nihilego
+          - listitem [ref=f2e3438]:
+            - button "Okidogi, costs 6, poison fighting type" [ref=f2e3439] [cursor=pointer]:
+              - generic [ref=f2e3440]: "6"
+              - generic [ref=f2e3441]: Okidogi
+          - listitem [ref=f2e3445]:
+            - button "Raikou, costs 6, electric type" [ref=f2e3446] [cursor=pointer]:
+              - generic [ref=f2e3447]: "6"
+              - generic [ref=f2e3448]: Raikou
+          - listitem [ref=f2e3451]:
+            - button "Regidrago, costs 6, dragon type" [ref=f2e3452] [cursor=pointer]:
+              - generic [ref=f2e3453]: "6"
+              - generic [ref=f2e3454]: Regidrago
+          - listitem [ref=f2e3457]:
+            - button "Regieleki, costs 6, electric type" [ref=f2e3458] [cursor=pointer]:
+              - generic [ref=f2e3459]: "6"
+              - generic [ref=f2e3460]: Regieleki
+          - listitem [ref=f2e3463]:
+            - button "Regirock, costs 6, rock type" [ref=f2e3464] [cursor=pointer]:
+              - generic [ref=f2e3465]: "6"
+              - generic [ref=f2e3466]: Regirock
+          - listitem [ref=f2e3469]:
+            - button "Registeel, costs 6, steel type" [ref=f2e3470] [cursor=pointer]:
+              - generic [ref=f2e3471]: "6"
+              - generic [ref=f2e3472]: Registeel
+          - listitem [ref=f2e3475]:
+            - button "Sandy Shocks, costs 6, electric ground type" [ref=f2e3476] [cursor=pointer]:
+              - generic [ref=f2e3477]: "6"
+              - generic [ref=f2e3478]: Sandy Shocks
+          - listitem [ref=f2e3482]:
+            - button "Shaymin, costs 6, grass type" [ref=f2e3483] [cursor=pointer]:
+              - generic [ref=f2e3484]: "6"
+              - generic [ref=f2e3485]: Shaymin
+          - listitem [ref=f2e3488]:
+            - button "Slither Wing, costs 6, bug fighting type" [ref=f2e3489] [cursor=pointer]:
+              - generic [ref=f2e3490]: "6"
+              - generic [ref=f2e3491]: Slither Wing
+          - listitem [ref=f2e3495]:
+            - button "Stakataka, costs 6, rock steel type" [ref=f2e3496] [cursor=pointer]:
+              - generic [ref=f2e3497]: "6"
+              - generic [ref=f2e3498]: Stakataka
+          - listitem [ref=f2e3502]:
+            - button "Suicune, costs 6, water type" [ref=f2e3503] [cursor=pointer]:
+              - generic [ref=f2e3504]: "6"
+              - generic [ref=f2e3505]: Suicune
+          - listitem [ref=f2e3508]:
+            - button "Tapu Bulu, costs 6, grass fairy type" [ref=f2e3509] [cursor=pointer]:
+              - generic [ref=f2e3510]: "6"
+              - generic [ref=f2e3511]: Tapu Bulu
+          - listitem [ref=f2e3515]:
+            - button "Tapu Fini, costs 6, water fairy type" [ref=f2e3516] [cursor=pointer]:
+              - generic [ref=f2e3517]: "6"
+              - generic [ref=f2e3518]: Tapu Fini
+          - listitem [ref=f2e3522]:
+            - button "Tapu Koko, costs 6, electric fairy type" [ref=f2e3523] [cursor=pointer]:
+              - generic [ref=f2e3524]: "6"
+              - generic [ref=f2e3525]: Tapu Koko
+          - listitem [ref=f2e3529]:
+            - button "Ting-Lu, costs 6, dark ground type" [ref=f2e3530] [cursor=pointer]:
+              - generic [ref=f2e3531]: "6"
+              - generic [ref=f2e3532]: Ting-Lu
+          - listitem [ref=f2e3536]:
+            - button "Tornadus, costs 6, flying type" [ref=f2e3537] [cursor=pointer]:
+              - generic [ref=f2e3538]: "6"
+              - generic [ref=f2e3539]: Tornadus
+          - listitem [ref=f2e3542]:
+            - button "Victini, costs 6, psychic fire type" [ref=f2e3543] [cursor=pointer]:
+              - generic [ref=f2e3544]: "6"
+              - generic [ref=f2e3545]: Victini
+          - listitem [ref=f2e3549]:
+            - button "Virizion, costs 6, grass fighting type" [ref=f2e3550] [cursor=pointer]:
+              - generic [ref=f2e3551]: "6"
+              - generic [ref=f2e3552]: Virizion
+          - listitem [ref=f2e3556]:
+            - button "Volcanion, costs 6, fire water type" [ref=f2e3557] [cursor=pointer]:
+              - generic [ref=f2e3558]: "6"
+              - generic [ref=f2e3559]: Volcanion
+          - listitem [ref=f2e3563]:
+            - button "Xurkitree, costs 6, electric type" [ref=f2e3564] [cursor=pointer]:
+              - generic [ref=f2e3565]: "6"
+              - generic [ref=f2e3566]: Xurkitree
+          - listitem [ref=f2e3569]:
+            - button "Zapdos, costs 6, electric flying type" [ref=f2e3570] [cursor=pointer]:
+              - generic [ref=f2e3571]: "6"
+              - generic [ref=f2e3572]: Zapdos
+          - listitem [ref=f2e3576]:
+            - button "Zarude, costs 6, dark grass type" [ref=f2e3577] [cursor=pointer]:
+              - generic [ref=f2e3578]: "6"
+              - generic [ref=f2e3579]: Zarude
+          - listitem [ref=f2e3583]:
+            - button "Blacephalon, costs 7, fire ghost type" [ref=f2e3584] [cursor=pointer]:
+              - generic [ref=f2e3585]: "7"
+              - generic [ref=f2e3586]: Blacephalon
+          - listitem [ref=f2e3590]:
+            - button "Chi-Yu, costs 7, dark fire type" [ref=f2e3591] [cursor=pointer]:
+              - generic [ref=f2e3592]: "7"
+              - generic [ref=f2e3593]: Chi-Yu
+          - listitem [ref=f2e3597]:
+            - button "Chien-Pao, costs 7, dark ice type" [ref=f2e3598] [cursor=pointer]:
+              - generic [ref=f2e3599]: "7"
+              - generic [ref=f2e3600]: Chien-Pao
+          - listitem [ref=f2e3604]:
+            - button "Cosmog, costs 7, psychic type" [ref=f2e3605] [cursor=pointer]:
+              - generic [ref=f2e3606]: "7"
+              - generic [ref=f2e3607]: Cosmog
+          - listitem [ref=f2e3610]:
+            - button "Darkrai, costs 7, dark type" [ref=f2e3611] [cursor=pointer]:
+              - generic [ref=f2e3612]: "7"
+              - generic [ref=f2e3613]: Darkrai
+          - listitem [ref=f2e3616]:
+            - button "Diancie, costs 7, rock fairy type" [ref=f2e3617] [cursor=pointer]:
+              - generic [ref=f2e3618]: "7"
+              - generic [ref=f2e3619]: Diancie
+          - listitem [ref=f2e3623]:
+            - button "Flutter Mane, costs 7, ghost fairy type" [ref=f2e3624] [cursor=pointer]:
+              - generic [ref=f2e3625]: "7"
+              - generic [ref=f2e3626]: Flutter Mane
+          - listitem [ref=f2e3630]:
+            - button "Genesect, costs 7, bug steel type" [ref=f2e3631] [cursor=pointer]:
+              - generic [ref=f2e3632]: "7"
+              - generic [ref=f2e3633]: Genesect
+          - listitem [ref=f2e3637]:
+            - button "Gouging Fire, costs 7, fire dragon type" [ref=f2e3638] [cursor=pointer]:
+              - generic [ref=f2e3639]: "7"
+              - generic [ref=f2e3640]: Gouging Fire
+          - listitem [ref=f2e3644]:
+            - button "Great Tusk, costs 7, ground fighting type" [ref=f2e3645] [cursor=pointer]:
+              - generic [ref=f2e3646]: "7"
+              - generic [ref=f2e3647]: Great Tusk
+          - listitem [ref=f2e3651]:
+            - button "Heatran, costs 7, fire steel type" [ref=f2e3652] [cursor=pointer]:
+              - generic [ref=f2e3653]: "7"
+              - generic [ref=f2e3654]: Heatran
+          - listitem [ref=f2e3658]:
+            - button "Hoopa, costs 7, psychic ghost type" [ref=f2e3659] [cursor=pointer]:
+              - generic [ref=f2e3660]: "7"
+              - generic [ref=f2e3661]: Hoopa
+          - listitem [ref=f2e3665]:
+            - button "Iron Boulder, costs 7, rock psychic type" [ref=f2e3666] [cursor=pointer]:
+              - generic [ref=f2e3667]: "7"
+              - generic [ref=f2e3668]: Iron Boulder
+          - listitem [ref=f2e3672]:
+            - button "Iron Crown, costs 7, steel psychic type" [ref=f2e3673] [cursor=pointer]:
+              - generic [ref=f2e3674]: "7"
+              - generic [ref=f2e3675]: Iron Crown
+          - listitem [ref=f2e3679]:
+            - button "Landorus, costs 7, ground flying type" [ref=f2e3680] [cursor=pointer]:
+              - generic [ref=f2e3681]: "7"
+              - generic [ref=f2e3682]: Landorus
+          - listitem [ref=f2e3686]:
+            - button "Latias, costs 7, dragon psychic type" [ref=f2e3687] [cursor=pointer]:
+              - generic [ref=f2e3688]: "7"
+              - generic [ref=f2e3689]: Latias
+          - listitem [ref=f2e3693]:
+            - button "Latios, costs 7, dragon psychic type" [ref=f2e3694] [cursor=pointer]:
+              - generic [ref=f2e3695]: "7"
+              - generic [ref=f2e3696]: Latios
+          - listitem [ref=f2e3700]:
+            - button "Meloetta, costs 7, normal psychic type" [ref=f2e3701] [cursor=pointer]:
+              - generic [ref=f2e3702]: "7"
+              - generic [ref=f2e3703]: Meloetta
+          - listitem [ref=f2e3707]:
+            - button "Ogerpon, costs 7, grass type" [ref=f2e3708] [cursor=pointer]:
+              - generic [ref=f2e3709]: "7"
+              - generic [ref=f2e3710]: Ogerpon
+          - listitem [ref=f2e3713]:
+            - button "Pheromosa, costs 7, bug fighting type" [ref=f2e3714] [cursor=pointer]:
+              - generic [ref=f2e3715]: "7"
+              - generic [ref=f2e3716]: Pheromosa
+          - listitem [ref=f2e3720]:
+            - button "Poipole, costs 7, poison type" [ref=f2e3721] [cursor=pointer]:
+              - generic [ref=f2e3722]: "7"
+              - generic [ref=f2e3723]: Poipole
+          - listitem [ref=f2e3726]:
+            - button "Raging Bolt, costs 7, electric dragon type" [ref=f2e3727] [cursor=pointer]:
+              - generic [ref=f2e3728]: "7"
+              - generic [ref=f2e3729]: Raging Bolt
+          - listitem [ref=f2e3733]:
+            - button "Regigigas, costs 7, normal type" [ref=f2e3734] [cursor=pointer]:
+              - generic [ref=f2e3735]: "7"
+              - generic [ref=f2e3736]: Regigigas
+          - listitem [ref=f2e3739]:
+            - button "Roaring Moon, costs 7, dragon dark type" [ref=f2e3740] [cursor=pointer]:
+              - generic [ref=f2e3741]: "7"
+              - generic [ref=f2e3742]: Roaring Moon
+          - listitem [ref=f2e3746]:
+            - button "Tapu Lele, costs 7, psychic fairy type" [ref=f2e3747] [cursor=pointer]:
+              - generic [ref=f2e3748]: "7"
+              - generic [ref=f2e3749]: Tapu Lele
+          - listitem [ref=f2e3753]:
+            - button "Terrakion, costs 7, rock fighting type" [ref=f2e3754] [cursor=pointer]:
+              - generic [ref=f2e3755]: "7"
+              - generic [ref=f2e3756]: Terrakion
+          - listitem [ref=f2e3760]:
+            - button "Thundurus, costs 7, electric flying type" [ref=f2e3761] [cursor=pointer]:
+              - generic [ref=f2e3762]: "7"
+              - generic [ref=f2e3763]: Thundurus
+          - listitem [ref=f2e3767]:
+            - button "Walking Wake, costs 7, water dragon type" [ref=f2e3768] [cursor=pointer]:
+              - generic [ref=f2e3769]: "7"
+              - generic [ref=f2e3770]: Walking Wake
+          - listitem [ref=f2e3774]:
+            - button "Zeraora, costs 7, electric type" [ref=f2e3775] [cursor=pointer]:
+              - generic [ref=f2e3776]: "7"
+              - generic [ref=f2e3777]: Zeraora
+          - listitem [ref=f2e3780]:
+            - button "Calyrex, costs 8, psychic grass type" [ref=f2e3781] [cursor=pointer]:
+              - generic [ref=f2e3782]: "8"
+              - generic [ref=f2e3783]: Calyrex
+          - listitem [ref=f2e3787]:
+            - button "Dialga, costs 8, steel dragon type" [ref=f2e3788] [cursor=pointer]:
+              - generic [ref=f2e3789]: "8"
+              - generic [ref=f2e3790]: Dialga
+          - listitem [ref=f2e3794]:
+            - button "Giratina, costs 8, ghost dragon type" [ref=f2e3795] [cursor=pointer]:
+              - generic [ref=f2e3796]: "8"
+              - generic [ref=f2e3797]: Giratina
+          - listitem [ref=f2e3801]:
+            - button "Ho-Oh, costs 8, fire flying type" [ref=f2e3802] [cursor=pointer]:
+              - generic [ref=f2e3803]: "8"
+              - generic [ref=f2e3804]: Ho-Oh
+          - listitem [ref=f2e3808]:
+            - button "Kartana, costs 8, grass steel type" [ref=f2e3809] [cursor=pointer]:
+              - generic [ref=f2e3810]: "8"
+              - generic [ref=f2e3811]: Kartana
+          - listitem [ref=f2e3815]:
+            - button "Kyurem, costs 8, dragon ice type" [ref=f2e3816] [cursor=pointer]:
+              - generic [ref=f2e3817]: "8"
+              - generic [ref=f2e3818]: Kyurem
+          - listitem [ref=f2e3822]:
+            - button "Lugia, costs 8, psychic flying type" [ref=f2e3823] [cursor=pointer]:
+              - generic [ref=f2e3824]: "8"
+              - generic [ref=f2e3825]: Lugia
+          - listitem [ref=f2e3829]:
+            - button "Magearna, costs 8, steel fairy type" [ref=f2e3830] [cursor=pointer]:
+              - generic [ref=f2e3831]: "8"
+              - generic [ref=f2e3832]: Magearna
+          - listitem [ref=f2e3836]:
+            - button "Marshadow, costs 8, fighting ghost type" [ref=f2e3837] [cursor=pointer]:
+              - generic [ref=f2e3838]: "8"
+              - generic [ref=f2e3839]: Marshadow
+          - listitem [ref=f2e3843]:
+            - button "Mewtwo, costs 8, psychic type" [ref=f2e3844] [cursor=pointer]:
+              - generic [ref=f2e3845]: "8"
+              - generic [ref=f2e3846]: Mewtwo
+          - listitem [ref=f2e3849]:
+            - button "Necrozma, costs 8, psychic type" [ref=f2e3850] [cursor=pointer]:
+              - generic [ref=f2e3851]: "8"
+              - generic [ref=f2e3852]: Necrozma
+          - listitem [ref=f2e3855]:
+            - button "Palkia, costs 8, water dragon type" [ref=f2e3856] [cursor=pointer]:
+              - generic [ref=f2e3857]: "8"
+              - generic [ref=f2e3858]: Palkia
+          - listitem [ref=f2e3862]:
+            - button "Reshiram, costs 8, dragon fire type" [ref=f2e3863] [cursor=pointer]:
+              - generic [ref=f2e3864]: "8"
+              - generic [ref=f2e3865]: Reshiram
+          - listitem [ref=f2e3869]:
+            - button "Spectrier, costs 8, ghost type" [ref=f2e3870] [cursor=pointer]:
+              - generic [ref=f2e3871]: "8"
+              - generic [ref=f2e3872]: Spectrier
+          - listitem [ref=f2e3875]:
+            - button "Xerneas, costs 8, fairy type" [ref=f2e3876] [cursor=pointer]:
+              - generic [ref=f2e3877]: "8"
+              - generic [ref=f2e3878]: Xerneas
+          - listitem [ref=f2e3881]:
+            - button "Yveltal, costs 8, dark flying type" [ref=f2e3882] [cursor=pointer]:
+              - generic [ref=f2e3883]: "8"
+              - generic [ref=f2e3884]: Yveltal
+          - listitem [ref=f2e3888]:
+            - button "Zekrom, costs 8, dragon electric type" [ref=f2e3889] [cursor=pointer]:
+              - generic [ref=f2e3890]: "8"
+              - generic [ref=f2e3891]: Zekrom
+          - listitem [ref=f2e3895]:
+            - button "Arceus, costs 9, normal type" [ref=f2e3896] [cursor=pointer]:
+              - generic [ref=f2e3897]: "9"
+              - generic [ref=f2e3898]: Arceus
+          - listitem [ref=f2e3901]:
+            - button "Groudon, costs 9, ground type" [ref=f2e3902] [cursor=pointer]:
+              - generic [ref=f2e3903]: "9"
+              - generic [ref=f2e3904]: Groudon
+          - listitem [ref=f2e3907]:
+            - button "Koraidon, costs 9, fighting dragon type" [ref=f2e3908] [cursor=pointer]:
+              - generic [ref=f2e3909]: "9"
+              - generic [ref=f2e3910]: Koraidon
+          - listitem [ref=f2e3914]:
+            - button "Kyogre, costs 9, water type" [ref=f2e3915] [cursor=pointer]:
+              - generic [ref=f2e3916]: "9"
+              - generic [ref=f2e3917]: Kyogre
+          - listitem [ref=f2e3920]:
+            - button "Miraidon, costs 9, electric dragon type" [ref=f2e3921] [cursor=pointer]:
+              - generic [ref=f2e3922]: "9"
+              - generic [ref=f2e3923]: Miraidon
+          - listitem [ref=f2e3927]:
+            - button "Rayquaza, costs 9, dragon flying type" [ref=f2e3928] [cursor=pointer]:
+              - generic [ref=f2e3929]: "9"
+              - generic [ref=f2e3930]: Rayquaza
+          - listitem [ref=f2e3934]:
+            - button "Terapagos, costs 9, normal type" [ref=f2e3935] [cursor=pointer]:
+              - generic [ref=f2e3936]: "9"
+              - generic [ref=f2e3937]: Terapagos
+          - listitem [ref=f2e3940]:
+            - button "Zacian, costs 9, fairy type" [ref=f2e3941] [cursor=pointer]:
+              - generic [ref=f2e3942]: "9"
+              - generic [ref=f2e3943]: Zacian
+          - listitem [ref=f2e3946]:
+            - button "Zamazenta, costs 9, fighting type" [ref=f2e3947] [cursor=pointer]:
+              - generic [ref=f2e3948]: "9"
+              - generic [ref=f2e3949]: Zamazenta
+          - listitem [ref=f2e3952]:
+            - button "Zygarde, costs 9, dragon ground type" [ref=f2e3953] [cursor=pointer]:
+              - generic [ref=f2e3954]: "9"
+              - generic [ref=f2e3955]: Zygarde
+          - listitem [ref=f2e3959]:
+            - button "Eternatus, costs 10, poison dragon type" [ref=f2e3960] [cursor=pointer]:
+              - generic [ref=f2e3961]: "10"
+              - generic [ref=f2e3962]: Eternatus
+        - paragraph [ref=f2e3966]: Costs are before candy discounts. The team check uses each starter's first-stage types; evolving can change them.
+    - region [ref=f2e3967]:
+      - generic [ref=f2e3968]:
+        - heading "Candy and eggs" [level=2] [ref=f2e3969]
+        - paragraph [ref=f2e3970]: Catch or hatch a starter's line and that starter earns candy.
+        - paragraph [ref=f2e3971]: Spend it on a passive ability, two cost drops or an egg of the same species. Cheaper starters need more candy for the same upgrade, so your 3-cost favourites take longest to power up.
+      - generic [ref=f2e3972]:
+        - article [ref=f2e3973]:
+          - heading "Egg hatch times" [level=3] [ref=f2e3974]
+          - paragraph [ref=f2e3975]: Waves until each egg hatches
+          - generic [ref=f2e3976]:
+            - generic [ref=f2e3977]:
+              - img "Common egg" [ref=f2e3978]
+              - term [ref=f2e3979]: Common
+              - definition [ref=f2e3980]: "10"
+            - generic [ref=f2e3981]:
+              - img "Rare egg" [ref=f2e3982]
+              - term [ref=f2e3983]: Rare
+              - definition [ref=f2e3984]: "25"
+            - generic [ref=f2e3985]:
+              - img "Epic egg" [ref=f2e3986]
+              - term [ref=f2e3987]: Epic
+              - definition [ref=f2e3988]: "50"
+            - generic [ref=f2e3989]:
+              - img "Legendary egg" [ref=f2e3990]
+              - term [ref=f2e3991]: Legendary
+              - definition [ref=f2e3992]: "100"
+        - article [ref=f2e3993]:
+          - heading "Gacha vouchers" [level=3] [ref=f2e3994]
+          - paragraph [ref=f2e3995]: Eggs per voucher, and the best egg it promises
+          - generic [ref=f2e3996]:
+            - generic [ref=f2e3997]:
+              - term [ref=f2e3998]:
+                - text: Regular
+                - generic [ref=f2e3999]: No promise
+              - definition [ref=f2e4000]: 1 egg
+            - generic [ref=f2e4001]:
+              - term [ref=f2e4002]:
+                - text: 10 Regulars
+                - generic [ref=f2e4003]: At least one Rare
+              - definition [ref=f2e4004]: 10 eggs
+            - generic [ref=f2e4005]:
+              - term [ref=f2e4006]:
+                - text: Plus
+                - generic [ref=f2e4007]: No promise
+              - definition [ref=f2e4008]: 5 eggs
+            - generic [ref=f2e4009]:
+              - term [ref=f2e4010]:
+                - text: Premium
+                - generic [ref=f2e4011]: At least one Rare
+              - definition [ref=f2e4012]: 10 eggs
+            - generic [ref=f2e4013]:
+              - term [ref=f2e4014]:
+                - text: Golden
+                - generic [ref=f2e4015]: At least one Epic
+              - definition [ref=f2e4016]: 25 eggs
+        - article [ref=f2e4017]:
+          - heading "Passive ability" [level=3] [ref=f2e4018]
+          - paragraph [ref=f2e4019]: Candy for the passive
+          - generic [ref=f2e4020]:
+            - generic [ref=f2e4021]:
+              - term [ref=f2e4022]: Cost 1 to 2
+              - definition [ref=f2e4023]: "40"
+            - generic [ref=f2e4024]:
+              - term [ref=f2e4025]: Cost 3
+              - definition [ref=f2e4026]: "35"
+            - generic [ref=f2e4027]:
+              - term [ref=f2e4028]: Cost 4
+              - definition [ref=f2e4029]: "30"
+            - generic [ref=f2e4030]:
+              - term [ref=f2e4031]: Cost 5
+              - definition [ref=f2e4032]: "25"
+            - generic [ref=f2e4033]:
+              - term [ref=f2e4034]: Cost 6
+              - definition [ref=f2e4035]: "20"
+            - generic [ref=f2e4036]:
+              - term [ref=f2e4037]: Cost 7
+              - definition [ref=f2e4038]: "15"
+            - generic [ref=f2e4039]:
+              - term [ref=f2e4040]: Cost 8 to 10
+              - definition [ref=f2e4041]: "10"
+          - img "Charmander candy" [ref=f2e4042]
+        - article [ref=f2e4043]:
+          - heading "First cost drop" [level=3] [ref=f2e4044]
+          - paragraph [ref=f2e4045]: Candy to lower the cost once
+          - generic [ref=f2e4046]:
+            - generic [ref=f2e4047]:
+              - term [ref=f2e4048]: Cost 1 to 2
+              - definition [ref=f2e4049]: "25"
+            - generic [ref=f2e4050]:
+              - term [ref=f2e4051]: Cost 3
+              - definition [ref=f2e4052]: "20"
+            - generic [ref=f2e4053]:
+              - term [ref=f2e4054]: Cost 4
+              - definition [ref=f2e4055]: "15"
+            - generic [ref=f2e4056]:
+              - term [ref=f2e4057]: Cost 5
+              - definition [ref=f2e4058]: "12"
+            - generic [ref=f2e4059]:
+              - term [ref=f2e4060]: Cost 6
+              - definition [ref=f2e4061]: "10"
+            - generic [ref=f2e4062]:
+              - term [ref=f2e4063]: Cost 7
+              - definition [ref=f2e4064]: "8"
+            - generic [ref=f2e4065]:
+              - term [ref=f2e4066]: Cost 8 to 10
+              - definition [ref=f2e4067]: "5"
+          - img "Bulbasaur candy" [ref=f2e4068]
+        - article [ref=f2e4069]:
+          - heading "Second cost drop" [level=3] [ref=f2e4070]
+          - paragraph [ref=f2e4071]: Candy to lower it again
+          - generic [ref=f2e4072]:
+            - generic [ref=f2e4073]:
+              - term [ref=f2e4074]: Cost 1 to 2
+              - definition [ref=f2e4075]: "60"
+            - generic [ref=f2e4076]:
+              - term [ref=f2e4077]: Cost 3
+              - definition [ref=f2e4078]: "50"
+            - generic [ref=f2e4079]:
+              - term [ref=f2e4080]: Cost 4
+              - definition [ref=f2e4081]: "40"
+            - generic [ref=f2e4082]:
+              - term [ref=f2e4083]: Cost 5
+              - definition [ref=f2e4084]: "35"
+            - generic [ref=f2e4085]:
+              - term [ref=f2e4086]: Cost 6
+              - definition [ref=f2e4087]: "30"
+            - generic [ref=f2e4088]:
+              - term [ref=f2e4089]: Cost 7
+              - definition [ref=f2e4090]: "20"
+            - generic [ref=f2e4091]:
+              - term [ref=f2e4092]: Cost 8 to 10
+              - definition [ref=f2e4093]: "15"
+          - img "Squirtle candy" [ref=f2e4094]
+        - article [ref=f2e4095]:
+          - heading "Same-species egg" [level=3] [ref=f2e4096]
+          - paragraph [ref=f2e4097]: Candy for an egg of that line
+          - generic [ref=f2e4098]:
+            - generic [ref=f2e4099]:
+              - term [ref=f2e4100]: Cost 1 to 2
+              - definition [ref=f2e4101]: "30"
+            - generic [ref=f2e4102]:
+              - term [ref=f2e4103]: Cost 3
+              - definition [ref=f2e4104]: "25"
+            - generic [ref=f2e4105]:
+              - term [ref=f2e4106]: Cost 4
+              - definition [ref=f2e4107]: "20"
+            - generic [ref=f2e4108]:
+              - term [ref=f2e4109]: Cost 5
+              - definition [ref=f2e4110]: "18"
+            - generic [ref=f2e4111]:
+              - term [ref=f2e4112]: Cost 6
+              - definition [ref=f2e4113]: "15"
+            - generic [ref=f2e4114]:
+              - term [ref=f2e4115]: Cost 7
+              - definition [ref=f2e4116]: "12"
+            - generic [ref=f2e4117]:
+              - term [ref=f2e4118]: Cost 8 to 10
+              - definition [ref=f2e4119]: "10"
+          - img "Gible candy" [ref=f2e4120]
+    - region [ref=f2e4121]:
+      - generic [ref=f2e4122]:
+        - heading "Where can I go next?" [level=2] [ref=f2e4123]
+        - paragraph [ref=f2e4124]: Every run starts in Town. When a biome ends, the game picks the next one from its links, and some links only open in some runs. Carry a Map and you choose between the open ones yourself.
+      - generic [ref=f2e4125]:
+        - img "The Town biome as drawn in the game" [ref=f2e4127]
+        - generic [ref=f2e4128]:
+          - heading "Town" [level=3] [ref=f2e4129]
+          - paragraph [ref=f2e4130]: "Where every run begins. From here:"
+          - list [ref=f2e4131]:
+            - listitem [ref=f2e4132]:
+              - button "Plains Always open" [ref=f2e4133] [cursor=pointer]:
+                - generic [ref=f2e4134]: Plains
+                - generic [ref=f2e4136]: Always open
+      - group "Jump to any biome" [ref=f2e4137]:
+        - button "Town" [pressed] [ref=f2e4138] [cursor=pointer]
+        - button "Abyss" [ref=f2e4139] [cursor=pointer]
+        - button "Badlands" [ref=f2e4140] [cursor=pointer]
+        - button "Beach" [ref=f2e4141] [cursor=pointer]
+        - button "Cave" [ref=f2e4142] [cursor=pointer]
+        - button "Construction Site" [ref=f2e4143] [cursor=pointer]
+        - button "Desert" [ref=f2e4144] [cursor=pointer]
+        - button "Dojo" [ref=f2e4145] [cursor=pointer]
+        - button "Factory" [ref=f2e4146] [cursor=pointer]
+        - button "Fairy Cave" [ref=f2e4147] [cursor=pointer]
+        - button "Forest" [ref=f2e4148] [cursor=pointer]
+        - button "Grass" [ref=f2e4149] [cursor=pointer]
+        - button "Graveyard" [ref=f2e4150] [cursor=pointer]
+        - button "Ice Cave" [ref=f2e4151] [cursor=pointer]
+        - button "Island" [ref=f2e4152] [cursor=pointer]
+        - button "Jungle" [ref=f2e4153] [cursor=pointer]
+        - button "Laboratory" [ref=f2e4154] [cursor=pointer]
+        - button "Lake" [ref=f2e4155] [cursor=pointer]
+        - button "Meadow" [ref=f2e4156] [cursor=pointer]
+        - button "Metropolis" [ref=f2e4157] [cursor=pointer]
+        - button "Mountain" [ref=f2e4158] [cursor=pointer]
+        - button "Plains" [ref=f2e4159] [cursor=pointer]
+        - button "Power Plant" [ref=f2e4160] [cursor=pointer]
+        - button "Ruins" [ref=f2e4161] [cursor=pointer]
+        - button "Sea" [ref=f2e4162] [cursor=pointer]
+        - button "Seabed" [ref=f2e4163] [cursor=pointer]
+        - button "Slum" [ref=f2e4164] [cursor=pointer]
+        - button "Snowy Forest" [ref=f2e4165] [cursor=pointer]
+        - button "Space" [ref=f2e4166] [cursor=pointer]
+        - button "Swamp" [ref=f2e4167] [cursor=pointer]
+        - button "Tall Grass" [ref=f2e4168] [cursor=pointer]
+        - button "Temple" [ref=f2e4169] [cursor=pointer]
+        - button "Volcano" [ref=f2e4170] [cursor=pointer]
+        - button "Wasteland" [ref=f2e4171] [cursor=pointer]
+    - region [ref=f2e4172]:
+      - generic [ref=f2e4173]:
+        - heading "Types" [level=2] [ref=f2e4174]
+        - paragraph [ref=f2e4175]: Tap a type, or two for a dual-type Pokemon, to see what it hits hard and what hits it hard.
+        - group "Pick up to two types" [ref=f2e4176]:
+          - button "Normal" [ref=f2e4177] [cursor=pointer]
+          - button "Fire" [pressed] [ref=f2e4178] [cursor=pointer]
+          - button "Water" [ref=f2e4179] [cursor=pointer]
+          - button "Electric" [ref=f2e4180] [cursor=pointer]
+          - button "Grass" [ref=f2e4181] [cursor=pointer]
+          - button "Ice" [ref=f2e4182] [cursor=pointer]
+          - button "Fighting" [ref=f2e4183] [cursor=pointer]
+          - button "Poison" [ref=f2e4184] [cursor=pointer]
+          - button "Ground" [ref=f2e4185] [cursor=pointer]
+          - button "Flying" [ref=f2e4186] [cursor=pointer]
+          - button "Psychic" [ref=f2e4187] [cursor=pointer]
+          - button "Bug" [ref=f2e4188] [cursor=pointer]
+          - button "Rock" [ref=f2e4189] [cursor=pointer]
+          - button "Ghost" [ref=f2e4190] [cursor=pointer]
+          - button "Dragon" [ref=f2e4191] [cursor=pointer]
+          - button "Dark" [ref=f2e4192] [cursor=pointer]
+          - button "Steel" [ref=f2e4193] [cursor=pointer]
+          - button "Fairy" [ref=f2e4194] [cursor=pointer]
+        - generic [ref=f2e4195]:
+          - generic [ref=f2e4196]:
+            - heading "When a Fire Pokemon is hit" [level=3] [ref=f2e4197]
+            - generic [ref=f2e4198]:
+              - generic [ref=f2e4199]:
+                - term [ref=f2e4200]: Takes 2x from
+                - definition [ref=f2e4201]:
+                  - generic [ref=f2e4202]: Water
+                  - generic [ref=f2e4203]: Ground
+                  - generic [ref=f2e4204]: Rock
+              - generic [ref=f2e4205]:
+                - term [ref=f2e4206]: Takes half from
+                - definition [ref=f2e4207]:
+                  - generic [ref=f2e4208]: Fire
+                  - generic [ref=f2e4209]: Grass
+                  - generic [ref=f2e4210]: Ice
+                  - generic [ref=f2e4211]: Bug
+                  - generic [ref=f2e4212]: Steel
+                  - generic [ref=f2e4213]: Fairy
+          - generic [ref=f2e4214]:
+            - heading "When it attacks with a Fire move" [level=3] [ref=f2e4215]
+            - generic [ref=f2e4216]:
+              - generic [ref=f2e4217]:
+                - term [ref=f2e4218]: Double damage to
+                - definition [ref=f2e4219]:
+                  - generic [ref=f2e4220]: Grass
+                  - generic [ref=f2e4221]: Ice
+                  - generic [ref=f2e4222]: Bug
+                  - generic [ref=f2e4223]: Steel
+              - generic [ref=f2e4224]:
+                - term [ref=f2e4225]: Half damage to
+                - definition [ref=f2e4226]:
+                  - generic [ref=f2e4227]: Fire
+                  - generic [ref=f2e4228]: Water
+                  - generic [ref=f2e4229]: Rock
+                  - generic [ref=f2e4230]: Dragon
+    - region [ref=f2e4231]:
+      - heading "Things worth knowing" [level=2] [ref=f2e4232]
+      - generic [ref=f2e4233]:
+        - paragraph [ref=f2e4234]:
+          - strong [ref=f2e4235]: When do bosses show up?
+          - text: Every wave that ends in 0. A boss closes out each biome, and your team is fully healed when the biome changes, so spend healing items freely just before a 0 wave.
+        - paragraph [ref=f2e4236]:
+          - strong [ref=f2e4237]: When are the gym leaders?
+          - text: The first is on wave 20 or 30, decided by the run, then one every 30 waves. Normal trainers never spawn within two waves of a fixed fight.
+        - paragraph [ref=f2e4238]:
+          - strong [ref=f2e4239]: What should I save money for?
+          - text: "Waves 182 to 200: four Elite Four members, the Champion, your rival and Eternatus, nearly back to back. You will buy more healing there than in the rest of the run."
+        - paragraph [ref=f2e4240]:
+          - strong [ref=f2e4241]: Is the Map worth taking?
+          - text: Yes, early. Without one the next biome is random. With one you choose between the open links and can route toward the Pokemon you still need.
+        - paragraph [ref=f2e4242]:
+          - strong [ref=f2e4243]: What makes a run worth it?
+          - text: New species, not wins. Each new line becomes a starter and pays candy. A run that ends on wave 60 with eight new lines still moved your account forward.
+        - paragraph [ref=f2e4244]:
+          - strong [ref=f2e4245]: How do I beat Eternatus?
+          - text: "It is Poison and Dragon, so Ground, Psychic, Ice and Dragon moves hit it for double. It is very bulky: bring stat boosts or status, not just raw power."
+        - paragraph [ref=f2e4246]:
+          - strong [ref=f2e4247]: How is Endless different?
+          - text: You get 15 starter points instead of 10, bosses come every 50 waves, and Eternatus returns every 250th wave.
+        - paragraph [ref=f2e4248]:
+          - strong [ref=f2e4249]: Why do cheap starters level so slowly?
+          - text: "Candy prices run the other way: a 1-cost starter needs 40 candy for its passive, a 9-cost one only 10. Catch plenty of the cheap lines you like."
+        - paragraph [ref=f2e4250]:
+          - strong [ref=f2e4251]: Which types does the team check use?
+          - text: Each starter's first-stage types. A starter that evolves can change type, so check again once your team is built out.
+  - contentinfo [ref=f2e4252]:
+    - generic [ref=f2e4253]:
+      - generic [ref=f2e4254]:
+        - heading "See you on wave 200" [level=2] [ref=f2e4255]
+        - paragraph [ref=f2e4256]: A fan guide by Zi Cong Tan. Numbers checked against the PokeRogue source in October 2026. The game updates often, so if something has changed, tell me and I will fix it.
+      - generic [ref=f2e4257]:
+        - img "The Space biome, as a stamp" [ref=f2e4258]
+        - link "This guide on GitHub" [ref=f2e4259] [cursor=pointer]:
+          - /url: https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic
+        - link "Report a change" [ref=f2e4260] [cursor=pointer]:
+          - /url: https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/issues
+        - link "PokeRogue source code" [ref=f2e4261] [cursor=pointer]:
+          - /url: https://github.com/pagefaultgames/pokerogue
+        - link "PokeAPI sprites" [ref=f2e4262] [cursor=pointer]:
+          - /url: https://github.com/PokeAPI/sprites
+      - paragraph [ref=f2e4263]:
+        - text: Biome and trainer art from
+        - link "pokerogue-assets" [ref=f2e4264] [cursor=pointer]:
+          - /url: https://github.com/pagefaultgames/pokerogue-assets
+        - text: by Pagefault Games, CC BY-NC-SA 4.0. Not affiliated with PokeRogue. Pokemon belongs to Nintendo, Creatures and GAME FREAK.

@@ -1,5 +1,5 @@
 {
-  "name": "pokerogue-react-demo",
+  "name": "pokerogue-field-guide",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "vite build && cd dist && touch .nojekyll && git init -q -b gh-pages && git add -A && git commit -qm deploy && git push -qf https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic.git gh-pages"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

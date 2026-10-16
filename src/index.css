@@ -91,7 +91,7 @@ section { padding: var(--section) var(--m); }
 .links a:hover { color: var(--accent); }
 .btn {
   background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 600;
-  padding: 10px 18px; transition: transform .15s, background-color .15s;
+  padding: 10px 18px; transition: background-color .15s; /* no transform transition: it fights the GSAP intro */
 }
 .btn:hover { background: #d8f7b8; }
 .btn:active { transform: translateY(2px); }

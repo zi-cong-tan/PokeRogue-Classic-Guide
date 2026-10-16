@@ -7,7 +7,7 @@ import { CANDY } from '../data/game';
 const COST_ROWS = [['Cost 1 to 2', 0], ['Cost 3', 2], ['Cost 4', 3], ['Cost 5', 4], ['Cost 6', 5], ['Cost 7', 6], ['Cost 8 to 10', 7]];
 // Each candy slip shows one starter's candy, tinted with that starter's colours the way the game does.
 const candySlip = (title, note, col, candy, who) => ({
-  title, note, icon: `/sprites/candy-${candy}.png`, iconAlt: `${who} candy`,
+  title, note, icon: `${import.meta.env.BASE_URL}sprites/candy-${candy}.png`, iconAlt: `${who} candy`,
   rows: COST_ROWS.map(([label, i]) => ({ k: label, v: CANDY[i][col] })),
 });
 const egg = (k, file, v) => ({ k, v, img: itemArt(file), alt: `${k} egg` });
