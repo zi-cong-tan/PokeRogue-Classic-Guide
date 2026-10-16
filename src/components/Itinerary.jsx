@@ -3,6 +3,8 @@ import { useReveal, countTo, gsap, MOTION_OK } from '../motion';
 import { RUN, FINAL } from '../data/fights';
 import { animated } from '../art';
 import Trainer from './Trainer';
+import { RIVALS } from '../data/rivals';
+import { sprite } from '../art';
 
 const ALL = [...RUN.flatMap(g => g.rows), FINAL];
 const TALL = 200; // trainers are drawn at whole-pixel scale, about this tall
@@ -10,6 +12,27 @@ const TALL = 200; // trainers are drawn at whole-pixel scale, about this tall
 function Who({ f }) {
   if (f.mon) return <img className="who" src={animated(f.mon)} alt={f.title} width="160" height="160" />;
   return <Trainer id={f.who} tall={TALL} label={f.shown ? f.shown.replace('Shown: ', '').split('.')[0] : f.title} />;
+}
+
+// A rival fight's team: each slot is one of the Pokémon shown (rival-party-config.ts in the game).
+function RivalTeam({ wave }) {
+  const r = RIVALS.find(x => x.wave === wave);
+  if (!r) return null;
+  return (
+    <ol className="rival-team" aria-label="Their team, slot by slot">
+      {r.slots.map((s, i) => (
+        <li key={i}>
+          <span className="rival-slot">{s.pool.length > 1 ? `Slot ${i + 1}, one of ${s.pool.length}` : `Slot ${i + 1}`}</span>
+          <span className="rival-mons">
+            {s.pool.slice(0, 6).map(([n, id]) => <img key={n} src={sprite(id)} alt={n} title={n} width="96" height="96" loading="lazy" />)}
+            {s.pool.length > 6 && <small>+{s.pool.length - 6} more</small>}
+          </span>
+          {s.pool.length === 1 && <strong>{s.pool[0][0]}</strong>}
+          {s.note && <span className="rival-note">{s.note[0].toUpperCase() + s.note.slice(1)}</span>}
+        </li>
+      ))}
+    </ol>
+  );
 }
 
 export default function Itinerary() {
@@ -48,6 +71,7 @@ export default function Itinerary() {
             <h3>{sel.title}</h3>
             <p>{sel.text}</p>
             {sel.shown && <p className="pick-shown">{sel.shown}</p>}
+            {sel.title.startsWith('Rival') && <RivalTeam wave={sel.n} />}
           </div>
         </div>
       </div>

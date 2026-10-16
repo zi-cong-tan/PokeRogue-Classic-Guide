@@ -10,6 +10,7 @@ import { sprite } from '../art';
 import { bossPrep } from '../advice';
 import { useRun, setRun, useTeam, waveRule, fits, biomeKey, members, BOSS_TIERS } from '../run';
 import { BIOME_BOSSES } from '../data/biome-bosses';
+import { RIVALS } from '../data/rivals';
 
 const FIGHTS = [...RUN.flatMap(g => g.rows), FINAL].map(f => ({ ...f, waves: (f.at.match(/\d+/g) || [f.n]).map(Number) }));
 const ODDS = { 2: ', 1 run in 2', 3: ', 1 run in 3' };
@@ -31,6 +32,14 @@ function nextBossWave(w, run) {
 // Bosses whose teams are known for this run, in wave order.
 function knownBosses(run) {
   const out = [];
+  // Rivals: prep the slots that are predictable (the bird and Rayquaza); the big pools are summed up in words.
+  for (const r of RIVALS) {
+    const small = r.slots.filter(s => s.pool.length <= 9).sort((a, b) => a.pool.length - b.pool.length); // Rayquaza first
+    const big = r.slots.filter(s => s.pool.length > 9);
+    out.push({ wave: r.wave, title: 'Your rival', rival: true,
+      extra: big.length ? `Plus ${big.length} more from big pools: their starter (one of ${big[0].pool.length})${big.length > 1 ? ` and ${big.length - 1} more from bigger pools` : ''}. See the run schedule.` : '',
+      slots: small.flatMap(s => s.pool.map(([name, id]) => [[name.replace(' (Mega)', '')], id, '', '', s.note])) });
+  }
   const v = VILLAINS[run.villain];
   if (v) {
     out.push({ wave: 115, title: `${v.boss}, ${v.name}`, slots: v.first });
@@ -45,7 +54,7 @@ function knownBosses(run) {
     });
   }
   out.push({ wave: 200, title: 'Eternatus', slots: [[['Eternatus'], 890, 'B', '']] });
-  return out;
+  return out.sort((a, b) => a.wave - b.wave);
 }
 
 // "Gym leader, wave 120 (in 7)": only the waves still ahead, and how far the nearest is.
@@ -140,7 +149,7 @@ function Body({ popped, onPop }) {
           <h3>Boss prep: {boss.title}</h3>
           {!team.party.length ? <p className="hint">Pick your party in the starter planner (and set its moves in the build sheet) to see how it matches up.</p>
             : !prep ? <p className="hint">Loading the matchup...</p> : <>
-              <p className="hint">{boss.biome ? `One of these will show up (or the gym leader on a gym wave). ` : ''}{uncovered ? `${uncovered} of ${prep.length} have no super-effective hit from your team. Teach a move of the type below them, or swap someone in.` : 'Your team can hit every one of them for at least double.'}</p>
+              <p className="hint">{boss.extra ? `${boss.extra} ` : ''}{boss.biome ? `One of these will show up (or the gym leader on a gym wave). ` : ''}{uncovered ? `${uncovered} of ${prep.length} have no super-effective hit from your team. Teach a move of the type below them, or swap someone in.` : 'Your team can hit every one of them for at least double.'}</p>
               <ul className="prep">
                 {prep.map(p => (
                   <li key={p.name} className={p.best.mult < 2 ? 'gap' : undefined}>

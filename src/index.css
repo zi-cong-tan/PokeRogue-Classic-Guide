@@ -406,6 +406,16 @@ section { padding: var(--section) var(--m); }
 .tier-odds td:last-child { font-weight: 600; background: var(--accent); }
 .luck-sheet .hint { color: var(--paper-soft); }
 
+/* the run schedule: a rival fight's team */
+.rival-team { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; }
+.rival-team li { display: grid; grid-template-columns: 140px 1fr; gap: 2px 12px; align-items: center; }
+.rival-slot { font-size: var(--step-small); color: var(--muted); }
+.rival-mons { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
+.rival-mons img { width: 48px; height: 48px; image-rendering: pixelated; }
+.rival-mons small { color: var(--muted); margin-left: 6px; }
+.rival-team strong, .rival-note { grid-column: 2; font-size: var(--step-small); }
+.rival-note { color: var(--accent); }
+
 /* ---------- your run: a log slip that follows the game, with the boss prep beside it ---------- */
 .track { background: var(--surface); }
 .track-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }

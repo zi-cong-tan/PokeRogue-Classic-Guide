@@ -28,14 +28,14 @@ export const RUN = [
     gym(110, 120, 'erika', 'Erika'),
     { n: 112, at: '112 to 115', title: 'Evil team, second strike', who: 'rocket_boss_giovanni_1', shown: 'Shown: Giovanni, boss of Team Rocket. ' + ROCKET.slice(ROCKET.indexOf('Your')), text: "Grunt on 112, admin on 114, and the team's boss on 115." },
     gym(140, 150, 'sabrina', 'Sabrina'),
-    { n: 145, at: '145', title: 'Rival, round 5', who: 'rival_m', shown: RIVAL, text: 'A full, strong team. Treat it like a gym leader.' },
+    { n: 145, at: '145', title: 'Rival, round 5', who: 'rival_m', shown: RIVAL, text: 'A full, strong team. Treat it like a gym leader. Their sixth Pokémon is a shiny Rayquaza with three health bars.' },
   ] },
   { group: 'Waves 151 to 199', rows: [
     { n: 164, at: '164 to 165', title: 'Evil boss rematch', who: 'rocket_boss_giovanni_1', shown: 'Shown: Giovanni, boss of Team Rocket. ' + ROCKET.slice(ROCKET.indexOf('Your')), text: 'An admin on 164, then the boss again on 165 with a stronger team.' },
     gym(170, 180, 'blaine', 'Blaine'),
     { n: 182, at: '182 to 188', title: 'Elite Four', who: 'lorelei', shown: 'Shown: Lorelei. The run picks one region, and all four come from its league.', text: 'Elite Four members on waves 182, 184, 186 and 188, all from one region. Spend money here.' },
     { n: 190, at: '190', title: 'Champion', who: 'lance', shown: 'Shown: Lance. The Champion comes from the same region as the Elite Four.', text: 'The Champion, straight after the Elite Four. Heal up first: no biome change in between.' },
-    { n: 195, at: '195', title: 'Rival, final round', who: 'rival_m', shown: RIVAL, text: 'The last fight before the end. Their strongest team.' },
+    { n: 195, at: '195', title: 'Rival, final round', who: 'rival_m', shown: RIVAL, text: 'The last fight before the end. Their sixth Pokémon is always Mega Rayquaza at level 200, and their starter has three health bars.' },
   ] },
 ];
 
