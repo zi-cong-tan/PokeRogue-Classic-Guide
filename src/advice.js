@@ -229,3 +229,60 @@ export function bossOdds(luck) {
 
 // Wild shiny chance: 64 / 65536 (1 in 1024), doubled 1 + n times by n Shiny Charms (up to 4).
 export const shinyOneIn = charms => 1024 / (charms ? 2 ** (1 + charms) : 1);
+
+// Popular tactics and which starters can run them. A starter qualifies when some form in its line can learn (level-up,
+// TM or egg move) one move from every group; ranked by that form's base stat total, cheapest first on ties.
+export const TACTICS = [
+  { key: 'seed', name: 'Leech Seed stall', how: 'Seed the foe, then Protect or Substitute while the seed and Leftovers heal you.',
+    needs: [['LEECH_SEED'], ['PROTECT', 'DETECT', 'SUBSTITUTE']], items: 'Leftovers, Shell Bell' },
+  { key: 'toxic', name: 'Toxic stall', how: 'Badly poison the foe and outlast it with protection and recovery.',
+    needs: [['TOXIC'], ['PROTECT', 'DETECT', 'SUBSTITUTE'], ['RECOVER', 'ROOST', 'SLACK_OFF', 'SOFT_BOILED', 'MOONLIGHT', 'SYNTHESIS', 'MORNING_SUN', 'WISH', 'SHORE_UP', 'MILK_DRINK']], items: 'Leftovers' },
+  { key: 'phys', name: 'Physical setup sweep', how: 'Boost Attack (and Speed) once or twice, then sweep with strong same-type attacks.',
+    needs: [['DRAGON_DANCE', 'SWORDS_DANCE', 'SHELL_SMASH', 'BULK_UP', 'VICTORY_DANCE', 'SHIFT_GEAR', 'COIL', 'NO_RETREAT']], items: 'White Herb (with Shell Smash), Focus Band, Reviver Seed', stat: 1 },
+  { key: 'spec', name: 'Special setup sweep', how: 'Boost Sp. Atk, then sweep.',
+    needs: [['NASTY_PLOT', 'QUIVER_DANCE', 'CALM_MIND', 'TAIL_GLOW', 'TAKE_HEART', 'GEOMANCY']], items: 'Soul Dew (with a Sp. Atk nature), Leftovers', stat: 3 },
+  { key: 'sleep', name: 'Sleep, then hit', how: 'Put the foe to sleep and attack freely; strong against single bosses.',
+    needs: [['SPORE', 'SLEEP_POWDER', 'HYPNOSIS', 'LOVELY_KISS', 'SING', 'YAWN', 'DARK_VOID']], items: 'Quick Claw, Wide Lens (for inaccurate sleep moves)' },
+  { key: 'drum', name: 'Belly Drum', how: 'Max Attack in one turn at half HP, ideally with a priority move.',
+    needs: [['BELLY_DRUM']], items: 'Sitrus Berry, Leftovers', stat: 1 },
+  { key: 'baton', name: 'Baton Pass chain', how: 'Set up boosts on one Pokémon, then pass them to a sweeper.',
+    needs: [['BATON_PASS'], ['SWORDS_DANCE', 'NASTY_PLOT', 'CALM_MIND', 'DRAGON_DANCE', 'QUIVER_DANCE', 'BULK_UP', 'IRON_DEFENSE', 'AMNESIA', 'AGILITY', 'SHELL_SMASH']], items: 'Baton (the item lets boosts pass on any switch)' },
+];
+
+// Truant and Slow Start make a set-up sweep impractical, whatever the stats say.
+const POOR_SWEEPERS = new Set(['Slaking', 'Regigigas', 'Slakoth', 'Vigoroth']);
+
+export function tacticStarters(tactic, L, eggs) {
+  const { FORMS: F, LINES, MOVE_KEYS } = L;
+  const out = [];
+  LINES.forEach((line, i) => {
+    let best = null;
+    for (const form of line) {
+      const can = learnable(line, form, eggs[i] || [], L);
+      const keys = new Set([...can.keys()].map(m => MOVE_KEYS[m]));
+      if (!tactic.needs.every(group => group.some(k => keys.has(k)))) continue;
+      if (tactic.stat && POOR_SWEEPERS.has(F[form][0])) continue;
+      const stats = F[form][3];
+      const score = tactic.stat ? stats[tactic.stat] * 2 + stats.reduce((a, b) => a + b) : stats.reduce((a, b) => a + b);
+      if (!best || score > best.score) best = { i, form, score, total: stats.reduce((a, b) => a + b) };
+    }
+    if (best) out.push(best);
+  });
+  return out.sort((a, b) => b.score - a.score);
+}
+
+// Which two of your party to fuse with DNA Splicers: every ordered pair, scored on the fused stat total, the
+// weaknesses it removes compared with the first Pokémon alone, and the new type it brings.
+export function fusionPicks(members) {
+  const weak = types => TYPES.filter(a => mult(a, types) > 1).length;
+  const picks = [];
+  for (const a of members) for (const b of members) {
+    if (a === b) continue;
+    const f = fuse(a, b);
+    const total = f.stats.reduce((x, y) => x + y);
+    const fewerWeak = weak(a.types) - weak(f.types);
+    const newType = f.types.some(t => !a.types.includes(t));
+    picks.push({ a: a.name, b: b.name, types: f.types, stats: f.stats, total, fewerWeak, newType, score: total + fewerWeak * 25 + (newType ? 10 : 0) });
+  }
+  return picks.sort((x, y) => y.score - x.score);
+}

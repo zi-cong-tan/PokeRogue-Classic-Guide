@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import * as L from '../src/data/learnsets.js';
 import { STARTERS } from '../src/data/starters.js';
 import { BUILDS } from '../src/data/builds.js';
-import { suggestNature, suggestMoves, evolveAdvice, teamReport, learnable, bossPrep, fuse, itemOdds, bossOdds, partyLuck, shinyOneIn } from '../src/advice.js';
+import { suggestNature, suggestMoves, evolveAdvice, teamReport, learnable, bossPrep, fuse, itemOdds, bossOdds, partyLuck, shinyOneIn, TACTICS, tacticStarters, fusionPicks } from '../src/advice.js';
 
 const at = n => STARTERS.findIndex(s => s[0] === n);
 const name = m => L.MOVE_LIST[m][0];
@@ -49,6 +49,15 @@ assert.ok(itemOdds(14).tiers[3] > itemOdds(0).tiers[3]);
 assert.equal(bossOdds(0).ultraRare, 1 / 64);
 assert.equal(partyLuck([3, 3, 3, 3, 3, 3]), 14);
 assert.equal(shinyOneIn(0), 1024); assert.equal(shinyOneIn(4), 32);
+
+// Tactics: Leech Seed stall finds starters, and every listed one really can learn Leech Seed.
+const seed = tacticStarters(TACTICS[0], L, BUILDS.map(b => (b ? b[3] : [])));
+assert.ok(seed.length > 10);
+assert.ok(seed.every(s => [...learnable(L.LINES[s.i], s.form, BUILDS[s.i][3], L).keys()].some(m => L.MOVE_KEYS[m] === 'LEECH_SEED')));
+// Fusion picks: every ordered pair, best first.
+const fp = fusionPicks([{ name: 'Garchomp', types: ['dragon', 'ground'], stats: [108, 130, 95, 80, 85, 102] }, { name: 'Lapras', types: ['water', 'ice'], stats: [130, 85, 80, 85, 95, 60] }]);
+assert.equal(fp.length, 2);
+console.log('Leech Seed top:', seed.slice(0, 5).map(s => L.FORMS[s.form][0]).join(', '));
 
 console.log('Garchomp:', gm.map(x => `${name(x.m)} (${x.label})`).join(', '));
 console.log('Ivysaur ->', evo.map(e => `${e.name} by ${e.how}; keep ${e.keep.map(k => name(k.m) + ' @' + k.lvl).join(', ') || 'nothing'}`).join(' | '));

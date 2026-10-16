@@ -18,11 +18,16 @@
 - **A team check.** Which attack types hit most of your team, which types your moves can't hit hard, and who to swap out for what type.
 - **Share your team** as a link. Opening one shows that team, with Undo to get yours back.
 - **Save teams online** (optional). Sign in with GitHub or an email link to keep named teams across devices. Without signing in, everything still saves in your browser.
+- **Builds, fusions and Megas.** Popular tactics (Leech Seed stall, setup sweeps, Belly Drum...) and which starters can really run them, the best DNA Splicer pairs for your party, and every Mega, Primal and Gigantamax form with its stats.
 - **Candy and eggs.** Hatch times, what each gacha voucher promises, and candy costs per starter price.
 - **Where can I go next?** All 34 biomes with their real art and the odds of each link.
 - **Mystery Encounters.** All 29 in Classic with their game art: rarity, waves, biomes, every choice, what the battle and rewards really are, and which option to pick when.
 - **The shop, Pokérus and fusion.** Every reward item by tier, how Pokérus spreads, and a fusion calculator using the game's own fusion maths.
 - **Types.** Pick one or two types to see what hits them hard and what they hit hard.
+
+## Browser extension
+
+`extension/` holds a read-only Chrome extension that puts a small panel over PokeRogue itself: the enemy's weaknesses, your best move, who it threatens and what fight comes next. See `extension/README.md`.
 
 ## Where the numbers come from
 

@@ -4,6 +4,7 @@ import Tracker, { TrackerOnly } from './components/Tracker';
 import Villains from './components/Villains';
 import League from './components/League';
 import Planner from './components/Planner';
+import Builds from './components/Builds';
 import Eggs from './components/Eggs';
 import Shop from './components/Shop';
 import Luck from './components/Luck';
@@ -24,6 +25,7 @@ export default function App() {
         <Villains />
         <League />
         <Planner />
+        <Builds />
         <Eggs />
         <Shop />
         <Luck />

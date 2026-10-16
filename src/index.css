@@ -345,6 +345,44 @@ section { padding: var(--section) var(--m); }
 .gyms li { display: flex; align-items: flex-end; gap: 8px; background: var(--paper-step); padding: 6px 12px 8px 6px; font-weight: 600; }
 .gym-sprite { width: var(--w); height: var(--h); background-repeat: no-repeat; image-rendering: pixelated; }
 
+/* ---------- builds, fusions and Megas: tactics as tabs, fusion advice in the margin, the forms as a stat sheet ---------- */
+.builds { background: var(--paper); color: var(--paper-ink); display: grid; gap: 56px; }
+.builds > * { min-width: 0; } /* let the wide stats table scroll inside its box instead of widening the page */
+.builds h3 { font: 400 var(--step-lead)/1.1 "Pixelify Sans", sans-serif; margin: 0 0 14px; }
+.builds h4 { font: 600 var(--step-body)/1.3 "Source Serif 4", Georgia, serif; margin: 0 0 8px; }
+.builds .hint { color: var(--paper-soft); font-size: var(--step-small); margin-top: 10px; max-width: 70ch; }
+.builds-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
+.builds-head h2 { grid-column: 1 / 8; max-width: 12ch; }
+.builds-head p { grid-column: 8 / 13; max-width: 44ch; }
+.builds-body { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: start; }
+.builds-body > div { grid-column: 1 / 9; }
+.builds-side { grid-column: 9 / 13; background: var(--paper-step); padding: 22px; }
+.tactic-how { margin: 16px 0; max-width: 64ch; }
+.tactic-how span { color: var(--paper-soft); }
+.tactic-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.picks-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; }
+.picks-list li { display: flex; align-items: center; gap: 8px; background: var(--paper-step); padding: 2px 10px 2px 0; }
+.picks-list img { width: 56px; height: 56px; image-rendering: pixelated; }
+.picks-list span { display: grid; }
+.picks-list small { color: var(--paper-soft); font-size: var(--step-small); }
+.fusion-picks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.fusion-picks li { background: var(--paper); padding: 10px 12px; display: grid; gap: 4px; }
+.fusion-picks .small { font-size: var(--step-small); color: var(--paper-soft); }
+.special-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.check-line { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.check-line input { width: 18px; height: 18px; accent-color: var(--bg); }
+.special-table { margin-top: 14px; overflow-x: auto; }
+.special-table table { border-collapse: collapse; width: 100%; font-size: var(--step-small); font-variant-numeric: tabular-nums; }
+.special-table th, .special-table td { padding: 4px 8px; text-align: right; white-space: nowrap; }
+.special-table thead th:first-child { text-align: left; }
+.special-table thead th { background: var(--paper); border-bottom: 2px solid var(--paper-ink); }
+.special-table tbody th { text-align: left; display: flex; align-items: center; gap: 4px; font-weight: 600; }
+.special-table tbody th small { font-weight: 400; color: var(--paper-soft); }
+.special-table tbody th img { width: 48px; height: 48px; image-rendering: pixelated; }
+.special-table td:nth-child(2), .special-table td:nth-child(3), .special-table td:last-child { text-align: left; }
+.special-table td.up { background: var(--accent); font-weight: 600; }
+.special-table tbody tr:nth-child(even) { background: var(--paper-step); }
+
 /* ---------- the shop: item tiers as a printed price list, Pokérus and fusion in the margin ---------- */
 .shop { background: var(--paper); color: var(--paper-ink); }
 .shop-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
@@ -482,6 +520,7 @@ section { padding: var(--section) var(--m); }
 .rung-id h3 { font: 400 var(--step-lead)/1.05 "Pixelify Sans", sans-serif; margin: 0 0 8px; }
 .rung-sprite { width: var(--w); height: var(--h); background-repeat: no-repeat; image-rendering: pixelated; flex: none; }
 .rung-mixed { font-size: var(--step-small); color: var(--muted); }
+.rung.champ .rung-mixed { color: var(--paper-soft); }
 .rung .party h4 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .rung .party li { background: #202020; }
 .rung .party li.danger { background: #2c2c2c; }
@@ -650,7 +689,8 @@ section { padding: var(--section) var(--m); }
   .slip { padding: 16px 12px; }
 
   .ticket { grid-template-columns: 1fr; border-radius: 22px; }
-  .enc-head, .enc-body, .league-head, .track-head, .tracker, .shop-head, .shop-body, .luck-head, .luck-body { grid-template-columns: 1fr; }
+  .enc-head, .enc-body, .league-head, .track-head, .tracker, .shop-head, .shop-body, .luck-head, .luck-body, .builds-head, .builds-body, .tactic-lists { grid-template-columns: 1fr; }
+  .builds-head > *, .builds-body > * { grid-column: 1 / -1 !important; }
   .luck-head > *, .luck-body > * { grid-column: 1 / -1 !important; }
   .luck-slots { grid-template-columns: 1fr 1fr; }
   .shiny-tiers { grid-template-columns: 1fr; }
@@ -689,4 +729,9 @@ section { padding: var(--section) var(--m); }
   .back { grid-template-columns: 1fr; padding: 44px 20px 20px; }
   .back-addr { padding-right: 76px; font-size: var(--step-body); }
   .stamp { width: 64px; height: 85px; }
+}
+
+/* tablet: these two-column sections stack (kept last so it wins over the desktop column rules above) */
+@media (max-width: 1100px) {
+  .builds-body > div, .builds-side, .luck-set, .luck-sheet, .shop-body > div:first-child, .shop-side, .track-log, .track-prep { grid-column: 1 / -1; }
 }
