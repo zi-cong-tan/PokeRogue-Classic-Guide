@@ -4,6 +4,7 @@
 //  - the enemies on the field, limited to what the battle screen shows: name, level, HP, types, boss bars
 //  - which Mystery Encounter is on screen, if any
 //  - the enemy's defences and exact HP, for the damage estimate
+//  - on the reward screen, the items offered and where they sit
 (() => {
   const TYPES = ['normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass',
     'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']; // PokemonType enum order in the game
@@ -46,8 +47,32 @@
     return typeof t === 'number' ? t : null;
   }
 
+  // The reward screen: each offered item (and the shop row under it) with where it sits on the canvas (0 to 1), plus your
+  // money and held items, so the HUD can rate each one for this run. Null when the screen isn't open.
+  function rewards() {
+    const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
+    const h = battle?.ui?.getHandler?.();
+    if (!h?.active || !Array.isArray(h.options) || !Array.isArray(h.shopOptionsRows) || !h.options.length) return null;
+    const W = scenes.game?.config?.width || 1920, H = scenes.game?.config?.height || 1080;
+    const read = (o, shop) => {
+      const t = o.modifierTypeOption?.type || {};
+      let b = null;
+      try { b = o.getBounds?.(); } catch { /* not drawn yet */ }
+      return {
+        id: t.id, name: t.name, tier: t.tier, cost: o.modifierTypeOption?.cost || 0, shop,
+        tm: 'moveId' in t, moveType: typeof t.moveType === 'number' ? TYPES[t.moveType] : null,
+        x: b ? b.centerX / W : null, y: b ? b.y / H : null,
+      };
+    };
+    return {
+      money: battle.money ?? 0,
+      held: (battle.modifiers || []).map(m => m.type?.id).filter(Boolean),
+      options: [...h.options.map(o => read(o, false)), ...h.shopOptionsRows.flat().map(o => read(o, true))],
+    };
+  }
+
   setInterval(() => {
     hook();
-    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter() }, location.origin);
+    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards() }, location.origin);
   }, 1000);
 })();

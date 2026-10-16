@@ -8,6 +8,8 @@ game (or folded into corner tabs on small windows) that follow your run.
 - **Right:** the enemy's weaknesses and the move to use, plus your active Pokémon's moves as a damage range (% of its HP)
   with KO / can KO / hits to KO. When a Mystery Encounter is on screen, its choices and which to pick instead. Out of
   battle, this biome's possible bosses.
+- **Reward screen:** a tier badge (S to E) on every item offered and in the shop, rated for your run: your wave, team HP,
+  fainted Pokémon, types, moves, abilities and items you already hold. Hover a badge for the reason; the right panel lists them all.
 - **Guide button:** items by tier with icons, every Mystery Encounter's advice, Mega and Gigantamax forms of your party.
 
 It is **read-only**. It reads `window.gameInfo`, which the game publishes itself (mode, biome, wave, luck, your party),

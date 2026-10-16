@@ -10,6 +10,7 @@ import { ENCOUNTERS } from '../../src/data/encounters.js';
 import { ENCOUNTER_NOTES } from '../../src/data/encounter-notes.js';
 import { ITEM_TIERS } from '../../src/data/items.js';
 import { SPECIAL_FORMS } from '../../src/data/megas.js';
+import { rateItem } from './rate.js';
 
 const GUIDE = 'https://zi-cong-tan.github.io/PokeRogue-Guide-Aesthetic/';
 const CDN = 'https://cdn.jsdelivr.net/gh/';
@@ -110,7 +111,17 @@ function runPanel(info, enemies) {
 }
 
 // ---- right band: the Mystery Encounter on screen, or the enemy, or this biome's bosses
-function enemyPanel(info, enemies, encounterId) {
+function rewardsPanel(info, rewards) {
+  const run = { ...info, held: rewards.held };
+  const rows = rewards.options.map(o => ({ o, r: rateItem(o, run) }))
+    .sort((a, b) => 'SABCDE'.indexOf(a.r.tier) - 'SABCDE'.indexOf(b.r.tier));
+  return `<section><h3>Rewards for your run <small>S best, E worst</small></h3>
+    <ul class="rewards">${rows.map(({ o, r }) => `<li><span class="tier t${r.tier}">${r.tier}</span><div><strong>${esc(o.name)}</strong>${o.shop ? ` <small>shop, ₽${esc(o.cost)}</small>` : ''}<p>${esc(r.why)}</p></div></li>`).join('')}</ul>
+    <p class="muted tiny">Rules of thumb for this run: your wave, HP, fainted, types, moves and items. TMs don't check who can learn them.</p></section>`;
+}
+
+function enemyPanel(info, enemies, encounterId, rewards) {
+  if (rewards?.options?.length) return rewardsPanel(info, rewards);
   const me = ME_BY_ID[encounterId];
   if (me) {
     const n = ENCOUNTER_NOTES[me.key];
@@ -188,6 +199,14 @@ b { display: inline-block; min-width: 24px; }
 .dmg li.ko { background: #c6f19d; color: #0f1f10; } .dmg li.ko small { color: #3c5a3e; }
 .dmg li.maybe strong { color: #c6f19d; }
 .tiny { font-size: 11px; }
+.tier, .badge { display: inline-grid; place-items: center; font: 700 14px/1 Georgia, serif; color: #0f1f10; }
+.tier { width: 26px; height: 26px; flex: none; }
+.tS { background: #ffd84d; } .tA { background: #c6f19d; } .tB { background: #8fd6ad; } .tC { background: #d4dbd4; } .tD { background: #f0b38a; } .tE { background: #ff8f8f; }
+.rewards { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; }
+.rewards li { display: flex; gap: 8px; align-items: flex-start; background: #182d19; padding: 6px 8px; } .rewards p { font-size: 12px; color: #d4dbd4; }
+.badges { position: fixed; inset: 0; pointer-events: none; z-index: 2147482999; }
+.badge { position: fixed; width: 34px; height: 34px; font-size: 20px; transform: translate(-50%, -110%); pointer-events: auto; cursor: help;
+  box-shadow: 0 2px 8px rgba(0,0,0,.5); outline: 2px solid #0f1f10; }
 .opt { background: #182d19; padding: 6px 8px; } .opt p { color: #d4dbd4; font-size: 12px; }
 .mons { display: flex; flex-wrap: wrap; gap: 2px; } figure { margin: 0; width: 64px; text-align: center; font-size: 11px; }
 figure img { width: 48px; height: 48px; image-rendering: pixelated; display: block; margin: 0 auto; }
@@ -224,8 +243,24 @@ function mount() {
   const saved = (() => { try { return JSON.parse(localStorage.getItem('prg-hud')) || {}; } catch { return {}; } })();
   const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items' };
   const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right })); } catch { /* storage blocked */ } };
-  let state = { info: null, enemies: [], encounter: null };
+  let state = { info: null, enemies: [], encounter: null, rewards: null };
   let roomy = true;
+
+  // Tier badges over each reward item, at the item's place on the canvas; hover for the reason.
+  const badgeLayer = document.createElement('div');
+  badgeLayer.className = 'badges';
+  root.append(badgeLayer);
+  function badges() {
+    const rw = state.rewards;
+    const c = document.querySelector('canvas');
+    if (!rw?.options?.length || !c || !state.info) { badgeLayer.innerHTML = ''; return; }
+    const r = c.getBoundingClientRect();
+    const run = { ...state.info, held: rw.held };
+    badgeLayer.innerHTML = rw.options.filter(o => o.x != null).map(o => {
+      const t = rateItem(o, run);
+      return `<span class="badge t${t.tier}" style="left:${r.left + o.x * r.width}px;top:${r.top + o.y * r.height}px" title="${esc(t.why)}">${t.tier}</span>`;
+    }).join('');
+  }
 
   // Panels go in the bands beside the game canvas; with no room they start folded in the canvas's top corners.
   function place() {
@@ -244,7 +279,8 @@ function mount() {
     const { info, enemies, encounter } = state;
     const live = info && info.gameMode !== 'Title' && info.wave;
     root.querySelector('.l').innerHTML = live ? runPanel(info, enemies) : '<section><p class="muted">Start or continue a run: your wave, biome, team and the next fights show here.</p></section>';
-    root.querySelector('.r').innerHTML = live ? enemyPanel(info, enemies, encounter) : '';
+    root.querySelector('.r').innerHTML = live ? enemyPanel(info, enemies, encounter, state.rewards) : '';
+    badges();
     right.dataset.hide = live ? '' : '1';
     if (!drawer.hidden) body.innerHTML = guideTab(ui.tab, info);
     place();
@@ -261,14 +297,14 @@ function mount() {
     body.innerHTML = guideTab(ui.tab, state.info);
   }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !drawer.hidden) drawer.hidden = true; });
-  addEventListener('resize', place);
+  addEventListener('resize', () => { place(); badges(); });
 
   let last = '';
   addEventListener('message', e => {
     if (e.source !== window || !e.data?.__prgOverlay) return;
-    state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null };
+    state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null, rewards: e.data.rewards ?? null };
     const key = JSON.stringify(state);
-    if (key !== last) { last = key; render(); } else place();
+    if (key !== last) { last = key; render(); } else { place(); badges(); }
   });
   render();
   document.documentElement.append(host);
