@@ -207,6 +207,7 @@ b { display: inline-block; min-width: 24px; }
 .badges { position: fixed; inset: 0; pointer-events: none; z-index: 2147482999; }
 .badge { position: fixed; width: 34px; height: 34px; font-size: 20px; transform: translate(-50%, -110%); pointer-events: auto; cursor: help;
   box-shadow: 0 2px 8px rgba(0,0,0,.5); outline: 2px solid #0f1f10; }
+.badge { transform: translate(-50%, -50%); }
 .opt { background: #182d19; padding: 6px 8px; } .opt p { color: #d4dbd4; font-size: 12px; }
 .mons { display: flex; flex-wrap: wrap; gap: 2px; } figure { margin: 0; width: 64px; text-align: center; font-size: 11px; }
 figure img { width: 48px; height: 48px; image-rendering: pixelated; display: block; margin: 0 auto; }
@@ -258,7 +259,9 @@ function mount() {
     const run = { ...state.info, held: rw.held };
     badgeLayer.innerHTML = rw.options.filter(o => o.x != null).map(o => {
       const t = rateItem(o, run);
-      return `<span class="badge t${t.tier}" style="left:${r.left + o.x * r.width}px;top:${r.top + o.y * r.height}px" title="${esc(t.why)}">${t.tier}</span>`;
+      // just above the item's icon, kept inside the game area
+      const top = Math.max(r.top + 4, r.top + o.y * r.height - 0.075 * r.height);
+      return `<span class="badge t${t.tier}" style="left:${r.left + o.x * r.width}px;top:${top}px" title="${esc(`${o.name}: ${t.why}`)}">${t.tier}</span>`;
     }).join('');
   }
 

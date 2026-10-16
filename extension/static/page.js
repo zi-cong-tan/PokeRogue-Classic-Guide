@@ -56,12 +56,13 @@
     const W = scenes.game?.config?.width || 1920, H = scenes.game?.config?.height || 1080;
     const read = (o, shop) => {
       const t = o.modifierTypeOption?.type || {};
-      let b = null;
-      try { b = o.getBounds?.(); } catch { /* not drawn yet */ }
+      // The item's own point on the screen (its world position), not its bounding box, which spans more than the icon.
+      let p = null;
+      try { const m = o.getWorldTransformMatrix?.(); if (m) p = { x: m.tx, y: m.ty }; } catch { /* not drawn yet */ }
       return {
         id: t.id, name: t.name, tier: t.tier, cost: o.modifierTypeOption?.cost || 0, shop,
         tm: 'moveId' in t, moveType: typeof t.moveType === 'number' ? TYPES[t.moveType] : null,
-        x: b ? b.centerX / W : null, y: b ? b.y / H : null,
+        x: p ? p.x / W : null, y: p ? p.y / H : null,
       };
     };
     return {
