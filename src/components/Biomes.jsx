@@ -29,7 +29,7 @@ export default function Biomes() {
 
       <div className="ticket" ref={ticket} aria-live="polite" data-reveal>
         <div className="ticket-art">
-          <img src={biomeArt(cur)} alt={`The ${cur} biome as drawn in the game`} width="320" height="180" />
+          <img src={biomeArt(cur)} alt={`The ${cur} biome as drawn in the game`} width="320" height="180" loading="lazy" />
         </div>
         <div className="ticket-body">
           <h3>{cur}</h3>

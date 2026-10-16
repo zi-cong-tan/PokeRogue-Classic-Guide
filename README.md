@@ -8,8 +8,10 @@
 
 ## What's in it
 
+- **Your run, right now.** Set your wave, biome, villain team and league region: see the next fight, which encounters can appear, where you can go, and boss prep (your team against the next boss, Pokémon by Pokémon). Pop it out into a small window that stays on top of the game.
 - **The run, wave by wave.** Every fixed fight in Classic on one itinerary slip: rivals, gym leaders, the evil team, the Elite Four, the Champion and Eternatus. Click a fight to see the trainer.
 - **The ten villain teams.** A case file per team, from Rocket to Star: boss and grunt sprites, admins by wave, both boss teams, and which Pokemon to watch out for (two health bars, Mega, Gigantamax).
+- **Elite Four and Champions.** A run meets one region's whole league; every region's five fights with full teams, Megas, Tera types and bosses.
 - **Spend your 10 points.** All 572 starters, searchable, with a receipt that adds up your party and checks its type coverage.
 - **A build sheet for your party.** Pick ability (hidden included), passive, nature, IVs, shiny, unlocked egg moves and the four moves you start with. It warns you when an ability changes on evolving, and saves in your browser.
 - **Mid-run help.** Set what each Pokemon has evolved into and the moves it knows now, chosen from everything it can learn (level-up, egg moves, TMs with their shop tier). Each one gets a suggested nature, a suggested moveset, and when to evolve, including moves to learn first because the next form can't.
@@ -18,7 +20,8 @@
 - **Save teams online** (optional). Sign in with GitHub or an email link to keep named teams across devices. Without signing in, everything still saves in your browser.
 - **Candy and eggs.** Hatch times, what each gacha voucher promises, and candy costs per starter price.
 - **Where can I go next?** All 34 biomes with their real art and the odds of each link.
-- **Mystery Encounters.** All 29 in Classic: rarity, waves, biomes, what each choice gives or costs. Say where you are and which wave, and it lists what can show up.
+- **Mystery Encounters.** All 29 in Classic with their game art: rarity, waves, biomes, every choice, what the battle and rewards really are, and which option to pick when.
+- **The shop, Pokérus and fusion.** Every reward item by tier, how Pokérus spreads, and a fusion calculator using the game's own fusion maths.
 - **Types.** Pick one or two types to see what hits them hard and what they hit hard.
 
 ## Where the numbers come from

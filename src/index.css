@@ -88,7 +88,7 @@ section { padding: var(--section) var(--m); }
 .mark { font: 700 var(--step-body) "Pixelify Sans", sans-serif; text-decoration: none; }
 .links { display: flex; gap: 28px; }
 .links a { text-decoration: none; color: var(--ink); transition: color .15s; white-space: nowrap; }
-@media (max-width: 1100px) { .shop-body > div:first-child, .shop-side { grid-column: 1 / -1; } .links { display: none; } .rung-trainer { grid-template-columns: 1fr; } .track-log, .track-prep { grid-column: 1 / -1; } } /* six links stop fitting beside the wordmark and button */
+@media (max-width: 1100px) { .letter-head { flex-direction: column-reverse; align-items: flex-start; } .rung { grid-template-columns: 1fr; gap: 10px; } .rung .party ul { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); } .shop-body > div:first-child, .shop-side { grid-column: 1 / -1; } .links { display: none; } .rung-trainer { grid-template-columns: 1fr; } .track-log, .track-prep { grid-column: 1 / -1; } } /* six links stop fitting beside the wordmark and button */
 .links a:hover { color: var(--accent); }
 .btn {
   background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 600;
@@ -331,7 +331,7 @@ section { padding: var(--section) var(--m); }
 /* ---------- the shop: item tiers as a printed price list, Pokérus and fusion in the margin ---------- */
 .shop { background: var(--paper); color: var(--paper-ink); }
 .shop-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
-.shop-head h2 { grid-column: 1 / 7; max-width: 10ch; }
+.shop-head h2 { grid-column: 1 / 8; max-width: 14ch; }
 .shop-head p { grid-column: 8 / 13; max-width: 44ch; }
 .shop-body { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); margin-top: 48px; align-items: start; }
 .shop-body > div:first-child { grid-column: 1 / 8; }
@@ -397,6 +397,10 @@ section { padding: var(--section) var(--m); }
 .tracker-pop .track-form { display: grid; grid-template-columns: 1fr 1fr; }
 .tracker-pop .prep { grid-template-columns: 1fr; }
 .tracker-pop .track-log { padding: 18px 16px; }
+.tracker-pop .track-log li { display: grid; gap: 2px; padding: 6px 0; }
+.tracker-pop .track-log li > span:first-child { max-width: none; font-size: var(--step-small); color: var(--paper-soft); }
+.tracker-pop .track-log li > span:last-child { text-align: left; }
+.tracker-pop .track-log li b { display: none; }
 
 /* ---------- the league: a ladder of five rungs on a black field, the champion's rung printed on paper ---------- */
 .league { background: var(--black); }
@@ -593,6 +597,10 @@ section { padding: var(--section) var(--m); }
   .items { grid-template-columns: 1fr; }
   .track-head > *, .tracker > * { grid-column: 1 / -1 !important; }
   .prep { grid-template-columns: 1fr; }
+  .track-log li, .tracker-pop .track-log li { display: grid; gap: 2px; padding: 6px 0; }
+  .track-log li > span:first-child { max-width: none; font-size: var(--step-small); color: var(--paper-soft); }
+  .track-log li > span:last-child { text-align: left; }
+  .track-log li b { display: none; }
   .track-form { display: grid; grid-template-columns: 1fr 1fr; }
   .track-form select { min-width: 0; width: 100%; }
   .league-head > * { grid-column: 1 / -1 !important; }

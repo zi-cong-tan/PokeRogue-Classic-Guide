@@ -38,7 +38,7 @@ export default function Eggs() {
     gsap.matchMedia().add(MOTION_OK, () => {
       // The biome art drifts as the section scrolls past; the slips rise up out of the bottom edge.
       gsap.fromTo('.photo-bg', { scale: 1.12 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: root.current, start: 'top bottom', end: 'bottom top', scrub: true } });
-      gsap.from('.slip', { yPercent: 40, duration: 0.9, ease: 'power3.out', stagger: 0.07, scrollTrigger: { trigger: '.slips', start: 'top 90%', once: true } });
+      gsap.from('.slip', { y: 48, duration: 0.9, ease: 'power3.out', stagger: 0.07, scrollTrigger: { trigger: '.slips', start: 'top 90%', once: true } });
       gsap.from('.photo-copy > *', { y: 24, opacity: 0, duration: 0.7, stagger: 0.1, ease: 'power3.out', scrollTrigger: { trigger: root.current, start: 'top 70%', once: true } });
     });
   }, { scope: root });
@@ -65,7 +65,7 @@ export default function Eggs() {
                 </div>
               ))}
             </dl>
-            {s.icon && <img className="slip-icon" src={s.icon} alt={s.iconAlt} width="16" height="16" />}
+            {s.icon && <img className="slip-icon" src={s.icon} alt={s.iconAlt} width="16" height="16" loading="lazy" />}
           </article>
         ))}
       </div>

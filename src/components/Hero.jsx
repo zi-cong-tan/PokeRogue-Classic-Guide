@@ -25,13 +25,13 @@ export default function Hero() {
         <a className="btn" href="#starters">Plan a team</a>
       </nav>
 
-      <img className="hero-bg" src={biomeArt('Town')} alt="" width="320" height="180" />
+      <img className="hero-bg" src={biomeArt('Town')} alt="" width="320" height="180" fetchPriority="high" />
       <div className="card">
         <h1><span>200 waves</span><span>to Eternatus</span></h1>
         <p className="details">
           <span>Classic mode</span><i aria-hidden="true" /><span>10 starter points</span><i aria-hidden="true" /><span>A boss every 10 waves</span>
         </p>
-        <img className="boss" src={animated(890)} alt="Eternatus, the final boss, idling" width="160" height="160" />
+        <img className="boss" src={animated(890)} alt="Eternatus, the final boss, idling" width="160" height="160" fetchPriority="high" />
         <p className="lede">
           A field guide to one PokeRogue Classic run, printed like the paperwork of the trip: the fight schedule, your
           starter receipt, a biome ticket. Every number comes from the game's source code.
