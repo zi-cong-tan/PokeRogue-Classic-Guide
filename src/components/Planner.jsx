@@ -5,6 +5,7 @@ import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import { sprite } from '../art';
 import { teamReport } from '../advice';
 import PartyEditor from './PartyEditor';
+import CloudTeams from './CloudTeams';
 
 // Party and builds are kept in this browser only; any storage error just means nothing is remembered.
 const load = (k, fallback) => { try { return JSON.parse(localStorage.getItem(k)) ?? fallback; } catch { return fallback; } };
@@ -99,7 +100,8 @@ export default function Planner() {
 
       <div className="editor-col" data-reveal><PartyEditor party={party} builds={builds} setBuild={setBuild} data={data} /></div>
 
-      <div className="paper zig receipt" aria-live="polite" data-reveal>
+      <div className="receipt-col" data-reveal>
+      <div className="paper zig receipt" aria-live="polite">
         <h3>Your party</h3>
         <ol>
           {party.length ? party.map(i => (
@@ -137,6 +139,9 @@ export default function Planner() {
             <button type="button" className="text-btn" onClick={() => setParty([])}>Clear party</button>
           </p>
         )}
+      </div>
+
+      <CloudTeams party={party} builds={builds} setParty={setParty} setBuilds={setBuilds} />
       </div>
 
       <div className="picker" data-reveal>

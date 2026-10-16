@@ -95,7 +95,7 @@ export default function Encounters() {
             </li>
           ))}
         </ol>
-        <label className="enc-pick">Encounter
+        <label className="enc-pick"><span className="sr-only">Encounter</span>
           <select value={cur} onChange={ev => open(ev.target.value)}>
             {(shown.some(x => x.key === cur) ? shown : [e, ...shown]).map(x => <option key={x.key} value={x.key}>{x.name} ({TIER[x.tier]})</option>)}
           </select>

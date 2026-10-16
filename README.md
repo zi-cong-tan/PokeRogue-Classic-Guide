@@ -15,6 +15,7 @@
 - **Mid-run help.** Set what each Pokemon has evolved into and the moves it knows now, chosen from everything it can learn (level-up, egg moves, TMs with their shop tier). Each one gets a suggested nature, a suggested moveset, and when to evolve, including moves to learn first because the next form can't.
 - **A team check.** Which attack types hit most of your team, which types your moves can't hit hard, and who to swap out for what type.
 - **Share your team** as a link. Opening one shows that team, with Undo to get yours back.
+- **Save teams online** (optional). Sign in with GitHub or an email link to keep named teams across devices. Without signing in, everything still saves in your browser.
 - **Candy and eggs.** Hatch times, what each gacha voucher promises, and candy costs per starter price.
 - **Where can I go next?** All 34 biomes with their real art and the odds of each link.
 - **Mystery Encounters.** All 29 in Classic: rarity, waves, biomes, what each choice gives or costs. Say where you are and which wave, and it lists what can show up.
@@ -34,7 +35,9 @@ node scripts/check-advice.mjs   # sanity check for the suggestions
 npm run deploy                  # build and publish to GitHub Pages
 ```
 
-Built with React, Vite and GSAP.
+Online saves use [Supabase](https://supabase.com) (free plan). To switch them on in your own copy: create a project, run `supabase/schema.sql` in its SQL editor, copy `.env.example` to `.env` with your project URL and anon key, and turn on the GitHub and Email sign-in providers. Without a `.env` the site works exactly the same, minus online saves.
+
+Built with React, Vite, GSAP and Supabase.
 
 ## Credits
 
