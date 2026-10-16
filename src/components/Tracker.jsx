@@ -8,7 +8,7 @@ import { ENCOUNTERS } from '../data/encounters';
 import { TYPES, TYPE_COLOR, cap, typeInk, mult } from '../data/types';
 import { sprite } from '../art';
 import { bossPrep } from '../advice';
-import { useRun, setRun, useTeam, waveRule, fits, biomeKey, members, BOSS_TIERS } from '../run';
+import { useRun, setRun, useTeam, waveRule, fits, biomeKey, runMembers, BOSS_TIERS } from '../run';
 import { BIOME_BOSSES } from '../data/biome-bosses';
 import { RIVALS } from '../data/rivals';
 
@@ -35,21 +35,19 @@ function knownBosses(run) {
   // Rivals roll every slot fresh each fight, so the prep groups each slot by type: exact for the starter from fight 4,
   // which Terastallizes to its first type; birds by their full typing; the big pools by their main type.
   for (const r of RIVALS) {
-    const slots = r.slots.map((s, k) => [s, k]).sort((a, b) => (a[0].pool.length === 1 ? -1 : 0) - (b[0].pool.length === 1 ? -1 : 0)).flatMap(([s, k]) => {  // a fixed slot (Rayquaza) first
-      if (s.pool.length === 1) { const [n, id, types] = s.pool[0]; return [[[n.replace(' (Mega)', '')], id, '', '', s.note, types]]; }
-      const label = k === 0 ? 'Their starter' : k === 1 ? 'Their bird' : `Slot ${k + 1}`;
+    const slots = r.slots.map((s, k) => {
+      const label = s.pool.length === 1 ? s.pool[0][0] : k === 0 ? 'Their starter' : k === 1 ? 'Their bird' : `Slot ${k + 1}`;
       const groups = new Map();
       for (const [n, id, types] of s.pool) {
-        const key = k === 1 ? types : types.split(' ')[0];
+        // the starter fights as its first type from fight 4 (Tera); birds by full typing; big pools by main type
+        const key = s.pool.length === 1 || k === 1 ? types : types.split(' ')[0];
         if (!groups.has(key)) groups.set(key, []);
         groups.get(key).push([n, id]);
       }
-      return [...groups].sort((a, b) => b[1].length - a[1].length).map(([key, list]) => [
-        [`${label}, ${key.split(' ').map(cap).join('/')}${s.tera ? ' (Tera)' : k === 1 ? '' : ' type'}`], list[0][1], '', '',
-        `${list.length} of ${s.pool.length}: ${list.slice(0, 4).map(x => x[0]).join(', ')}${list.length > 4 ? '...' : ''}`, key]);
-    });
-    out.push({ wave: r.wave, title: 'Your rival', rival: true, slots,
-      extra: 'Each slot is grouped by type' + (r.wave >= 95 ? '; their starter Terastallizes, so it fights as one type.' : '.') });
+      return { label, note: s.note, size: s.pool.length,
+        groups: [...groups].sort((a, b) => b[1].length - a[1].length).map(([types, list]) => ({ types: types.split(' '), list })) };
+    }).sort((a, b) => (a.size === 1 ? -1 : 0) - (b.size === 1 ? -1 : 0)); // Rayquaza first
+    out.push({ wave: r.wave, title: 'Your rival', rival: true, rivalSlots: slots, slots: [] });
   }
   const v = VILLAINS[run.villain];
   if (v) {
@@ -78,12 +76,77 @@ function nextText(f, w) {
 const Chip = ({ t }) => <span className="ty" style={{ '--t': TYPE_COLOR[t], '--ti': typeInk(t) }}>{cap(t)}</span>;
 
 // Wave 200 is always Eternatus, and it changes to Eternamax Eternatus partway through (same types, much bulkier).
-function Final({ team, data }) {
-  if (!team.party.length) return null;
-  const ms = data ? members(team.party, team.builds, data) : null;
+// A slot's note without what its heading already says ("Their starter", "Always a bird").
+const tidy = note => { const s = (note || '').replace(/^Their starter(, |; )?/, '').replace(/^Always a bird(; )?/, ''); return s && s[0].toUpperCase() + s.slice(1); };
+
+// Rival prep: one row per slot, each type group a cell with your best answer, so gaps stand out at a glance.
+function RivalPrep({ slots, team }) {
+  return (
+    <div className="rival-prep">
+      {slots.map(slot => (
+        <div key={slot.label} className="rival-row">
+          <p className="rival-row-head"><strong>{slot.label}</strong>{slot.size > 1 && <span> one of {slot.size}</span>}{tidy(slot.note) && <small>{tidy(slot.note)}</small>}</p>
+          <ul>
+            {slot.groups.map(g => {
+              const [p] = bossPrep(team, [{ name: g.list[0][0], types: g.types }]);
+              return (
+                <li key={g.types.join()} className={p.best.mult < 2 ? 'gap' : undefined}>
+                  <span className="chips">{g.types.map(t => <Chip key={t} t={t} />)}</span>
+                  <span className="rival-sprites">
+                    {g.list.slice(0, 3).map(([n, id]) => <img key={n} src={sprite(id)} alt={n} title={n} width="96" height="96" loading="lazy" />)}
+                    {g.list.length > 3 && <small>+{g.list.length - 3}</small>}
+                  </span>
+                  <span className="rival-answer">{p.best.mult >= 2 ? `${p.best.mult}× ${cap(p.best.type)}, ${p.best.who}` : 'No good answer'}</span>
+                  {p.threatened.length > 0 && <span className="threat">Hits {p.threatened.join(', ')}</span>}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Pokémon caught during the run: they join boss prep and the Mega / Gigantamax filter. Names come from the game data.
+function Caught({ caught, names }) {
+  const [name, setName] = useState('');
+  const known = names ? new Set(names) : null;
+  const add = e => {
+    e.preventDefault();
+    const n = name.trim();
+    if (!n || caught.includes(n) || (known && !known.has(n))) return;
+    setRun({ caught: [...caught, n].slice(-12) });
+    setName('');
+  };
+  return (
+    <form className="track-caught" onSubmit={add}>
+      <label htmlFor="caught-name">Caught this run</label>
+      <div>
+        <input id="caught-name" list="caught-names" value={name} onChange={e => setName(e.target.value)} placeholder={names ? 'Type a Pokémon, like Lapras' : 'Loading names...'} autoComplete="off" />
+        <datalist id="caught-names">{names?.map(n => <option key={n} value={n} />)}</datalist>
+        <button type="submit" className="mini-btn">Add</button>
+      </div>
+      {name && known && !known.has(name.trim()) && <p className="hint">Pick a name from the list.</p>}
+      {caught.length > 0 && (
+        <ul className="caught-list">
+          {caught.map(n => <li key={n}>{n} <button type="button" aria-label={`Remove ${n}`} onClick={() => setRun({ caught: caught.filter(x => x !== n) })}>×</button></li>)}
+        </ul>
+      )}
+    </form>
+  );
+}
+
+function Final({ team, caught, data }) {
+  if (!team.party.length && !caught.length) return null;
+  const ms = data ? runMembers(team, caught, data) : null;
   const [p] = ms ? bossPrep(ms, [{ name: 'Eternatus', types: ['poison', 'dragon'] }]) : [null];
   return (
     <div className="track-final">
+      <div className="final-mons">
+        <figure><img src={sprite(890)} alt="Eternatus" width="96" height="96" loading="lazy" /><figcaption>Phase 1</figcaption></figure>
+        <figure><img src={sprite(10190)} alt="Eternamax Eternatus" width="96" height="96" loading="lazy" /><figcaption>Phase 2, Eternamax</figcaption></figure>
+      </div>
       <h3>Always last: Eternatus, wave 200</h3>
       <p className="hint">Two phases, both Poison and Dragon: Eternatus (140 HP, 145 Sp. Atk, 130 Speed), then Eternamax (255 HP, 250 Defense and Sp. Def). Weak to Ground, Psychic, Ice and Dragon.</p>
       {!p ? <p className="hint">Loading...</p> : (
@@ -97,15 +160,13 @@ function Final({ team, data }) {
 function Body({ popped, onPop }) {
   const run = useRun();
   const team = useTeam();
-  const [data, setData] = useState(null);
+  // Species types are small and always load (for the caught list); the move lists only load once you have starters.
+  const [speciesTypes, setSpeciesTypes] = useState(null);
+  const [moves, setMoves] = useState(null);
+  useEffect(() => { import('../data/species-types').then(m => setSpeciesTypes(m.SPECIES_TYPES)); }, []);
+  useEffect(() => { if (team.party.length && !moves) import('../data/learnsets').then(setMoves); }, [team.party.length, moves]);
+  const data = speciesTypes && (moves || !team.party.length) ? { ...(moves || {}), SPECIES_TYPES: speciesTypes } : null;
   const w = run.wave || 1;
-
-  // Moves, forms and every species' types: only needed once you have a team for the boss prep.
-  useEffect(() => {
-    if (team.party.length && !data) {
-      Promise.all([import('../data/learnsets'), import('../data/species-types')]).then(([l, t]) => setData({ ...l, ...t }));
-    }
-  }, [team.party.length, data]);
 
   const next = FIGHTS.find(f => Math.max(...f.waves) >= w);
   const blocked = waveRule(run.wave);
@@ -121,10 +182,11 @@ function Body({ popped, onPop }) {
   const nextBiomeWave = Math.floor(w / 10) * 10 + 10;
 
   let prep = null;
-  if (boss && data && team.party.length) {
+  const ms = data && (team.party.length || run.caught?.length) ? runMembers(team, run.caught, data) : null;
+  if (boss && !boss.rival && ms) {
     const types = Object.fromEntries(Object.entries(data.SPECIES_TYPES).map(([k, v]) => [norm(k), v]));
     const enemy = boss.slots.map(([names, id, tags, , odds, typesOverride]) => ({ name: names.join(' or '), id, tags, odds, types: (typesOverride || types[norm(names[0])] || 'normal').split(' ') }));
-    prep = bossPrep(members(team.party, team.builds, data), enemy);
+    prep = bossPrep(ms, enemy);
   }
   const uncovered = prep ? prep.filter(p => p.best.mult < 2).length : 0;
 
@@ -154,6 +216,7 @@ function Body({ popped, onPop }) {
           </select>
         </label>
       </form>
+      <Caught caught={run.caught || []} names={data ? Object.keys(data.SPECIES_TYPES) : null} />
 
       <div className="paper zig track-log" aria-live="polite">
         <ol>
@@ -175,7 +238,8 @@ function Body({ popped, onPop }) {
       {boss && (
         <div className="track-prep">
           <h3>Boss prep: {boss.title}</h3>
-          {!team.party.length ? <p className="hint">Pick your party in the starter planner (and set its moves in the build sheet) to see how it matches up.</p>
+          {boss.rival && ms ? <><p className="hint">Each slot is rolled fresh every fight. Its options are grouped by type, with your best answer to each.</p><RivalPrep slots={boss.rivalSlots} team={ms} /></>
+            : !team.party.length && !run.caught?.length ? <p className="hint">Pick your starters in the planner, or add what you caught below, to see how your team matches up.</p>
             : !prep ? <p className="hint">Loading the matchup...</p> : <>
               <p className="hint">{boss.extra ? `${boss.extra} ` : ''}{boss.biome ? `One of these will show up (or the gym leader on a gym wave). ` : ''}{uncovered ? `${uncovered} of ${prep.length} have no super-effective hit from your team. Teach a move of the type below them, or swap someone in.` : 'Your team can hit every one of them for at least double.'}</p>
               <ul className="prep">
@@ -196,7 +260,7 @@ function Body({ popped, onPop }) {
         </div>
       )}
 
-      <Final team={team} data={data} />
+      <Final team={team} caught={run.caught || []} data={data} />
 
       {!popped && onPop && <button type="button" className="mini-btn" onClick={onPop}>Pop out over the game</button>}
     </div>

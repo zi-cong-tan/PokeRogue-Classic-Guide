@@ -5,7 +5,7 @@ import { SPECIAL_FORMS } from '../data/megas';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import { sprite } from '../art';
 import { TACTICS, tacticStarters, fusionPicks } from '../advice';
-import { useTeam, members } from '../run';
+import { useTeam, members, useRun } from '../run';
 
 const STAT = ['HP', 'Atk', 'Def', 'SpA', 'SpD', 'Spe'];
 const Chip = ({ t }) => <span className="ty" style={{ '--t': TYPE_COLOR[t], '--ti': typeInk(t) }}>{cap(t)}</span>;
@@ -68,13 +68,19 @@ function Fusions({ data }) {
   );
 }
 
-function SpecialForms() {
+function SpecialForms({ data }) {
   const team = useTeam();
+  const run = useRun();
+  const [q, setQ] = useState('');
   const [kind, setKind] = useState('mega');
   const [mine, setMine] = useState(false);
   const [all, setAll] = useState(false);
-  const party = new Set(team.party.map(i => STARTERS[i][0]));
-  const list = SPECIAL_FORMS.filter(f => f.kind === kind && (!mine || party.has(f.starter))).sort((a, b) => sum(b.stats) - sum(a.stats));
+  // Your run's lines: the planner's starters, plus the line of anything you caught (a caught Charmander counts Charizard).
+  const caught = run.caught || [];
+  const lines = new Set(team.party.map(i => STARTERS[i][0]));
+  if (data) data.LINES.forEach((line, i) => { if (line.some(f => caught.includes(data.FORMS[f][0]))) lines.add(STARTERS[i][0]); });
+  const words = q.toLowerCase().trim();
+  const list = SPECIAL_FORMS.filter(f => f.kind === kind && (!mine || lines.has(f.starter) || caught.includes(f.name)) && (!words || `${f.name} ${f.starter}`.toLowerCase().includes(words))).sort((a, b) => sum(b.stats) - sum(a.stats));
   return (
     <div className="special">
       <div className="special-filters">
@@ -82,7 +88,8 @@ function SpecialForms() {
           <button type="button" aria-pressed={kind === 'mega'} onClick={() => setKind('mega')}>Mega and Primal</button>
           <button type="button" aria-pressed={kind === 'gmax'} onClick={() => setKind('gmax')}>Gigantamax</button>
         </div>
-        <label className="check-line"><input type="checkbox" checked={mine} onChange={e => setMine(e.target.checked)} /> Only my party's lines</label>
+        <label className="check-line"><input type="checkbox" checked={mine} onChange={e => setMine(e.target.checked)} /> Only my run's Pokémon</label>
+        <input type="search" className="special-search" value={q} onChange={e => setQ(e.target.value)} placeholder="Search, like Charizard" aria-label="Search forms" />
       </div>
       <p className="hint">{kind === 'mega'
         ? 'Needs the Mega Bracelet (Rogue tier); Mega Stones then turn up as rare form change items. The Pokémon Mega Evolves in battle.'
@@ -105,7 +112,8 @@ function SpecialForms() {
           </tbody>
         </table>
       </div>
-      {!list.length && <p className="hint">None of your party's lines has one.</p>}
+      {!list.length && <p className="hint">{mine ? "None of your run's Pokémon has one. Starters come from the planner; add what you catch in the tracker at the top (Caught this run)." : 'No match.'}</p>}
+      {mine && list.length > 0 && <p className="hint">Your starters from the planner, plus what you added under "Caught this run" in the tracker, with their evolution lines.</p>}
       {list.length > 12 && <button type="button" className="text-btn" onClick={() => setAll(v => !v)}>{all ? 'Show the top 12' : `Show all ${list.length}`}</button>}
     </div>
   );
@@ -139,7 +147,7 @@ export default function Builds() {
         <aside className="builds-side" data-reveal><h3>DNA Splicers for your party</h3><Fusions data={data} />
           <p className="hint">Scored on the fused base stats, weaknesses it drops and a new type. The first Pokémon keeps its first type; see the fusion calculator in the shop section.</p></aside>
       </div>
-      <div data-reveal><h3>Mega Evolution and Gigantamax</h3><SpecialForms /></div>
+      <div data-reveal><h3>Mega Evolution and Gigantamax</h3><SpecialForms data={data} /></div>
     </section>
   );
 }

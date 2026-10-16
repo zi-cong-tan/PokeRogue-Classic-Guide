@@ -5,7 +5,7 @@ import { ME_RULES } from './data/encounters';
 import { STARTERS } from './data/starters';
 
 const KEY = 'prg-run-1';
-const EMPTY = { wave: 0, biome: '', villain: -1, region: -1 };
+const EMPTY = { wave: 0, biome: '', villain: -1, region: -1, caught: [] };
 const read = () => { try { return { ...EMPTY, ...JSON.parse(localStorage.getItem(KEY)) }; } catch { return EMPTY; } };
 
 export function setRun(patch) {
@@ -62,7 +62,7 @@ export const fits = (e, biome, wave) =>
 export function members(party, builds, data) {
   return party.map(i => {
     const b = builds[i] || {};
-    if (!data) return { name: STARTERS[i][0], types: STARTERS[i][3].split(' '), moves: [] };
+    if (!data?.FORMS) return { name: STARTERS[i][0], types: STARTERS[i][3].split(' '), moves: [] };
     const { FORMS, LINES, MOVE_LIST, MOVE_KEYS } = data;
     const form = LINES[i].includes(b.form) ? b.form : LINES[i][0];
     const moves = (b.runMoves?.length ? b.runMoves : b.moves || [])
@@ -76,3 +76,10 @@ export const biomeKey = name => (name ? name.toUpperCase().replace(/ /g, '_') : 
 
 // Boss tiers and their odds out of 64 (generateBossBiomeTier in src/field/arena.ts); an empty tier falls to the next one down.
 export const BOSS_TIERS = [['BOSS', 'Usual', 44], ['BOSS_RARE', 'Rare', 14], ['BOSS_SUPER_RARE', 'Super rare', 5], ['BOSS_ULTRA_RARE', 'Ultra rare', 1]];
+
+// Your team for boss prep: the planner's starters (with their build-sheet forms and moves) plus the Pokémon you
+// caught this run (types only; their moves aren't known). speciesTypes: name -> "type1 type2".
+export function runMembers(team, caught, data) {
+  const caughtMembers = (caught || []).filter(n => data?.SPECIES_TYPES?.[n]).map(n => ({ name: n, types: data.SPECIES_TYPES[n].split(' '), moves: [] }));
+  return [...members(team.party, team.builds, data), ...caughtMembers];
+}
