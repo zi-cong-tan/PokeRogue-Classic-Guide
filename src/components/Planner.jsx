@@ -4,6 +4,7 @@ import { STARTERS, LIMIT, MAX_PARTY } from '../data/starters';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import { sprite } from '../art';
 import { teamReport } from '../advice';
+import { members } from '../run';
 import PartyEditor from './PartyEditor';
 import CloudTeams from './CloudTeams';
 
@@ -22,19 +23,6 @@ function sharedTeam() {
     const { p, b } = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(6)))));
     return Array.isArray(p) ? { party: p.filter(i => STARTERS[i]).slice(0, MAX_PARTY), builds: b || {} } : null;
   } catch { return null; }
-}
-
-// Each member as it is now: the form picked in the build sheet and the types of its damaging moves.
-function members(party, builds, data) {
-  return party.map(i => {
-    const b = builds[i] || {};
-    if (!data) return { name: STARTERS[i][0], types: STARTERS[i][3].split(' '), moves: [] };
-    const { FORMS, LINES, MOVE_LIST, MOVE_KEYS } = data;
-    const form = LINES[i].includes(b.form) ? b.form : LINES[i][0];
-    const moves = (b.runMoves?.length ? b.runMoves : b.moves || [])
-      .map(k => MOVE_LIST[MOVE_KEYS.indexOf(k)]).filter(m => m && m[3] > 0).map(m => m[1]);
-    return { name: FORMS[form][0], types: FORMS[form][2].split(' '), moves };
-  });
 }
 
 const Chips = ({ list }) => (
@@ -63,6 +51,8 @@ export default function Planner() {
   }, [party.length, data]);
   useEffect(() => save('prg-party-2', party), [party]);
   useEffect(() => save('prg-builds-2', builds), [builds]);
+  // Let the run tracker's boss prep follow the team.
+  useEffect(() => { window.dispatchEvent(new CustomEvent('prg-team', { detail: { party, builds } })); }, [party, builds]);
   const setBuild = (i, b) => setBuilds(all => ({ ...all, [i]: b }));
   const [q, setQ] = useState('');
   const [fits, setFits] = useState(false);

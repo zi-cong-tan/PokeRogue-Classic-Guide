@@ -88,7 +88,7 @@ section { padding: var(--section) var(--m); }
 .mark { font: 700 var(--step-body) "Pixelify Sans", sans-serif; text-decoration: none; }
 .links { display: flex; gap: 28px; }
 .links a { text-decoration: none; color: var(--ink); transition: color .15s; white-space: nowrap; }
-@media (max-width: 1100px) { .links { display: none; } .rung-trainer { grid-template-columns: 1fr; } } /* six links stop fitting beside the wordmark and button */
+@media (max-width: 1100px) { .links { display: none; } .rung-trainer { grid-template-columns: 1fr; } .track-log, .track-prep { grid-column: 1 / -1; } } /* six links stop fitting beside the wordmark and button */
 .links a:hover { color: var(--accent); }
 .btn {
   background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 600;
@@ -328,6 +328,45 @@ section { padding: var(--section) var(--m); }
 .atlas button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 
 /* ---------- types: one giant word, then a stack of bars ---------- */
+/* ---------- your run: a log slip that follows the game, with the boss prep beside it ---------- */
+.track { background: var(--surface); }
+.track-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
+.track-head h2 { grid-column: 1 / 7; max-width: 11ch; }
+.track-head p { grid-column: 8 / 13; max-width: 44ch; }
+.tracker { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px var(--gap); margin-top: 48px; align-items: start; }
+.track-form { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 12px 20px; }
+.track-form label { display: grid; gap: 6px; font-weight: 600; }
+.track-form input, .track-form select { font: inherit; font-weight: 400; color: var(--paper-ink); background: var(--paper); border: 0; padding: 8px 10px; min-height: 44px; }
+.track-form input { width: 100px; }
+.track-form select { min-width: 190px; }
+.track-log { grid-column: 1 / 6; }
+.track-log li { display: flex; align-items: baseline; gap: 10px; padding: 8px 0; }
+.track-log li > span:first-child { flex: none; max-width: 55%; }
+.track-log li > span:last-child { text-align: right; font-weight: 600; }
+.track-log li b { flex: 1; min-width: 16px; border-bottom: 4px dotted currentColor; opacity: .3; transform: translateY(-5px); }
+.track-link { margin-top: 14px; }
+.track-link a { color: inherit; text-underline-offset: 3px; }
+.track-prep { grid-column: 6 / 13; }
+.track-prep h3 { font-size: var(--step-lead); margin: 0 0 10px; }
+.prep { list-style: none; padding: 0; margin: 16px 0 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.prep li { display: flex; gap: 10px; align-items: center; background: var(--bg); padding: 8px 12px 8px 4px; }
+.prep li.gap { background: #3a2f1a; }
+.prep img { width: 80px; height: 80px; image-rendering: pixelated; flex: none; }
+.prep li > div { display: grid; gap: 4px; font-size: var(--step-small); }
+.prep strong { font-size: var(--step-body); }
+.prep .chips { margin: 0; }
+.prep .threat { color: #ffb4a8; }
+.tracker > .mini-btn { grid-column: 1 / -1; justify-self: start; }
+.tracker .hint { color: var(--muted); font-size: var(--step-small); }
+/* the pop-out window: one narrow column */
+.pip-body { margin: 0; background: var(--surface); color: var(--ink); padding: 14px; }
+.tracker-pop { grid-template-columns: 1fr; margin: 0; gap: 14px; }
+.tracker-pop > * { grid-column: 1 / -1 !important; }
+.tracker-pop .track-form select { min-width: 0; width: 100%; }
+.tracker-pop .track-form { display: grid; grid-template-columns: 1fr 1fr; }
+.tracker-pop .prep { grid-template-columns: 1fr; }
+.tracker-pop .track-log { padding: 18px 16px; }
+
 /* ---------- the league: a ladder of five rungs on a black field, the champion's rung printed on paper ---------- */
 .league { background: var(--black); }
 .league-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
@@ -518,7 +557,11 @@ section { padding: var(--section) var(--m); }
   .slip { padding: 16px 12px; }
 
   .ticket { grid-template-columns: 1fr; border-radius: 22px; }
-  .enc-head, .enc-body, .league-head { grid-template-columns: 1fr; }
+  .enc-head, .enc-body, .league-head, .track-head, .tracker { grid-template-columns: 1fr; }
+  .track-head > *, .tracker > * { grid-column: 1 / -1 !important; }
+  .prep { grid-template-columns: 1fr; }
+  .track-form { display: grid; grid-template-columns: 1fr 1fr; }
+  .track-form select { min-width: 0; width: 100%; }
   .league-head > * { grid-column: 1 / -1 !important; }
   .rung { grid-template-columns: 1fr; padding: 18px 14px; gap: 10px; }
   .rung-trainer { grid-template-columns: 1fr; gap: 12px; }

@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useReveal, gsap, MOTION_OK } from '../motion';
+import { useRun } from '../run';
 import { VILLAINS } from '../data/villains';
 import Party from './Party';
 import Trainer from './Trainer';
@@ -8,7 +9,11 @@ export default function Villains() {
   const root = useReveal();
   const file = useRef(null);
   const tabs = useRef([]);
-  const [cur, setCur] = useState(0);
+  const run = useRun();
+  const [cur, setCur] = useState(run.villain >= 0 ? run.villain : 0);
+  // Opens on your run's pick once you set it in the tracker.
+  const [seen, setSeen] = useState(run.villain);
+  if (run.villain !== seen) { setSeen(run.villain); if (run.villain >= 0) setCur(run.villain); }
   const v = VILLAINS[cur];
 
   const open = i => {

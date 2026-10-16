@@ -174,3 +174,19 @@ export function teamReport(members) {
   }
   return { threats, gaps, swap, rows };
 }
+
+// Your team against a boss team, Pokémon by Pokémon: your best hit on it and who it threatens with its own types.
+// members: as for teamReport. enemy: [{ name, types }]. A 2x+ hit is "covered"; 1x or less leaves it as a problem.
+export function bossPrep(members, enemy) {
+  return enemy.map(e => {
+    let best = { mult: 0, who: null, type: null };
+    for (const p of members) {
+      for (const t of p.moves.length ? p.moves : p.types) {
+        const m = mult(t, e.types);
+        if (m > best.mult) best = { mult: m, who: p.name, type: t };
+      }
+    }
+    const threatened = members.filter(p => e.types.some(t => mult(t, p.types) > 1)).map(p => p.name);
+    return { ...e, best, threatened };
+  });
+}

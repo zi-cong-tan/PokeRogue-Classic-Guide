@@ -4,23 +4,11 @@ import { ENCOUNTERS, ME_RULES } from '../data/encounters';
 import { BIOME_NAMES } from '../data/game';
 import { ENCOUNTER_NOTES } from '../data/encounter-notes';
 import { Art } from './Trainer';
+import { useRun, setRun, waveRule, fits, biomeKey } from '../run';
 
 const TIER = { COMMON: 'Common', GREAT: 'Great', ULTRA: 'Ultra', ROGUE: 'Rogue', VARIES: 'Varies' };
 const biomeName = key => key.toLowerCase().replace(/(^|_)(\w)/g, (_, s, c) => (s ? ' ' : '') + c.toUpperCase());
 const MARK = { '+': ['good', 'Good'], '-': ['bad', 'Cost'], '?': ['maybe', 'Maybe'] };
-
-// Why a wave can't have an encounter, from isMysteryEncounterValidForWave in the game's battle-scene.ts.
-function waveRule(w) {
-  const [lo, hi] = ME_RULES.waves;
-  if (!w) return null;
-  if (w < lo || w > hi) return `Encounters only happen between waves ${lo} and ${hi}.`;
-  if (w % 10 === 0) return 'Wave ' + w + ' is a boss wave, so no encounter.';
-  if (w % 10 === 1) return 'Wave ' + w + ' is the first wave of a biome, so no encounter.';
-  return null;
-}
-
-const fits = (e, biome, wave) =>
-  (!biome || e.biomes.includes('ANY') || e.biomes.includes(biome)) && (!wave || (wave >= e.waves[0] && wave <= e.waves[1]));
 
 // One line of an option's outcome: "(+) Gain Berries" becomes a Good mark and the text.
 function Outcome({ line }) {
@@ -34,8 +22,10 @@ function Outcome({ line }) {
 export default function Encounters() {
   const root = useReveal();
   const letter = useRef(null);
-  const [biome, setBiome] = useState('');
-  const [wave, setWave] = useState('');
+  // The filter is your run's biome and wave, shared with the tracker at the top of the page.
+  const run = useRun();
+  const biome = biomeKey(run.biome);
+  const wave = run.wave || '';
   const [cur, setCur] = useState(ENCOUNTERS.find(e => e.key === 'MYSTERIOUS_CHEST')?.key ?? ENCOUNTERS[0].key);
 
   const w = Number(wave) || 0;
@@ -75,13 +65,13 @@ export default function Encounters() {
 
       <div className="enc-find" data-reveal>
         <label>Where are you?
-          <select value={biome} onChange={ev => setBiome(ev.target.value)}>
+          <select value={run.biome} onChange={ev => setRun({ biome: ev.target.value })}>
             <option value="">Any biome</option>
-            {BIOME_NAMES.map(n => <option key={n} value={n.toUpperCase().replace(/ /g, '_')}>{n}</option>)}
+            {BIOME_NAMES.map(n => <option key={n} value={n}>{n}</option>)}
           </select>
         </label>
         <label>Wave
-          <input type="number" min="1" max="200" inputMode="numeric" placeholder="Any" value={wave} onChange={ev => setWave(ev.target.value)} />
+          <input type="number" min="1" max="200" inputMode="numeric" placeholder="Any" value={wave} onChange={ev => setRun({ wave: Math.max(0, Math.min(200, Number(ev.target.value) || 0)) })} />
         </label>
         <p className="enc-count" aria-live="polite">
           {blocked || (shown.length ? `${shown.length} of ${ENCOUNTERS.length} encounters can show up here.` : 'None of the encounters can show up here.')}

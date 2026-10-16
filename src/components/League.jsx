@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useReveal, gsap, MOTION_OK } from '../motion';
+import { useRun } from '../run';
 import { LEAGUE, LEAGUE_TRAINERS } from '../data/league';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import Party from './Party';
@@ -40,7 +41,11 @@ function Rung({ wave, keys, champion }) {
 export default function League() {
   const root = useReveal();
   const ladder = useRef(null);
-  const [cur, setCur] = useState(0);
+  const run = useRun();
+  const [cur, setCur] = useState(run.region >= 0 ? run.region : 0);
+  // Opens on your run's pick once you set it in the tracker.
+  const [seen, setSeen] = useState(run.region);
+  if (run.region !== seen) { setSeen(run.region); if (run.region >= 0) setCur(run.region); }
   const r = LEAGUE[cur];
   const pick = i => {
     setCur(i);

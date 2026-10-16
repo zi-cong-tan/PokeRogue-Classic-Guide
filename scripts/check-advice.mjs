@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import * as L from '../src/data/learnsets.js';
 import { STARTERS } from '../src/data/starters.js';
 import { BUILDS } from '../src/data/builds.js';
-import { suggestNature, suggestMoves, evolveAdvice, teamReport, learnable } from '../src/advice.js';
+import { suggestNature, suggestMoves, evolveAdvice, teamReport, learnable, bossPrep } from '../src/advice.js';
 
 const at = n => STARTERS.findIndex(s => s[0] === n);
 const name = m => L.MOVE_LIST[m][0];
@@ -29,6 +29,12 @@ const team = teamReport([{ name: 'A', types: ['fire'], moves: ['fire'] }, { name
 assert.ok(team.threats.includes('water') && team.threats.includes('ground'));
 assert.ok(team.swap && team.swap.weakTo.includes('water'));
 assert.equal(teamReport([]).swap, null);
+
+const prep = bossPrep([{ name: 'Garchomp', types: ['dragon', 'ground'], moves: ['ground', 'dragon'] }, { name: 'Lapras', types: ['water', 'ice'], moves: ['ice'] }],
+  [{ name: 'Dragonite', types: ['dragon', 'flying'] }, { name: 'Machamp', types: ['fighting'] }]);
+assert.equal(prep[0].best.mult, 4); assert.equal(prep[0].best.who, 'Lapras');   // Ice on Dragon/Flying
+assert.deepEqual(prep[0].threatened, ['Garchomp']);                              // Dragonite's Dragon STAB hits Garchomp 2x
+assert.deepEqual(prep[1].threatened, ['Lapras']);                                // Fighting hits Lapras (Ice) 2x
 
 console.log('Garchomp:', gm.map(x => `${name(x.m)} (${x.label})`).join(', '));
 console.log('Ivysaur ->', evo.map(e => `${e.name} by ${e.how}; keep ${e.keep.map(k => name(k.m) + ' @' + k.lvl).join(', ') || 'nothing'}`).join(' | '));

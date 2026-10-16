@@ -1,19 +1,22 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useReveal, gsap, MOTION_OK } from '../motion';
 import { BIOMES, BIOME_NAMES } from '../data/game';
 import { biomeArt } from '../art';
+import { useRun, setRun } from '../run';
 
 const ODDS = { undefined: 'Always open', 2: 'Open 1 run in 2', 3: 'Open 1 run in 3' };
 
 export default function Biomes() {
   const root = useReveal();
   const ticket = useRef(null);
-  const [cur, setCur] = useState('Town');
+  // The ticket shows your run's biome; travelling on it moves your run there too.
+  const run = useRun();
+  const cur = BIOMES[run.biome] ? run.biome : 'Town';
   const from = BIOME_NAMES.filter(x => BIOMES[x].some(([d]) => d === cur));
 
   // Travelling stamps a fresh ticket: it dips and comes back with the new biome.
   const go = name => {
-    setCur(name);
+    setRun({ biome: name });
     if (window.matchMedia(MOTION_OK).matches) gsap.fromTo(ticket.current, { y: 14, opacity: 0.4 }, { y: 0, opacity: 1, duration: 0.45, ease: 'power3.out' });
   };
 
