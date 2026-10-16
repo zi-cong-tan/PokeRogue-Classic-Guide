@@ -112,6 +112,10 @@ section { padding: var(--section) var(--m); }
 .details i { width: 10px; height: 10px; background: var(--paper-ink); transform: rotate(45deg); }
 .boss { width: 160px; height: 160px; object-fit: contain; image-rendering: pixelated; margin: 34px 0 18px; }
 .lede { max-width: 34ch; }
+.overlay-cta { display: grid; justify-items: center; gap: 10px; margin: 14px 0 -8px; }
+.overlay-btn { font-size: var(--step-lead); padding: 16px 28px; border: 0; cursor: pointer; }
+.overlay-cta p { max-width: 40ch; font-size: var(--step-small); color: var(--paper-soft); }
+.overlay-cta a { color: var(--paper-ink); text-underline-offset: 3px; }
 
 /* ---------- the run: itinerary slip on a black field ---------- */
 .itin { background: var(--black); display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: start; }
@@ -494,7 +498,7 @@ section { padding: var(--section) var(--m); }
 .prep .chips { margin: 0; }
 .prep .threat { color: #ffb4a8; }
 .prep .odds-note { color: var(--muted); }
-.tracker > .mini-btn { grid-column: 1 / -1; justify-self: start; }
+.tracker > .pop-top { grid-column: 1 / -1; justify-self: start; border: 0; cursor: pointer; font-size: var(--step-body); padding: 12px 22px; }
 .track-final { grid-column: 1 / -1; background: var(--bg); padding: 16px 18px; display: grid; gap: 6px; }
 .track-final h3 { font-size: var(--step-body); margin: 0; }
 .final-mons { display: flex; gap: 8px; }

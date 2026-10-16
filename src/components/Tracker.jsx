@@ -229,6 +229,7 @@ function Body({ popped, onPop }) {
 
   return (
     <div className={popped ? 'tracker tracker-pop' : 'tracker'}>
+      {!popped && onPop && <button type="button" className="btn pop-top" onClick={onPop}>Pop out over your game</button>}
       <form className="track-form" onSubmit={e => e.preventDefault()}>
         <label>Wave
           <input type="number" min="1" max="200" inputMode="numeric" value={run.wave || ''} placeholder="1"
@@ -299,7 +300,7 @@ function Body({ popped, onPop }) {
 
       <Final team={team} caught={run.caught || []} data={data} />
 
-      {!popped && onPop && <button type="button" className="mini-btn" onClick={onPop}>Pop out over the game</button>}
+
     </div>
   );
 }
@@ -328,6 +329,13 @@ export default function Tracker() {
       window.open(`${location.pathname}?tracker`, 'prg-tracker', 'popup,width=440,height=760');
     }
   };
+
+  // The button in the opening card asks for the pop-out too.
+  useEffect(() => {
+    const ask = () => { if (!pip) { pop(); document.getElementById('tracker')?.scrollIntoView({ behavior: 'smooth' }); } };
+    window.addEventListener('prg-popout', ask);
+    return () => window.removeEventListener('prg-popout', ask);
+  });
 
   return (
     <section className="track" id="tracker" aria-labelledby="track-title">
