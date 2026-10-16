@@ -88,7 +88,7 @@ section { padding: var(--section) var(--m); }
 .mark { font: 700 var(--step-body) "Pixelify Sans", sans-serif; text-decoration: none; }
 .links { display: flex; gap: 28px; }
 .links a { text-decoration: none; color: var(--ink); transition: color .15s; white-space: nowrap; }
-@media (max-width: 1100px) { .links { display: none; } .rung-trainer { grid-template-columns: 1fr; } .track-log, .track-prep { grid-column: 1 / -1; } } /* six links stop fitting beside the wordmark and button */
+@media (max-width: 1100px) { .shop-body > div:first-child, .shop-side { grid-column: 1 / -1; } .links { display: none; } .rung-trainer { grid-template-columns: 1fr; } .track-log, .track-prep { grid-column: 1 / -1; } } /* six links stop fitting beside the wordmark and button */
 .links a:hover { color: var(--accent); }
 .btn {
   background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 600;
@@ -140,7 +140,7 @@ section { padding: var(--section) var(--m); }
   font: 700 var(--step-small) "Pixelify Sans", sans-serif; transition: background-color .15s;
 }
 .tabs button:hover { background: #d6e2cc; }
-.tabs button[aria-selected="true"] { background: var(--bg); color: var(--ink); }
+.tabs button[aria-selected="true"], .tabs button[aria-pressed="true"] { background: var(--bg); color: var(--ink); }
 .file { background: var(--bg); color: var(--ink); display: grid; grid-template-columns: 340px 1fr; gap: 48px; padding: 40px; }
 .file-people { display: flex; align-items: flex-end; gap: 12px; min-height: 250px; }
 .file-people .grunt { opacity: .9; }
@@ -328,6 +328,37 @@ section { padding: var(--section) var(--m); }
 .atlas button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 
 /* ---------- types: one giant word, then a stack of bars ---------- */
+/* ---------- the shop: item tiers as a printed price list, Pokérus and fusion in the margin ---------- */
+.shop { background: var(--paper); color: var(--paper-ink); }
+.shop-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
+.shop-head h2 { grid-column: 1 / 7; max-width: 10ch; }
+.shop-head p { grid-column: 8 / 13; max-width: 44ch; }
+.shop-body { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); margin-top: 48px; align-items: start; }
+.shop-body > div:first-child { grid-column: 1 / 8; }
+.items { margin: 20px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+.items div { padding: 12px 0; border-bottom: 4px dotted color-mix(in srgb, var(--paper-ink) 18%, transparent); break-inside: avoid; }
+.items dt { font-weight: 600; }
+.items dd { margin: 2px 0 0; font-size: var(--step-small); color: var(--paper-soft); }
+.shop-side { grid-column: 9 / 13; background: var(--paper-step); padding: 24px; }
+.shop-side h3 { font: 400 var(--step-lead)/1.1 "Pixelify Sans", sans-serif; margin: 0 0 12px; }
+.shop-side h3 + ul, .shop-side h3 + p { margin-bottom: 28px; }
+.shop-side ul { padding-left: 1.1em; margin: 0; display: grid; gap: 8px; }
+.fuse { margin-top: 16px; display: grid; gap: 14px; }
+.fuse-pick { display: grid; gap: 10px; }
+.fuse-pick label { display: grid; gap: 4px; font-size: var(--step-small); font-weight: 600; }
+.fuse-pick input { width: 100%; min-width: 0; font: inherit; font-weight: 400; min-height: 44px; padding: 8px 10px; border: 0; background: var(--paper); color: var(--paper-ink); }
+.fuse-mons { display: flex; align-items: center; gap: 4px; }
+.fuse-mons img { width: 88px; height: 88px; image-rendering: pixelated; }
+.fuse-mons span { font: 400 var(--step-lead) "Pixelify Sans", sans-serif; }
+.fuse .chips { margin: 0; }
+.fuse-stats { width: 100%; border-collapse: collapse; font-size: var(--step-small); font-variant-numeric: tabular-nums; }
+.fuse-stats th, .fuse-stats td { text-align: right; padding: 4px 6px; }
+.fuse-stats th:first-child { text-align: left; }
+.fuse-stats td:last-child { font-weight: 600; background: var(--accent); }
+.fuse-stats thead th { font-weight: 600; border-bottom: 2px solid var(--paper-ink); }
+.fuse-stats .sum th, .fuse-stats .sum td { border-top: 2px solid var(--paper-ink); font-weight: 600; }
+.shop .hint { color: var(--paper-soft); font-size: var(--step-small); }
+
 /* ---------- your run: a log slip that follows the game, with the boss prep beside it ---------- */
 .track { background: var(--surface); }
 .track-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
@@ -557,7 +588,9 @@ section { padding: var(--section) var(--m); }
   .slip { padding: 16px 12px; }
 
   .ticket { grid-template-columns: 1fr; border-radius: 22px; }
-  .enc-head, .enc-body, .league-head, .track-head, .tracker { grid-template-columns: 1fr; }
+  .enc-head, .enc-body, .league-head, .track-head, .tracker, .shop-head, .shop-body { grid-template-columns: 1fr; }
+  .shop-head > *, .shop-body > * { grid-column: 1 / -1 !important; }
+  .items { grid-template-columns: 1fr; }
   .track-head > *, .tracker > * { grid-column: 1 / -1 !important; }
   .prep { grid-template-columns: 1fr; }
   .track-form { display: grid; grid-template-columns: 1fr 1fr; }

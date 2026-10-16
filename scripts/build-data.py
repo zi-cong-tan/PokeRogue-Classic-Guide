@@ -490,6 +490,62 @@ out5 = ("// Types of every species, by display name. From src/data/balance/speci
         f"export const SPECIES_TYPES = {j(all_types)};\n")
 (ROOT / "src/data/species-types.js").write_text(out5, encoding="utf-8")
 print(f"Wrote src/data/species-types.js: {len(all_types)} species, {len(out5) // 1024} KB")
+# --- items.js: what each shop tier can offer (src/modifier/init-modifier-pools.ts), with names and descriptions
+# from pokerogue-locales. Grouped items (any berry, any TM...) get a plain name written here.
+pools_src = fetch(f"{SRC.replace('data/', '')}modifier/init-modifier-pools.ts")
+mt_src = fetch(f"{SRC.replace('data/', '')}modifier/modifier-type.ts")
+mt_loc = json.loads(fetch(LOCALES + "modifier-type.json"))["ModifierType"]
+item_class = dict(re.findall(r"\n\s+(\w+):\s*\(\)\s*=>\s*\n?\s*new (\w+)\(", mt_src))
+GROUP_NAMES = {
+    "POKEBALL": "Poké Balls", "GREAT_BALL": "Great Balls", "ULTRA_BALL": "Ultra Balls", "ROGUE_BALL": "Rogue Balls",
+    "MASTER_BALL": "Master Ball", "TEMP_STAT_STAGE_BOOSTER": "X items (X Attack, X Speed...)", "BERRY": "Berries",
+    "TM_COMMON": "TMs, common", "TM_GREAT": "TMs, great", "TM_ULTRA": "TMs, ultra", "SPECIES_STAT_BOOSTER": "Species items (Light Ball, Thick Club...)",
+    "EVOLUTION_ITEM": "Evolution items (stones and more)", "RARE_EVOLUTION_ITEM": "Rare evolution items", "BASE_STAT_BOOSTER": "Vitamins (HP Up, Protein...)",
+    "TERA_SHARD": "Tera Shards", "VOUCHER": "Voucher", "VOUCHER_PLUS": "Voucher Plus", "VOUCHER_PREMIUM": "Voucher Premium",
+    "MINT": "Mints", "FORM_CHANGE_ITEM": "Form change items", "RARE_SPECIES_STAT_BOOSTER": "Rare species items",
+    "ATTACK_TYPE_BOOSTER": "Type boosters (Charcoal, Mystic Water...)", "RARE_FORM_CHANGE_ITEM": "Rare form change items (Mega Stones...)",
+}
+GROUP_TEXT = {
+    "POKEBALL": "5 Poké Balls.", "GREAT_BALL": "5 Great Balls.", "ULTRA_BALL": "5 Ultra Balls.", "ROGUE_BALL": "5 Rogue Balls.",
+    "MASTER_BALL": "1 Master Ball: always catches.", "TEMP_STAT_STAGE_BOOSTER": "Raises one stat of your whole team for the next few battles.",
+    "DIRE_HIT": "Raises your team's critical-hit ratio for the next few battles.",
+    "MAX_ETHER": "Fully restores the PP of one move.", "MAX_ELIXIR": "Fully restores the PP of all of one Pokémon's moves.",
+    "MAX_POTION": "Fully restores one Pokémon's HP.", "FULL_RESTORE": "Fully restores one Pokémon's HP and heals its status.",
+    "RARE_CANDY": "Raises one Pokémon by 1 level (more with Candy Jars).", "RARER_CANDY": "Raises every party member by 1 level (more with Candy Jars).",
+    "VOUCHER": "One voucher for the egg gacha.", "VOUCHER_PLUS": "One Voucher Plus for the egg gacha.", "VOUCHER_PREMIUM": "One Voucher Premium for the egg gacha.",
+    "BERRY": "A berry to hold; it is eaten when its trigger hits (low HP, a status, a stat drop).",
+    "TM_COMMON": "Teaches one move from the common TM pool to a Pokémon that can learn it.",
+    "TM_GREAT": "Teaches one move from the great TM pool.", "TM_ULTRA": "Teaches one move from the ultra TM pool.",
+    "EVOLUTION_ITEM": "Evolves a Pokémon that needs an item (stones, trade items...).", "RARE_EVOLUTION_ITEM": "Rarer evolution items.",
+    "BASE_STAT_BOOSTER": "Raises one base stat of the holder by 10%, stackable.", "MINT": "Changes how a Pokémon's nature affects its stats.",
+    "TERA_SHARD": "Sets a Pokémon's Tera type.", "SPECIES_STAT_BOOSTER": "Boosts a stat for one particular Pokémon.",
+    "RARE_SPECIES_STAT_BOOSTER": "Rarer species items.", "ATTACK_TYPE_BOOSTER": "Raises the power of one type's moves by 20% for the holder.",
+    "FORM_CHANGE_ITEM": "Changes a Pokémon's form.", "RARE_FORM_CHANGE_ITEM": "Mega Stones and other rare form items.",
+}
+
+
+def item_text(key):
+    c = item_class.get(key, "")
+    d = GROUP_TEXT.get(key) or (mt_loc.get(key) or {}).get("description") or (mt_loc.get(c) or {}).get("description") or ""
+    call = re.search(r"\n\s+" + key + r":\s*\(\)\s*=>\s*\n?\s*new \w+\((.*?)\),?\n", mt_src, re.S)
+    nums = iter(re.findall(r"(?<![\w.])(\d+(?:\.\d+)?)(?![\w.])", call[1]) if call else [])
+    d = re.sub(r"a \{\{moneyMultiplier\}\} amount of money \(₽\{\{moneyAmount\}\}\)", "money", d)
+    d = re.sub(r"\{\{\w+\}\}", lambda m: next(nums, "some"), d)  # the constructor's numbers, in order
+    return d.replace("\n", " ")
+
+
+item_tiers = {}
+for tier, fn in (("COMMON", "initCommonModifierPool"), ("GREAT", "initGreatModifierPool"), ("ULTRA", "initUltraModifierPool"),
+                 ("ROGUE", "initRogueModifierPool"), ("MASTER", "initMasterModifierPool")):
+    body = pools_src.split(f"function {fn}()", 1)[1].split("\nfunction ", 1)[0]
+    keys = list(dict.fromkeys(re.findall(r"WeightedModifierType\(\s*modifierTypes\.(\w+)", body)))
+    item_tiers[tier] = [[k, GROUP_NAMES.get(k) or (mt_loc.get(k) or {}).get("name") or k.replace("_", " ").title(), item_text(k)] for k in keys]
+out6 = ("// What each reward tier can offer after a battle. From src/modifier/init-modifier-pools.ts (player pool) and\n"
+        "// pokerogue-locales modifier-type.json. Grouped items are named by hand in scripts/build-data.py.\n"
+        "// Generated by scripts/build-data.py, do not edit by hand. [key, name, what it does]\n"
+        f"export const ITEM_TIERS = {j(item_tiers)};\n")
+(ROOT / "src/data/items.js").write_text(out6, encoding="utf-8")
+print(f"Wrote src/data/items.js: {sum(len(v) for v in item_tiers.values())} items, {len(out6) // 1024} KB")
 print(f"Wrote src/data/builds.js: {len(builds)} starters, {len(abilities)} abilities, {len(moves)} moves, {len(out) // 1024} KB")
 for p in problems:
     print("CHECK:", p)

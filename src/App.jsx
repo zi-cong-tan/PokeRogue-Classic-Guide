@@ -5,6 +5,7 @@ import Villains from './components/Villains';
 import League from './components/League';
 import Planner from './components/Planner';
 import Eggs from './components/Eggs';
+import Shop from './components/Shop';
 import Biomes from './components/Biomes';
 import Encounters from './components/Encounters';
 import Types from './components/Types';
@@ -23,6 +24,7 @@ export default function App() {
         <League />
         <Planner />
         <Eggs />
+        <Shop />
         <Biomes />
         <Encounters />
         <Types />

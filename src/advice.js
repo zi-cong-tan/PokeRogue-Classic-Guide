@@ -190,3 +190,14 @@ export function bossPrep(members, enemy) {
     return { ...e, best, threatened };
   });
 }
+
+// Fusion as the game does it (calculateBaseStats and getTypes in src/field/pokemon.ts): each base stat is the
+// average of the two, rounded up; the types are the first Pokémon's first type plus the partner's second type,
+// or the partner's first type when it has no different second one.
+export function fuse(a, b) {
+  const [a1] = a.types;
+  const [b1, b2] = b.types;
+  // When the partner adds nothing new, the first Pokémon keeps its own second type (getTypes in pokemon.ts).
+  const second = b2 && b2 !== a1 ? b2 : b1 !== a1 ? b1 : a.types[1];
+  return { types: [a1, second].filter(Boolean), stats: a.stats.map((s, i) => Math.ceil((s + b.stats[i]) / 2)) };
+}
