@@ -1,23 +1,27 @@
-import SplitText from './components/SplitText/SplitText';
-import RunTrack from './components/RunTrack';
+import Hero from './components/Hero';
+import Itinerary from './components/Itinerary';
+import Villains from './components/Villains';
+import Planner from './components/Planner';
+import Eggs from './components/Eggs';
+import Biomes from './components/Biomes';
+import Types from './components/Types';
+import Tips from './components/Tips';
+import Footer from './components/Footer';
 
 export default function App() {
   return (
-    <main className="wrap">
-      <header className="hero">
-        <SplitText
-          tag="h1"
-          text="200 waves to Eternatus"
-          splitType="chars"
-          delay={35}
-          duration={1}
-          textAlign="left"
-          trigger="load"
-        />
-        <p className="sub">A field guide to a PokeRogue Classic run</p>
-      </header>
-      <RunTrack />
-      <p className="foot">React prototype of one section. Fight waves read from the PokeRogue source. Headline effect: Split Text from React Bits.</p>
-    </main>
+    <>
+      <main>
+        <Hero />
+        <Itinerary />
+        <Villains />
+        <Planner />
+        <Eggs />
+        <Biomes />
+        <Types />
+        <Tips />
+      </main>
+      <Footer />
+    </>
   );
 }
