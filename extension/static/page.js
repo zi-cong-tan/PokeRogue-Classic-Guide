@@ -1,7 +1,9 @@
 // Runs inside the PokeRogue page (Chrome's MAIN world). Read-only: it never changes the game.
-// Once a second it passes two things to the overlay (content.js):
+// Once a second it passes these to the HUD (content.js):
 //  - window.gameInfo, which the game itself publishes: mode, biome, wave, luck and your party
 //  - the enemies on the field, limited to what the battle screen shows: name, level, HP, types, boss bars
+//  - which Mystery Encounter is on screen, if any
+//  - the enemy's defences and exact HP, for the damage estimate
 (() => {
   const TYPES = ['normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass',
     'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']; // PokemonType enum order in the game
@@ -29,14 +31,23 @@
         try { types = typeNames(p.getTypes({ includeTeraType: true })); } catch { types = typeNames(p.getTypes?.()); }
         return {
           name: p.name, species: p.species?.name, level: p.level, hp: p.hp, maxHp: p.getMaxHp?.(), types,
-          boss: !!p.isBoss?.(), bars: p.bossSegments || 0, terastallized: !!p.isTerastallized,
+          boss: !!p.isBoss?.(), bars: p.bossSegments || 0, barIndex: p.bossSegmentIndex ?? 0, terastallized: !!p.isTerastallized,
+          // for the damage estimate: defences and their stat changes (Stat enum: DEF 2, SPDEF 4)
+          def: p.getStat?.(2), spDef: p.getStat?.(4), defStage: p.getStatStage?.(2) ?? 0, spDefStage: p.getStatStage?.(4) ?? 0,
         };
       });
     } catch { return []; }
   }
 
+  // The Mystery Encounter on screen, as the game's MysteryEncounterType number (or null).
+  function encounter() {
+    const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
+    const t = battle?.currentBattle?.mysteryEncounterType;
+    return typeof t === 'number' ? t : null;
+  }
+
   setInterval(() => {
     hook();
-    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies() }, location.origin);
+    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter() }, location.origin);
   }, 1000);
 })();

@@ -429,6 +429,10 @@ for f in tree:
         "money": "withSceneMoneyRequirement" in src, "biomes": sorted(by_biome[etype]),
         "text": fill(dialogue.get("description", ""), tokens), "options": options, "art": art[:2],
     })
+# The game's MysteryEncounterType numbers (enum order), so a live battle's encounter can be looked up.
+me_order = re.findall(r"^\s*([A-Z_]+),", fetch(f"{SRC.replace('data/', 'enums/')}mystery-encounter-type.ts"), re.M)
+for e in encounters:
+    e["id"] = me_order.index(e["key"]) if e["key"] in me_order else -1
 encounters.sort(key=lambda e: e["name"])
 out3 = (
     "// Mystery Encounters in Classic. From src/data/mystery-encounters/ in the PokeRogue source and the English\n"

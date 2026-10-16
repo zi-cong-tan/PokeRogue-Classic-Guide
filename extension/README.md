@@ -1,11 +1,19 @@
 # PokeRogue Field Guide overlay (Chrome extension)
 
-A small panel over [PokeRogue](https://pokerogue.net) that follows your run: what the enemy on the field is weak to,
-your party's best move against it, which of your Pokémon it threatens, and what fight comes next.
+A heads-up display for [PokeRogue](https://pokerogue.net), like a game overlay: panels in the empty bands beside the
+game (or folded into corner tabs on small windows) that follow your run.
+
+- **Left:** wave, biome, next fight, next boss wave (with this biome's gym leaders), next biomes, luck; your team with HP
+  and each member's best move against the enemy.
+- **Right:** the enemy's weaknesses and the move to use, plus your active Pokémon's moves as a damage range (% of its HP)
+  with KO / can KO / hits to KO. When a Mystery Encounter is on screen, its choices and which to pick instead. Out of
+  battle, this biome's possible bosses.
+- **Guide button:** items by tier with icons, every Mystery Encounter's advice, Mega and Gigantamax forms of your party.
 
 It is **read-only**. It reads `window.gameInfo`, which the game publishes itself (mode, biome, wave, luck, your party),
-and the enemies on the field, limited to what the battle screen shows (name, level, HP, types, boss bars). It never
-changes the game, never sends anything anywhere, and never shows hidden information like the enemy's moves or IVs.
+plus, from the battle itself: the enemies on the field (name, level, HP, types, boss bars, defences for the damage
+estimate) and which Mystery Encounter is on screen. It never changes the game, never sends anything anywhere, and never
+shows the enemy's moves. The damage estimate leaves out crits, abilities, items and weather.
 
 ## Install (Chrome, Edge, Brave, Arc)
 

@@ -1,24 +1,32 @@
-// The overlay panel, drawn over PokeRogue in its own shadow root so the game's page and this panel can't affect
-// each other's styles. Data arrives from page.js once a second; everything shown is computed from the guide's data.
+// The in-game HUD, drawn over PokeRogue in its own shadow root so the page and the HUD can't affect each other's
+// styles. Like a game overlay: panels sit in the empty bands beside the game canvas (or fold into corner tabs when
+// there is no room), and a Guide drawer holds the reference tabs. Data arrives from page.js once a second.
 import { TYPES, TYPE_COLOR, cap, mult, typeInk } from '../../src/data/types.js';
 import { ALL_MOVES } from '../../src/data/all-moves.js';
 import { RUN, FINAL } from '../../src/data/fights.js';
 import { BIOME_BOSSES } from '../../src/data/biome-bosses.js';
+import { BIOMES } from '../../src/data/game.js';
+import { ENCOUNTERS } from '../../src/data/encounters.js';
+import { ENCOUNTER_NOTES } from '../../src/data/encounter-notes.js';
+import { ITEM_TIERS } from '../../src/data/items.js';
+import { SPECIAL_FORMS } from '../../src/data/megas.js';
 
-const FIGHTS = [...RUN.flatMap(g => g.rows), FINAL].map(f => ({ ...f, waves: (f.at.match(/\d+/g) || [f.n]).map(Number) }));
 const GUIDE = 'https://zi-cong-tan.github.io/PokeRogue-Guide-Aesthetic/';
+const CDN = 'https://cdn.jsdelivr.net/gh/';
+const sprite = id => `${CDN}PokeAPI/sprites@master/sprites/pokemon/${id}.png`;
+const itemArt = id => `${CDN}pagefaultgames/pokerogue-assets@beta/images/items/${id}.png`;
+const FIGHTS = [...RUN.flatMap(g => g.rows), FINAL].map(f => ({ ...f, waves: (f.at.match(/\d+/g) || [f.n]).map(Number) }));
+const TIER_LABEL = { BOSS: 'Usual, 44 in 64', BOSS_RARE: 'Rare, 14 in 64', BOSS_SUPER_RARE: 'Super rare, 5 in 64', BOSS_ULTRA_RARE: 'Ultra rare, 1 in 64' };
+const ME_BY_ID = Object.fromEntries(ENCOUNTERS.map(e => [e.id, e]));
+
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const chip = t => `<span class="ty" style="--t:${TYPE_COLOR[t]};--ti:${typeInk(t)}">${cap(t)}</span>`;
 const lower = list => (list || []).map(t => String(t).toLowerCase()).filter(t => TYPES.includes(t));
 const x = m => (m === 0.5 ? '½' : m === 0.25 ? '¼' : m) + '×';
+const by = (types, m) => TYPES.filter(a => mult(a, types) === m);
+const sum = a => a.reduce((p, q) => p + q, 0);
 
-// What a type pair takes from each attack type, grouped.
-function weakness(types) {
-  const by = m => TYPES.filter(a => mult(a, types) === m);
-  return { x4: by(4), x2: by(2), half: [...by(0.5), ...by(0.25)], none: by(0) };
-}
-
-// Each party member's strongest damaging move into this enemy (power x type x same-type bonus).
+// Each party member's strongest damaging move into an enemy (power x type x same-type bonus).
 function answers(party, enemyTypes) {
   return party.filter(p => p.currentHP > 0).map(p => {
     const own = lower(p.types);
@@ -30,133 +38,239 @@ function answers(party, enemyTypes) {
       const score = (m[2] || 60) * eff * (own.includes(m[0]) ? 1.5 : 1);
       if (!best || score > best.score) best = { name, eff, score };
     }
-    const threat = enemyTypes.reduce((w, t) => Math.max(w, mult(t, own)), 0);
-    return { who: p.nickname || p.name, best, threat };
+    return { who: p.nickname || p.name, best, threat: enemyTypes.reduce((w, t) => Math.max(w, mult(t, own)), 0) };
   });
 }
 
-function comingUp(info) {
+// Damage like the game's getBaseDamage: ((2 * level / 5 + 2) * power * attack / defence) / 50 + 2, then the random
+// 85-100% roll, same-type 1.5x, type effectiveness and burn. Leaves out abilities, items, weather and crits.
+const stage = s => (s >= 0 ? (2 + s) / 2 : 2 / (2 - s));
+function damage(attacker, move, enemy) {
+  const m = ALL_MOVES[move];
+  if (!m || m[1] === 'X' || !m[2]) return null;
+  const physical = m[1] === 'P';
+  const st = attacker.baseStats || {}, stages = attacker.statStages || {};
+  const atk = (physical ? st.atk : st.spAtk) * stage((physical ? stages.atk : stages.spAtk) || 0);
+  const def = (physical ? enemy.def : enemy.spDef) * stage((physical ? enemy.defStage : enemy.spDefStage) || 0);
+  if (!atk || !def || !attacker.level) return null;
+  const eff = mult(m[0], enemy.types);
+  const base = ((2 * attacker.level / 5 + 2) * m[2] * atk / def) / 50 + 2;
+  const mod = (lower(attacker.types).includes(m[0]) ? 1.5 : 1) * eff * (physical && /burn/i.test(attacker.status || '') ? 0.5 : 1);
+  return { min: Math.floor(base * 0.85 * mod), max: Math.floor(base * mod), eff };
+}
+
+// Each move of your Pokémon on the field against this enemy: a range in % of its HP and whether it knocks it out.
+function damagePanel(info, e) {
+  const me = (info.party || []).find(p => p.currentHP > 0);
+  if (!me || !e.hp || !e.maxHp || !e.def) return '';
+  const rows = (me.moveset || []).map(name => {
+    const d = damage(me, name, e);
+    if (!d) return `<li><span>${esc(name)}</span><span class="muted">status or varies</span></li>`;
+    if (!d.eff) return `<li><span>${esc(name)}</span><span class="muted">no effect</span></li>`;
+    const pct = v => Math.round((v / e.maxHp) * 100);
+    const hits = Math.ceil(e.hp / Math.max(1, d.min));
+    const verdict = e.boss ? `${pct(d.min)}–${pct(d.max)}% of its HP, stops at each bar`
+      : d.min >= e.hp ? 'KO' : d.max >= e.hp ? 'Can KO' : `${hits} hits`;
+    return `<li class="${!e.boss && d.min >= e.hp ? 'ko' : !e.boss && d.max >= e.hp ? 'maybe' : ''}"><span>${esc(name)} <small>${x(d.eff)}</small></span>
+      <span>${pct(d.min)}–${pct(d.max)}%</span><strong>${esc(verdict)}</strong></li>`;
+  }).join('');
+  return `<h4>${esc(me.nickname || me.name)}'s moves on it <small>(it has ${Math.round((e.hp / e.maxHp) * 100)}% HP)</small></h4><ul class="dmg">${rows}</ul>
+    <p class="muted tiny">Estimate: no crits, abilities, items or weather.</p>`;
+}
+
+// ---- left band: your run and your team
+function runPanel(info, enemies) {
   const w = Math.max(1, info.wave || 1);
   const next = FIGHTS.find(f => Math.max(...f.waves) >= w);
   const boss = Math.ceil(w / 10) * 10;
-  const set = { 190: 'the Champion', 200: 'Eternatus' }[boss];
   const pool = BIOME_BOSSES[info.biome];
-  const top = pool && ['BOSS_ULTRA_RARE', 'BOSS_SUPER_RARE'].flatMap(k => pool.tiers[k].map(e => e[0])).slice(0, 4);
-  const gym = (boss % 30 === 20 || boss % 30 === 0) && pool?.gyms.length ? `gym leader ${pool.gyms.map(g => g[0]).join(' or ')}, or ` : '';
-  return [
-    next && ['Next fixed fight', `${next.title}, wave ${next.waves.filter(v => v >= w).join(' or ')}`],
-    ['Boss wave ' + boss, (t => t[0].toUpperCase() + t.slice(1))(set || `${gym}a ${info.biome || 'biome'} boss${top?.length ? ` (rare ones: ${top.join(', ')})` : ''}`)],
-    w < 200 && ['Final boss, wave 200', 'Eternatus, then Eternamax: Poison/Dragon both phases, weak to Ground, Psychic, Ice and Dragon'],
-  ].filter(Boolean);
+  const gymWave = boss % 30 === 20 || boss % 30 === 0;
+  const bossText = { 190: 'The Champion', 200: 'Eternatus' }[boss]
+    || `${gymWave && pool?.gyms.length ? `Gym leader ${pool.gyms.map(g => g[0]).join(' or ')}, or a` : 'A'} ${info.biome || 'biome'} boss`;
+  const target = enemies[0];
+  const team = (info.party || []).map(p => {
+    const hp = p.maxHP ? Math.max(0, p.currentHP / p.maxHP) : 1;
+    const a = target ? answers([p], target.types)[0] : null;
+    return `<li class="${p.currentHP <= 0 ? 'out' : ''}">
+      <div class="row"><strong>${esc(p.nickname || p.name)}</strong><small>Lv ${esc(p.level)}</small></div>
+      <div class="hp"><span style="width:${Math.round(hp * 100)}%"></span></div>
+      <div class="chips">${lower(p.types).map(chip).join('')}</div>
+      ${a?.best ? `<div class="move ${a.best.eff >= 2 ? 'good' : a.best.eff < 1 ? 'bad' : ''}">${esc(a.best.name)} ${x(a.best.eff)}</div>` : ''}
+      ${a && a.threat >= 2 ? `<div class="warn">Takes ${x(a.threat)} from it</div>` : ''}
+    </li>`;
+  }).join('');
+  return `<section><h3>Wave ${esc(info.wave)}, ${esc(info.biome)}</h3>
+      <dl>
+        ${next ? `<div><dt>Next fight</dt><dd>${esc(next.title)}, wave ${next.waves.filter(v => v >= w).join(' or ')}</dd></div>` : ''}
+        <div><dt>Boss wave ${boss}</dt><dd>${esc(bossText)}</dd></div>
+        ${BIOMES[info.biome] ? `<div><dt>Next biomes</dt><dd>${BIOMES[info.biome].map(([d, n]) => esc(d) + (n ? ` (1 in ${n})` : '')).join(', ')}</dd></div>` : ''}
+        ${info.luck >= 0 ? `<div><dt>Luck</dt><dd>${esc(info.luck)}</dd></div>` : ''}
+      </dl></section>
+    <section><h3>Your team${target ? ` vs ${esc(target.species || target.name)}` : ''}</h3><ul class="team">${team}</ul></section>`;
 }
 
-function render(state) {
-  const { info, enemies } = state;
-  if (!info || info.gameMode === 'Title' || !info.wave) {
-    return `<p class="muted">Start or continue a run and this panel follows it: the enemy's weaknesses, your best move, and what comes next.</p>`;
+// ---- right band: the Mystery Encounter on screen, or the enemy, or this biome's bosses
+function enemyPanel(info, enemies, encounterId) {
+  const me = ME_BY_ID[encounterId];
+  if (me) {
+    const n = ENCOUNTER_NOTES[me.key];
+    return `<section class="me"><h3>${esc(me.name)} <small>Mystery Encounter</small></h3>
+      ${me.options.map(([label, tip]) => `<div class="opt"><strong>${esc(label)}</strong><p>${esc(tip).replace(/\n/g, '<br>')}</p></div>`).join('')}
+      ${n ? `<h4>Which to pick</h4>${n.pick.map(([when, what]) => `<p class="pick"><small>${esc(when)}</small><br><strong>${esc(what)}</strong></p>`).join('')}
+             <h4>What the battle is</h4><p>${esc(n.fight)}</p><h4>What you get</h4><p>${esc(n.rewards)}</p>` : ''}</section>`;
   }
-  const party = info.party || [];
-  let html = `<p class="where"><strong>Wave ${info.wave}</strong>, ${esc(info.biome)}${info.luck >= 0 ? `, luck ${info.luck}` : ''}</p>`;
-  if (!enemies.length) {
-    html += `<p class="muted">No enemy on the field right now.</p>`;
+  if (enemies.length) {
+    const party = info.party || [];
+    return enemies.map(e => {
+      const top = answers(party, e.types).sort((a, b) => (b.best?.score || 0) - (a.best?.score || 0)).find(a => a.best && a.best.eff >= 2);
+      const half = [...by(e.types, 0.5), ...by(e.types, 0.25)], none = by(e.types, 0);
+      return `<section class="enemy"><h3>${esc(e.species || e.name)} <small>Lv ${esc(e.level)}${e.boss ? `, boss${e.bars > 1 ? ` (${esc(e.bars)} bars)` : ''}` : ''}</small></h3>
+        <div class="chips">${e.types.map(chip).join('')}${e.terastallized ? ' <small>Terastallized</small>' : ''}</div>
+        ${by(e.types, 4).length ? `<p><b>4×</b> ${by(e.types, 4).map(chip).join('')}</p>` : ''}
+        ${by(e.types, 2).length ? `<p><b>2×</b> ${by(e.types, 2).map(chip).join('')}</p>` : ''}
+        ${half.length || none.length ? `<p class="muted">${half.length ? `Resists ${half.map(cap).join(', ')}` : ''}${none.length ? `${half.length ? '; ' : ''}immune to ${none.map(cap).join(', ')}` : ''}</p>` : ''}
+        <p class="pick">${top ? `Use <strong>${esc(top.best.name)}</strong> from ${esc(top.who)} (${x(top.best.eff)})` : 'No super-effective move on your team: use your strongest same-type move, or switch.'}</p>
+        ${damagePanel(info, e)}
+      </section>`;
+    }).join('');
   }
-  for (const e of enemies) {
-    const w = weakness(e.types);
-    const ans = answers(party, e.types).sort((a, b) => (b.best?.score || 0) - (a.best?.score || 0));
-    const top = ans.find(a => a.best && a.best.eff >= 2);
-    html += `<section class="enemy">
-      <h3>${esc(e.species || e.name)} <small>Lv ${e.level}${e.boss ? `, boss${e.bars > 1 ? ` (${e.bars} bars)` : ''}` : ''}${e.terastallized ? ', Terastallized' : ''}</small></h3>
-      <p class="chips">${e.types.map(chip).join('')}</p>
-      ${w.x4.length ? `<p><b>4×</b> ${w.x4.map(chip).join('')}</p>` : ''}
-      ${w.x2.length ? `<p><b>2×</b> ${w.x2.map(chip).join('')}</p>` : ''}
-      ${w.half.length ? `<p class="muted">Resists ${w.half.map(cap).join(', ')}${w.none.length ? `; immune to ${w.none.map(cap).join(', ')}` : ''}</p>` : ''}
-      <p class="pick">${top ? `Use <strong>${esc(top.best.name)}</strong> from ${esc(top.who)} (${x(top.best.eff)})` : 'No super-effective move on your team: use your strongest same-type move, or switch.'}</p>
-      <ul class="team">${ans.map(a => `<li class="${a.threat >= 2 ? 'risk' : ''}"><span>${esc(a.who)}</span><span>${a.best ? `${esc(a.best.name)} ${x(a.best.eff)}` : 'no attack'}</span>${a.threat >= 2 ? `<em>takes ${x(a.threat)}</em>` : ''}</li>`).join('')}</ul>
-    </section>`;
+  const pool = BIOME_BOSSES[info.biome];
+  if (!pool) return '<section><p class="muted">The enemy shows here in battle.</p></section>';
+  return `<section><h3>${esc(info.biome)} bosses <small>wave ${Math.ceil(Math.max(1, info.wave) / 10) * 10}</small></h3>${Object.entries(pool.tiers).filter(([, l]) => l.length).map(([k, l]) =>
+    `<h4>${TIER_LABEL[k]}</h4><div class="mons">${l.map(([n, id, tod]) => `<figure><img src="${sprite(id)}" alt=""><figcaption>${esc(n)}${tod ? ` <small>(${tod})</small>` : ''}</figcaption></figure>`).join('')}</div>`).join('')}</section>`;
+}
+
+// ---- the Guide drawer
+function guideTab(tab, info) {
+  if (tab === 'items') {
+    return `<p class="muted">Every reward item by tier, rarest last. Luck makes items jump up a tier more often.</p>` + Object.entries(ITEM_TIERS).map(([tier, list]) => `<h4>${cap(tier.toLowerCase())}</h4>
+      <ul class="items">${list.map(([, name, text, icon]) => `<li>${icon ? `<img src="${itemArt(icon)}" alt="" width="48" height="48">` : '<span style="width:48px;flex:none"></span>'}<div><strong>${esc(name)}</strong><p>${esc(text)}</p></div></li>`).join('')}</ul>`).join('');
   }
-  html += `<dl class="next">${comingUp(info).map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>`;
-  return html;
+  if (tab === 'encounters') {
+    return ENCOUNTERS.map(e => `<details><summary>${esc(e.name)} <small>${cap(e.tier.toLowerCase())}, waves ${e.waves.join(' to ')}</small></summary>
+      ${(ENCOUNTER_NOTES[e.key]?.pick || []).map(([when, what]) => `<p><small>${esc(when)}:</small> <strong>${esc(what)}</strong></p>`).join('')}</details>`).join('');
+  }
+  const names = new Set((info?.party || []).map(p => p.name));
+  const mine = SPECIAL_FORMS.filter(f => names.has(f.name));
+  const list = mine.length ? mine : [...SPECIAL_FORMS].sort((a, b) => sum(b.stats) - sum(a.stats)).slice(0, 24);
+  return `<p class="muted">${mine.length ? 'Mega and Gigantamax forms of Pokémon in your party.' : 'None in your party yet: the strongest forms.'} Needs the Mega Bracelet or Dynamax Band (Rogue tier).</p>
+    <ul class="items">${list.map(f => `<li><img src="${sprite(f.sprite)}" alt="" width="48" height="48"><div><strong>${esc(f.name)} ${esc(f.form)}</strong>
+      <p>${f.types.split(' ').map(chip).join('')} ${esc(f.ability)}, total ${sum(f.stats)}${f.base ? ` (+${sum(f.stats) - sum(f.base)})` : ''}</p></div></li>`).join('')}</ul>`;
 }
 
 const CSS = `
 :host { all: initial; }
-.panel { position: fixed; z-index: 2147483000; width: 320px; max-height: 80vh; overflow: auto; background: #0f1f10; color: #fff;
-  font: 14px/1.4 "Source Serif 4", Georgia, serif; box-shadow: 0 8px 28px rgba(0,0,0,.45); border-radius: 0; }
-.bar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #c6f19d; color: #0f1f10; cursor: move; user-select: none; }
-.bar strong { flex: 1; font: 700 14px/1 Georgia, serif; }
-.bar button { all: unset; cursor: pointer; padding: 2px 8px; font-weight: 700; min-width: 20px; text-align: center; }
-.bar button:focus-visible { outline: 2px solid #0f1f10; }
-.body { padding: 12px; display: grid; gap: 12px; }
-.collapsed .body { display: none; }
-.muted { color: #a9b3a9; margin: 0; }
-p { margin: 0; }
-.where { font-size: 13px; }
-.enemy { background: #182d19; padding: 10px; display: grid; gap: 6px; }
-.enemy h3 { margin: 0; font-size: 16px; }
-.enemy h3 small { font-weight: 400; color: #a9b3a9; font-size: 12px; }
-.chips { display: inline-flex; flex-wrap: wrap; gap: 4px; }
-.ty { display: inline-block; padding: 1px 7px; margin-right: 3px; background: var(--t); color: var(--ti); font: 600 12px/1.5 Georgia, serif; }
-.enemy b { display: inline-block; min-width: 26px; }
-.pick { background: #c6f19d; color: #0f1f10; padding: 6px 8px; }
-.team { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; font-size: 13px; }
-.team li { display: grid; grid-template-columns: 1fr auto; gap: 0 8px; }
-.team li em { grid-column: 1 / -1; color: #ffb4a8; font-style: normal; font-size: 12px; }
-.team li.risk span:first-child { color: #ffb4a8; }
-.next { margin: 0; display: grid; gap: 6px; font-size: 13px; }
-.next dt { color: #a9b3a9; font-size: 12px; }
-.next dd { margin: 0; }
-a { color: #c6f19d; }
+* { box-sizing: border-box; }
+.rail { position: fixed; z-index: 2147483000; display: grid; gap: 8px; align-content: start; overflow: auto; color: #fff;
+  font: 13px/1.4 "Source Serif 4", Georgia, serif; scrollbar-width: thin; }
+.rail.folded { width: auto !important; }
+.rail.folded .body, .rail.folded .guide-btn { display: none; }
+.body { display: grid; gap: 8px; }
+.fold { all: unset; cursor: pointer; justify-self: start; background: #c6f19d; color: #0f1f10; font: 700 12px/1 Georgia, serif; padding: 8px 12px; }
+.right .fold { justify-self: end; }
+button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid #c6f19d; outline-offset: 2px; }
+section { background: #0f1f10; padding: 10px 12px; display: grid; gap: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.35); }
+h3 { margin: 0; font-size: 15px; } h3 small { font-weight: 400; color: #a9b3a9; font-size: 12px; }
+h4 { margin: 6px 0 0; font-size: 12px; color: #c6f19d; font-weight: 600; }
+p { margin: 0; } dl { margin: 0; display: grid; gap: 4px; } dt { color: #a9b3a9; font-size: 11px; } dd { margin: 0; }
+.muted, small { color: #a9b3a9; }
+.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; justify-content: space-between; }
+.ty { display: inline-block; padding: 0 6px; margin-right: 2px; background: var(--t); color: var(--ti); font: 600 11px/1.6 Georgia, serif; }
+b { display: inline-block; min-width: 24px; }
+.team { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.team li { background: #182d19; padding: 6px 8px; display: grid; gap: 3px; } .team li.out { opacity: .45; }
+.hp { height: 4px; background: #2c3d2d; } .hp span { display: block; height: 100%; background: #c6f19d; }
+.move.good { color: #c6f19d; font-weight: 600; } .move.bad { color: #a9b3a9; } .warn { color: #ffb4a8; }
+.pick { background: #c6f19d; color: #0f1f10; padding: 6px 8px; } .pick small { color: #3c5a3e; }
+.dmg { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+.dmg li { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: baseline; background: #182d19; padding: 4px 8px; font-variant-numeric: tabular-nums; }
+.dmg li.ko { background: #c6f19d; color: #0f1f10; } .dmg li.ko small { color: #3c5a3e; }
+.dmg li.maybe strong { color: #c6f19d; }
+.tiny { font-size: 11px; }
+.opt { background: #182d19; padding: 6px 8px; } .opt p { color: #d4dbd4; font-size: 12px; }
+.mons { display: flex; flex-wrap: wrap; gap: 2px; } figure { margin: 0; width: 64px; text-align: center; font-size: 11px; }
+figure img { width: 48px; height: 48px; image-rendering: pixelated; display: block; margin: 0 auto; }
+.items img { width: 48px; height: 48px; image-rendering: pixelated; display: block; margin: 0; flex: none; object-fit: contain; }
+.guide-btn { all: unset; cursor: pointer; background: #c6f19d; color: #0f1f10; font: 700 14px/1.2 Georgia, serif; padding: 10px 14px; text-align: center; }
+.drawer { position: fixed; z-index: 2147483001; inset: 6vh 8vw; background: #0f1f10; color: #fff; display: grid; grid-template-rows: auto 1fr;
+  font: 14px/1.45 "Source Serif 4", Georgia, serif; box-shadow: 0 12px 40px rgba(0,0,0,.6); }
+.drawer[hidden] { display: none; }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px; background: #182d19; align-items: center; }
+.tabs button { all: unset; cursor: pointer; padding: 8px 14px; background: #0f1f10; font-weight: 600; }
+.tabs button[aria-pressed="true"] { background: #c6f19d; color: #0f1f10; }
+.tabs .close { margin-left: auto; background: none; font-size: 22px; padding: 4px 12px; }
+.tabs a { color: #c6f19d; font-size: 12px; margin-left: 8px; }
+.drawer-body { overflow: auto; padding: 14px 18px; display: grid; gap: 8px; align-content: start; }
+.items { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; }
+.items li { display: flex; gap: 8px; background: #182d19; padding: 6px 8px; } .items p { font-size: 12px; color: #d4dbd4; }
+details { background: #182d19; padding: 6px 10px; } summary { cursor: pointer; font-weight: 600; }
 `;
 
 function mount() {
   const host = document.createElement('div');
-  host.id = 'prg-field-guide-overlay';
+  host.id = 'prg-field-guide-hud';
   const root = host.attachShadow({ mode: 'closed' });
-  const saved = (() => { try { return JSON.parse(localStorage.getItem('prg-overlay-ui')) || {}; } catch { return {}; } })();
-  const save = () => { try { localStorage.setItem('prg-overlay-ui', JSON.stringify(ui)); } catch { /* storage blocked */ } };
-  const ui = { x: saved.x ?? window.innerWidth - 340, y: saved.y ?? 20, collapsed: !!saved.collapsed };
-
   root.innerHTML = `<style>${CSS}</style>
-    <div class="panel" role="complementary" aria-label="PokeRogue Field Guide overlay">
-      <div class="bar"><strong>Field Guide</strong>
-        <button type="button" class="toggle" aria-label="Collapse or expand">–</button></div>
-      <div class="body" aria-live="polite"></div>
-      <p class="muted" style="padding:0 12px 10px;font-size:12px">Read-only. <a href="${GUIDE}" target="_blank" rel="noreferrer">Open the full guide</a></p>
-    </div>`;
-  const panel = root.querySelector('.panel');
-  const body = root.querySelector('.body');
-  const place = () => {
-    ui.x = Math.min(Math.max(0, ui.x), window.innerWidth - 120);
-    ui.y = Math.min(Math.max(0, ui.y), window.innerHeight - 40);
-    panel.style.left = ui.x + 'px';
-    panel.style.top = ui.y + 'px';
-    panel.classList.toggle('collapsed', ui.collapsed);
-    root.querySelector('.toggle').textContent = ui.collapsed ? '+' : '–';
-  };
-  place();
+    <div class="rail left" role="complementary" aria-label="Field Guide: your run"><button type="button" class="fold">Field Guide</button><div class="body l"></div><button type="button" class="guide-btn">Guide: items, encounters, Megas</button></div>
+    <div class="rail right" role="complementary" aria-label="Field Guide: the enemy"><button type="button" class="fold">Enemy</button><div class="body r"></div></div>
+    <div class="drawer" role="dialog" aria-label="Field Guide" hidden>
+      <div class="tabs"><button type="button" data-tab="items" aria-pressed="true">Items by tier</button><button type="button" data-tab="encounters" aria-pressed="false">Encounters</button><button type="button" data-tab="megas" aria-pressed="false">Mega and G-Max</button>
+        <a href="${GUIDE}" target="_blank" rel="noreferrer">Open the full guide</a><button type="button" class="close" aria-label="Close">×</button></div>
+      <div class="drawer-body"></div></div>`;
+  const left = root.querySelector('.left'), right = root.querySelector('.right');
+  const drawer = root.querySelector('.drawer'), body = root.querySelector('.drawer-body');
+  // folded: null until the player chooses, then remembered
+  const saved = (() => { try { return JSON.parse(localStorage.getItem('prg-hud')) || {}; } catch { return {}; } })();
+  const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items' };
+  const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right })); } catch { /* storage blocked */ } };
+  let state = { info: null, enemies: [], encounter: null };
+  let roomy = true;
 
-  root.querySelector('.toggle').addEventListener('click', () => { ui.collapsed = !ui.collapsed; place(); save(); });
-  const bar = root.querySelector('.bar');
-  bar.addEventListener('pointerdown', e => {
-    if (e.target.closest('button')) return;
-    const start = { px: e.clientX, py: e.clientY, x: ui.x, y: ui.y };
-    bar.setPointerCapture(e.pointerId);
-    const move = ev => { ui.x = start.x + ev.clientX - start.px; ui.y = start.y + ev.clientY - start.py; place(); };
-    const up = () => { bar.removeEventListener('pointermove', move); bar.removeEventListener('pointerup', up); bar.removeEventListener('pointercancel', up); save(); };
-    bar.addEventListener('pointermove', move);
-    bar.addEventListener('pointerup', up);
-    bar.addEventListener('pointercancel', up);
-  });
-  window.addEventListener('resize', place);
+  // Panels go in the bands beside the game canvas; with no room they start folded in the canvas's top corners.
+  function place() {
+    const c = document.querySelector('canvas');
+    const r = c ? c.getBoundingClientRect() : { left: 0, right: innerWidth, top: 0, bottom: innerHeight };
+    const spaceL = r.left - 12, spaceR = innerWidth - r.right - 12;
+    roomy = Math.min(spaceL, spaceR) >= 200;
+    const top = Math.max(6, r.top + 6), maxH = Math.max(200, Math.min(innerHeight, r.bottom) - top - 6);
+    left.style.cssText = `left:${roomy ? 6 : r.left + 6}px;top:${top}px;width:${roomy ? Math.min(320, spaceL) : 280}px;max-height:${maxH}px`;
+    right.style.cssText = `right:${roomy ? 6 : innerWidth - r.right + 6}px;top:${top}px;width:${roomy ? Math.min(320, spaceR) : 280}px;max-height:${maxH}px;${right.dataset.hide ? 'display:none' : ''}`;
+    left.classList.toggle('folded', ui.left ?? !roomy);
+    right.classList.toggle('folded', ui.right ?? !roomy);
+  }
+
+  function render() {
+    const { info, enemies, encounter } = state;
+    const live = info && info.gameMode !== 'Title' && info.wave;
+    root.querySelector('.l').innerHTML = live ? runPanel(info, enemies) : '<section><p class="muted">Start or continue a run: your wave, biome, team and the next fights show here.</p></section>';
+    root.querySelector('.r').innerHTML = live ? enemyPanel(info, enemies, encounter) : '';
+    right.dataset.hide = live ? '' : '1';
+    if (!drawer.hidden) body.innerHTML = guideTab(ui.tab, info);
+    place();
+  }
+
+  const folds = root.querySelectorAll('.fold');
+  folds[0].addEventListener('click', () => { ui.left = !left.classList.contains('folded'); save(); place(); });
+  folds[1].addEventListener('click', () => { ui.right = !right.classList.contains('folded'); save(); place(); });
+  root.querySelector('.guide-btn').addEventListener('click', () => { drawer.hidden = false; body.innerHTML = guideTab(ui.tab, state.info); });
+  root.querySelector('.close').addEventListener('click', () => { drawer.hidden = true; });
+  root.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
+    ui.tab = b.dataset.tab;
+    root.querySelectorAll('[data-tab]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+    body.innerHTML = guideTab(ui.tab, state.info);
+  }));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !drawer.hidden) drawer.hidden = true; });
+  addEventListener('resize', place);
 
   let last = '';
-  window.addEventListener('message', e => {
+  addEventListener('message', e => {
     if (e.source !== window || !e.data?.__prgOverlay) return;
-    const state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })) };
-    const html = render(state);
-    if (html !== last) { body.innerHTML = html; last = html; }
+    state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null };
+    const key = JSON.stringify(state);
+    if (key !== last) { last = key; render(); } else place();
   });
-  body.innerHTML = render({ info: null, enemies: [] });
+  render();
   document.documentElement.append(host);
 }
 
