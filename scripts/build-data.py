@@ -271,6 +271,109 @@ out2 = (
 )
 (ROOT / "src/data/learnsets.js").write_text(out2, encoding="utf-8")
 print(f"Wrote src/data/learnsets.js: {len(form_out)} forms, {len(move_list)} moves, {len(out2) // 1024} KB")
+# --- encounters.js: Mystery Encounters in Classic (src/data/mystery-encounters + the English dialogue files)
+ME = f"{SRC}mystery-encounters/"
+consts = fetch(f"{SRC.replace('data/', '')}constants.ts")
+me_waves = [int(x) for x in re.search(r"CLASSIC_MODE_MYSTERY_ENCOUNTER_WAVES[^=]*= \[(\d+), (\d+)\]", consts).groups()]
+me_rate = {k: int(re.search(k + r" = (\d+)", consts)[1]) for k in
+           ("BASE_MYSTERY_ENCOUNTER_SPAWN_WEIGHT", "MYSTERY_ENCOUNTER_SPAWN_MAX_WEIGHT", "WEIGHT_INCREMENT_ON_SPAWN_MISS",
+            "AVERAGE_ENCOUNTERS_PER_RUN_TARGET")}
+tier_src = fetch(f"{SRC.replace('data/', 'enums/')}mystery-encounter-tier.ts")
+tier_share = [float(x) for x in re.search(r"aim for ([\d.]+)/([\d.]+)/([\d.]+)/([\d.]+)%", tier_src).groups()]
+tier_weight = {k: int(v) for k, v in re.findall(r"(COMMON|GREAT|ULTRA|ROGUE) = (\d+)", tier_src)}
+biome_src = fetch(ME + "mystery-encounter-biomes.ts")
+tree = json.loads(fetch("https://api.github.com/repos/pagefaultgames/pokerogue/contents/src/data/mystery-encounters/encounters?ref=beta"))
+
+
+def biome_group(name):
+    body = re.search(name + r"[^=\n]*=\s*\[(.*?)\];", biome_src, re.S)[1]
+    return re.findall(r"^\s*(?:BiomeId|MysteryEncounterType)\.(\w+)", body, re.M)  # skips commented-out (disabled) lines
+
+
+groups = {"extremeBiomeEncounters": "EXTREME_ENCOUNTER_BIOMES", "nonExtremeBiomeEncounters": "NON_EXTREME_ENCOUNTER_BIOMES",
+          "humanTransitableBiomeEncounters": "HUMAN_TRANSITABLE_BIOMES", "civilizationBiomeEncounters": "CIVILIZATION_ENCOUNTER_BIOMES"}
+by_biome = {}
+for enc_list, biome_list in groups.items():
+    for e in biome_group(enc_list):
+        by_biome.setdefault(e, set()).update(biome_group(biome_list))
+for e in biome_group("anyBiomeEncounters"):
+    by_biome[e] = {"ANY"}
+for b, encs in re.findall(r"\[BiomeId\.(\w+),\s*\[(.*?)\]\s*,?\s*\]", biome_src.split("mysteryEncountersByBiome", 1)[1], re.S):
+    for e in re.findall(r"MysteryEncounterType\.(\w+)", encs):
+        by_biome.setdefault(e, set()).add(b)
+
+SPECIES_WORDS = {"liepard", "greedent", "oricorio", "blacephalon", "volcarona", "delibird", "wobbuffet", "snorlax", "shuckle"}
+GENERIC = [(r"(?i)primaryName|pokemon|pokeName|leader", "your Pokémon"), (r"(?i)item", "an item"), (r"(?i)move", "a move"),
+           (r"(?i)ability", "an ability"), (r"(?i)^num|count|amount|percent|price|cost", "some"), (r"(?i)type", "a type")]
+
+
+def fill(text, tokens):
+    def sub(m):
+        k, fmt = m[1], m[2]
+        if fmt == "money":
+            return "money"
+        if k in tokens:
+            return tokens[k]
+        base = k[:-4] if k.endswith("Name") else ""
+        if base.lower() in SPECIES_WORDS:
+            return base.capitalize()
+        return next((word for pat, word in GENERIC if re.search(pat, k)), "it")
+    text = re.sub(r"\{\{(\w+)(?:,\s*(\w+))?\}\}", sub, text)
+    text = re.sub(r"@\[\w+\]\{", "", text).replace("}", "")
+    # Read naturally where a runtime name was swapped for "your Pokémon" / "an item".
+    for a, b in (("The your Pokémon", "The Pokémon"), ("the your Pokémon", "the Pokémon"), ("a your Pokémon", "a Pokémon"),
+                 ("Your your Pokémon", "Your Pokémon"), ("a an item", "an item"), ("This your Pokémon", "This Pokémon"),
+                 ("That your Pokémon", "That Pokémon"), ("Pay money", "Pay money")):
+        text = text.replace(a, b)
+    text = re.sub(r"(\([+?-]\) )y", r"\1Y", text)
+    return text[:1].upper() + text[1:]
+
+
+encounters = []
+for f in tree:
+    src = fetch(ME + "encounters/" + f["name"])
+    etype = re.search(r"MysteryEncounterType\.(\w+)", src.split("withEncounterType", 1)[1])[1] if "withEncounterType" in src else None
+    if not etype or etype not in by_biome:
+        continue  # disabled in the biome table
+    dialogue = json.loads(fetch(f"https://raw.githubusercontent.com/pagefaultgames/pokerogue-locales/main/en/mystery-encounters/{f['name'].replace('-encounter.ts', '-dialogue.json')}"))
+    known = dict(re.findall(r"const (\w+)(?:: \w+)? = (\d+);", src))
+    known.update({c: named(m, move_names, "effect")[0] for c, m in re.findall(r"const (\w+)(?:: \w+)? = MoveId\.(\w+);", src)})
+    tokens = {}
+    for k, expr in re.findall(r'setDialogueToken\("(\w+)", ([^;]*)\)', src):
+        c = next((c for c in re.findall(r"\b[A-Z][A-Z0-9_]+\b", expr) if c in known), None)
+        if c:
+            tokens.setdefault(k, known[c])
+    tier = re.search(r"withEncounterTier\(MysteryEncounterTier\.(\w+)\)", src)
+    wr = re.search(r"withSceneWaveRangeRequirement\(([^)]*)\)", src)[1]
+    lo, hi = (me_waves if wr.startswith("...") else [me_waves[0] if "[0]" in a else me_waves[1] if "[1]" in a else int(a)
+                                                       for a in wr.split(", ")])
+    party = re.search(r"withScenePartySizeRequirement\((\d+)", src)
+    options = []
+    for k in sorted(dialogue.get("option", {}), key=lambda x: (not x.isdigit(), x)):
+        o = dialogue["option"][k]
+        if not isinstance(o, dict) or "label" not in o:
+            continue
+        options.append([fill(o["label"], tokens), fill(o.get("tooltip") or o.get("tooltipBase", ""), tokens), fill(o.get("labelDisabled", ""), tokens)])
+    encounters.append({
+        "key": etype, "name": fill(dialogue["title"], tokens) if re.search(r"[A-Za-z]", dialogue["title"]) else etype.replace("_", " ").title(), "tier": tier[1] if tier else "VARIES",
+        "waves": [lo, hi], "party": int(party[1]) if party else 0, "once": "withMaxAllowedEncounters(1)" in src,
+        "money": "withSceneMoneyRequirement" in src, "biomes": sorted(by_biome[etype]),
+        "text": fill(dialogue.get("description", ""), tokens), "options": options,
+    })
+encounters.sort(key=lambda e: e["name"])
+out3 = (
+    "// Mystery Encounters in Classic. From src/data/mystery-encounters/ in the PokeRogue source and the English\n"
+    "// dialogue in pokerogue-locales. Names of your own Pokémon and items are filled in by the game; here they read\n"
+    "// \"your Pokémon\" or \"an item\". Generated by scripts/build-data.py, do not edit by hand.\n\n"
+    "// Spawn: each eligible wave rolls BASE / MAX, and every miss adds INCREMENT until one appears. Tier weights from\n"
+    "// src/enums/mystery-encounter-tier.ts.\n"
+    "// share: the game's stated target split of encounters by tier, after its pity rules (Common, Great, Ultra, Rogue).\n"
+    f"export const ME_RULES = {j({'waves': me_waves, **me_rate, 'weights': tier_weight, 'share': tier_share})};\n\n"
+    "// biomes: BiomeId keys, or ANY. options: [label, what happens ((+) good, (-) bad, (?) depends), label when you can't pick it]\n"
+    f"export const ENCOUNTERS = {j(encounters)};\n"
+)
+(ROOT / "src/data/encounters.js").write_text(out3, encoding="utf-8")
+print(f"Wrote src/data/encounters.js: {len(encounters)} encounters, {len(out3) // 1024} KB")
 print(f"Wrote src/data/builds.js: {len(builds)} starters, {len(abilities)} abilities, {len(moves)} moves, {len(out) // 1024} KB")
 for p in problems:
     print("CHECK:", p)

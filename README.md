@@ -17,6 +17,7 @@
 - **Share your team** as a link. Opening one shows that team, with Undo to get yours back.
 - **Candy and eggs.** Hatch times, what each gacha voucher promises, and candy costs per starter price.
 - **Where can I go next?** All 34 biomes with their real art and the odds of each link.
+- **Mystery Encounters.** All 29 in Classic: rarity, waves, biomes, what each choice gives or costs. Say where you are and which wave, and it lists what can show up.
 - **Types.** Pick one or two types to see what hits them hard and what they hit hard.
 
 ## Where the numbers come from

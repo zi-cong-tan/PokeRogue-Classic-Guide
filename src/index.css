@@ -311,6 +311,53 @@ section { padding: var(--section) var(--m); }
 .atlas button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 
 /* ---------- types: one giant word, then a stack of bars ---------- */
+/* ---------- mystery encounters: an index of sealed letters, one opened on paper ---------- */
+.enc-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
+.enc-head h2 { grid-column: 1 / 7; max-width: 9ch; }
+.enc-head p { grid-column: 8 / 13; max-width: 44ch; }
+.tier-bar { display: flex; gap: 4px; margin-top: 56px; font-size: var(--step-small); }
+.tier-bar span { min-width: 128px; padding: 12px 14px; background: var(--surface); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tier-bar b { display: block; font: 600 var(--step-lead)/1 "Source Serif 4", Georgia, serif; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+.tier-bar .tier-great { background: #22402a; }
+.tier-bar .tier-ultra { background: var(--paper); color: var(--paper-ink); }
+.tier-bar .tier-rogue { background: var(--accent); color: var(--accent-ink); }
+.enc-find { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 20px; margin-top: 48px; }
+.enc-find label, .enc-pick { display: grid; gap: 6px; font-weight: 600; }
+.enc-find select, .enc-find input, .enc-pick select {
+  font: inherit; font-weight: 400; color: var(--paper-ink); background: var(--paper); border: 0; padding: 8px 10px; min-height: 44px;
+}
+.enc-find select { min-width: 220px; }
+.enc-find input { width: 110px; }
+.enc-count { color: var(--muted); font-size: var(--step-small); padding-bottom: 12px; }
+.enc-body { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); margin-top: 28px; align-items: start; }
+.enc-index { grid-column: 1 / 6; list-style: none; padding: 0; margin: 0; }
+.enc-index button {
+  display: flex; align-items: baseline; gap: 10px; width: 100%; min-height: 44px; padding: 8px 10px;
+  background: none; border: 0; color: var(--ink); text-align: left; transition: background-color .15s;
+}
+.enc-index button b { flex: 1; border-bottom: 4px dotted currentColor; opacity: .3; transform: translateY(-5px); }
+.enc-index button:hover { background: var(--surface); }
+.enc-index button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.enc-tier { font-size: var(--step-small); }
+.enc-pick { display: none; }
+.letter { grid-column: 6 / 13; position: sticky; top: 24px; }
+.letter h3 { font: 400 var(--step-head)/0.95 "Pixelify Sans", sans-serif; margin: 0 0 20px; }
+.letter-facts { display: grid; gap: 6px; margin: 0 0 24px; }
+.letter-facts div { display: grid; grid-template-columns: 6.5em 1fr; gap: 12px; }
+.letter-facts dt { font-weight: 600; }
+.letter-facts dd { margin: 0; }
+.letter blockquote { margin: 0 0 8px; padding: 18px 20px; background: var(--paper-step); font-style: italic; white-space: pre-line; }
+.choices { list-style: none; padding: 0; margin: 0; }
+.choices > li { padding-top: 22px; }
+.choices h4 { font: 600 var(--step-body)/1.3 "Source Serif 4", Georgia, serif; margin: 0 0 8px; }
+.choices ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.choices ul li { display: flex; align-items: baseline; gap: 10px; }
+.mark { flex: none; min-width: 4.2em; text-align: center; font: 600 var(--step-small)/1.5 "Source Serif 4", Georgia, serif; font-variant-numeric: tabular-nums; padding: 1px 8px; }
+.mark.good { background: var(--accent); color: var(--accent-ink); }
+.mark.bad { background: var(--paper-ink); color: var(--paper); }
+.mark.maybe { background: var(--paper-step); color: var(--paper-ink); }
+.letter .hint { margin-top: 8px; font-size: var(--step-small); color: var(--paper-soft); }
+
 .types { background: var(--paper); color: var(--paper-ink); }
 .types-col { max-width: 960px; margin: 0 auto; container-type: inline-size; }
 .giant { font-size: 22cqw; line-height: 0.8; text-transform: uppercase; margin-left: -0.04em; }
@@ -412,6 +459,13 @@ section { padding: var(--section) var(--m); }
   .slip { padding: 16px 12px; }
 
   .ticket { grid-template-columns: 1fr; border-radius: 22px; }
+  .enc-head, .enc-body { grid-template-columns: 1fr; }
+  .enc-head > *, .enc-body > * { grid-column: 1 / -1 !important; }
+  .enc-index { display: none; }
+  .enc-pick { display: grid; }
+  .letter { position: static; padding: 24px 20px; }
+  .tier-bar { flex-wrap: wrap; }
+  .tier-bar span { flex-basis: calc(50% - 2px); }
   .ticket-art img { aspect-ratio: 16 / 9; height: auto; }
   .ticket-body { border-left: 0; border-top: 8px dotted var(--black); padding: 28px 20px; }
 
