@@ -271,6 +271,29 @@ out2 = (
 )
 (ROOT / "src/data/learnsets.js").write_text(out2, encoding="utf-8")
 print(f"Wrote src/data/learnsets.js: {len(form_out)} forms, {len(move_list)} moves, {len(out2) // 1024} KB")
+ASSETS = "https://raw.githubusercontent.com/pagefaultgames/pokerogue-assets/beta/images/"
+_tree = None
+
+
+def asset_exists(path):
+    global _tree
+    if _tree is None:
+        _tree = {t["path"] for t in json.loads(fetch("https://api.github.com/repos/pagefaultgames/pokerogue-assets/git/trees/beta?recursive=1"))["tree"]}
+    return "images/" + path in _tree
+
+
+def atlas_frame(root, key):
+    """[x, y, w, h, sheet w, sheet h] of the first frame in a TexturePacker atlas, or None."""
+    if not asset_exists(f"{root}/{key}.json"):
+        return None
+    d = json.loads(fetch(f"{ASSETS}{root}/{key}.json"))
+    tex = d["textures"][0] if "textures" in d else d
+    frames = tex["frames"]
+    f = frames[0]["frame"] if isinstance(frames, list) else next(iter(frames.values()))["frame"]
+    size = tex.get("size") or d["meta"]["size"]
+    return [f["x"], f["y"], f["w"], f["h"], size["w"], size["h"]]
+
+
 # --- encounters.js: Mystery Encounters in Classic (src/data/mystery-encounters + the English dialogue files)
 ME = f"{SRC}mystery-encounters/"
 consts = fetch(f"{SRC.replace('data/', '')}constants.ts")
@@ -348,6 +371,31 @@ for f in tree:
     lo, hi = (me_waves if wr.startswith("...") else [me_waves[0] if "[0]" in a else me_waves[1] if "[1]" in a else int(a)
                                                        for a in wr.split(", ")])
     party = re.search(r"withScenePartySizeRequirement\((\d+)", src)
+    art = []
+    intro = src.split("withIntroSpriteConfigs(", 1)[1].split("])", 1)[0] if "withIntroSpriteConfigs(" in src else ""
+    for it in re.findall(r"\{(.*?)\}", intro, re.S) or []:
+        sp = re.search(r"SpeciesId\.(\w+)", it)
+        key = re.search(r'spriteKey:\s*"([^"]*)"', it)
+        root = re.search(r'fileRoot:\s*"([^"]*)"', it)
+        entry = None
+        if sp:
+            entry = ["mon", sprite_id(sp[1], species_ids.get(sp[1], 0))]
+        elif key and root and root[1] in ("mystery-encounters", "trainer"):
+            fr = atlas_frame(root[1], key[1])
+            entry = fr and ["atlas", f"{root[1]}/{key[1]}.png", fr]
+        if entry and entry not in art:
+            art.append(entry)
+    if not art:  # set at runtime in the game; a stand-in from the same source
+        stand_in = {"DANCING_LESSONS": ("mon", "ORICORIO"), "FIERY_FALLOUT": ("mon", "VOLCARONA"),
+                    "BERRIES_ABOUND": ("atlas", "mystery-encounters", "berries_abound_bush"),
+                    "THE_EXPERT_POKEMON_BREEDER": ("atlas", "trainer", "expert_pokemon_breeder"),
+                    "A_TRAINERS_TEST": ("atlas", "trainer", "buck")}.get(etype, ("atlas", "mystery-encounters", "encounter_exclaim"))
+        if stand_in[0] == "mon":
+            art.append(["mon", species_ids.get(stand_in[1], 0)])
+        else:
+            fr = atlas_frame(stand_in[1], stand_in[2])
+            path = f"{stand_in[1]}/{stand_in[2]}.png"
+            art.append(["atlas", path, fr] if fr else ["img", path])
     options = []
     for k in sorted(dialogue.get("option", {}), key=lambda x: (not x.isdigit(), x)):
         o = dialogue["option"][k]
@@ -358,7 +406,7 @@ for f in tree:
         "key": etype, "name": fill(dialogue["title"], tokens) if re.search(r"[A-Za-z]", dialogue["title"]) else etype.replace("_", " ").title(), "tier": tier[1] if tier else "VARIES",
         "waves": [lo, hi], "party": int(party[1]) if party else 0, "once": "withMaxAllowedEncounters(1)" in src,
         "money": "withSceneMoneyRequirement" in src, "biomes": sorted(by_biome[etype]),
-        "text": fill(dialogue.get("description", ""), tokens), "options": options,
+        "text": fill(dialogue.get("description", ""), tokens), "options": options, "art": art[:2],
     })
 encounters.sort(key=lambda e: e["name"])
 out3 = (
@@ -369,11 +417,71 @@ out3 = (
     "// src/enums/mystery-encounter-tier.ts.\n"
     "// share: the game's stated target split of encounters by tier, after its pity rules (Common, Great, Ultra, Rogue).\n"
     f"export const ME_RULES = {j({'waves': me_waves, **me_rate, 'weights': tier_weight, 'share': tier_share})};\n\n"
+    "// art: up to two pictures from the encounter's intro: [\"mon\", PokeAPI id], [\"atlas\", path under pokerogue-assets\n"
+    "// images/, first frame [x, y, w, h, sheet w, sheet h]] or [\"img\", path] for a single image.\n"
     "// biomes: BiomeId keys, or ANY. options: [label, what happens ((+) good, (-) bad, (?) depends), label when you can't pick it]\n"
     f"export const ENCOUNTERS = {j(encounters)};\n"
 )
 (ROOT / "src/data/encounters.js").write_text(out3, encoding="utf-8")
 print(f"Wrote src/data/encounters.js: {len(encounters)} encounters, {len(out3) // 1024} KB")
+# --- league.js: the Elite Four and Champion. All five fights share one seed (setSeedOffsetWave), so the run picks one
+# index into these lists: one region's whole league. From fixed-battle-configs.ts and trainer-config.ts.
+TR = f"{SRC}trainers/"
+fixed = fetch(TR + "fixed-battle-configs.ts")
+tconf = fetch(TR + "trainer-config.ts")
+trainer_names = json.loads(fetch(LOCALES + "trainer-names.json"))
+
+
+def pool(wave_key):
+    body = fixed.split(f"[ClassicFixedBossWaves.{wave_key}]", 1)[1].split("getRandomTrainerFunc([", 1)[1].split("]),", 1)[0]
+    out = []
+    for m in re.finditer(r"\[([^\]]+)\]|TrainerType\.(\w+)", body):
+        out.append(re.findall(r"TrainerType\.(\w+)", m[1]) if m[1] else [m[2]])
+    return out
+
+
+REGIONS = ["Kanto", "Johto", "Hoenn", "Sinnoh", "Unova", "Kalos", "Alola", "Galar", "Paldea", "Blueberry Academy"]
+cols = [pool(k) for k in ("ELITE_FOUR_1", "ELITE_FOUR_2", "ELITE_FOUR_3", "ELITE_FOUR_4", "CHAMPION")]
+assert all(len(c) == len(REGIONS) for c in cols), "league lists changed length; update REGIONS"
+league_trainers = {}
+
+
+def trainer_block(key):
+    m = re.search(r"\n  \[TrainerType\." + key + r"\]: new TrainerConfig\((.*?)(?=\n  \[TrainerType\.|\n\};)", tconf, re.S)
+    return m[1] if m else ""
+
+
+for key in {k for c in cols for group in c for k in group}:
+    b = trainer_block(key)
+    spec = re.search(r"initFor(?:EliteFour|Champion)\([^)]*?PokemonType\.(\w+)", b)
+    slots = []
+    for sm in re.finditer(r"setPartyMemberFunc\(\s*(\d+),\s*getRandomPartyMemberFunc\(\s*\[([^\]]*)\](.*?)(?=\.setPartyMemberFunc|\.setInstantTera|\.set\w+Bgm|$)", b, re.S):
+        names = [display_name(x) for x in re.findall(r"SpeciesId\.(\w+)", sm[2])]
+        first = re.search(r"SpeciesId\.(\w+)", sm[2])[1]
+        body = sm[3]
+        tags = ("B" if "setBoss(true" in body else "") + ("M" if re.search(r"//[^\n]*Mega", body) else "") + \
+               ("G" if re.search(r"//[^\n]*G-Max", body) else "")
+        tera = re.search(r"//\s*Tera (\w+)", body)
+        slots.append([int(sm[1]), names, sprite_id(first, species_ids.get(first, 0)), tags, tera[1].lower() if tera else ""])
+    slots = [x[1:] for x in sorted(slots)]
+    nm = trainer_names.get(camel(key), key.replace("_ELITE", "").replace("_CHAMPION", "").title())
+    league_trainers[key] = {"name": nm if isinstance(nm, str) else key.title(), "type": spec[1].lower() if spec else "",
+                            "sprite": next(([f"trainer/{k}.png", atlas_frame("trainer", k)] for k in
+                                            (key.lower(), re.sub(r"_(elite|champion)$", "", key.lower()))
+                                            if asset_exists(f"trainer/{k}.json")), None), "slots": slots}
+
+league = [{"region": r, "e4": [c[i] for c in cols[:4]], "champion": cols[4][i]} for i, r in enumerate(REGIONS)]
+out4 = (
+    "// The Elite Four (waves 182, 184, 186, 188) and Champion (190). All five share one random pick, so a run meets one\n"
+    "// region's whole league. From src/data/trainers/fixed-battle-configs.ts and trainer-config.ts in the PokeRogue source.\n"
+    "// Generated by scripts/build-data.py, do not edit by hand.\n"
+    "// e4 / champion: lists of trainer keys (two keys = either one). Slots: [names (game picks one), PokeAPI sprite id,\n"
+    "// tags B two health bars / M Mega / G Gigantamax, Tera type or \"\"]. type = their specialty type, \"\" if mixed.\n"
+    "// sprite: [path under pokerogue-assets images/, first frame [x, y, w, h, sheet w, sheet h]].\n"
+    f"export const LEAGUE = {j(league)};\n\nexport const LEAGUE_TRAINERS = {j(league_trainers)};\n"
+)
+(ROOT / "src/data/league.js").write_text(out4, encoding="utf-8")
+print(f"Wrote src/data/league.js: {len(league)} regions, {len(league_trainers)} trainers")
 print(f"Wrote src/data/builds.js: {len(builds)} starters, {len(abilities)} abilities, {len(moves)} moves, {len(out) // 1024} KB")
 for p in problems:
     print("CHECK:", p)

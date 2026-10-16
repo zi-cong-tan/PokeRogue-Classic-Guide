@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 import { useReveal, gsap, MOTION_OK } from '../motion';
 import { ENCOUNTERS, ME_RULES } from '../data/encounters';
 import { BIOME_NAMES } from '../data/game';
+import { ENCOUNTER_NOTES } from '../data/encounter-notes';
+import { Art } from './Trainer';
 
 const TIER = { COMMON: 'Common', GREAT: 'Great', ULTRA: 'Ultra', ROGUE: 'Rogue', VARIES: 'Varies' };
 const biomeName = key => key.toLowerCase().replace(/(^|_)(\w)/g, (_, s, c) => (s ? ' ' : '') + c.toUpperCase());
@@ -50,6 +52,7 @@ export default function Encounters() {
     e.once && 'Only once per run',
   ].filter(Boolean);
   const where = e.biomes.includes('ANY') ? 'Any biome' : e.biomes.map(biomeName).join(', ');
+  const notes = ENCOUNTER_NOTES[e.key];
 
   return (
     <section className="encounters" id="encounters" ref={root} aria-labelledby="encounters-title">
@@ -102,7 +105,10 @@ export default function Encounters() {
         </label>
 
         <article className="paper zig letter" ref={letter} aria-live="polite">
-          <h3>{e.name}</h3>
+          <div className="letter-head">
+            <h3>{e.name}</h3>
+            <div className="letter-art">{e.art.map((a, i) => <Art key={e.key + i} art={a} label={i ? '' : `${e.name}, as drawn in the game`} />)}</div>
+          </div>
           <dl className="letter-facts">
             <div><dt>Rarity</dt><dd>{TIER[e.tier]}</dd></div>
             <div><dt>Waves</dt><dd>{e.waves[0]} to {e.waves[1]}</dd></div>
@@ -119,6 +125,18 @@ export default function Encounters() {
               </li>
             ))}
           </ol>
+          {notes && (
+            <div className="letter-notes">
+              <h4>What the battle is</h4>
+              <p>{notes.fight}</p>
+              <h4>What you get</h4>
+              <p>{notes.rewards}</p>
+              <h4>Which to pick</h4>
+              <ul className="picks">
+                {notes.pick.map(([when, what]) => <li key={when}><span>{when}</span><strong>{what}</strong></li>)}
+              </ul>
+            </div>
+          )}
         </article>
       </div>
       <p className="note">From the game's source. Names in the game's text, like the Pokémon that helps, depend on your party, so they read "your Pokémon" here.</p>

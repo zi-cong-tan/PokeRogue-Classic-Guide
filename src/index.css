@@ -359,6 +359,18 @@ section { padding: var(--section) var(--m); }
 .enc-pick { display: none; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .letter { grid-column: 6 / 13; }
+.letter-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 20px; }
+.letter-head h3 { margin: 0 !important; }
+.letter-art { display: flex; align-items: flex-end; gap: 8px; flex: none; }
+.art-mon { width: 96px; height: 96px; image-rendering: pixelated; }
+.art-img { height: 64px; width: auto; image-rendering: pixelated; }
+.art-sheet { width: var(--w); height: var(--h); max-height: 140px; background-repeat: no-repeat; image-rendering: pixelated; }
+.letter-notes { margin-top: 28px; padding-top: 22px; border-top: 4px dotted color-mix(in srgb, var(--paper-ink) 25%, transparent); }
+.letter-notes h4 { font: 600 var(--step-body)/1.3 "Source Serif 4", Georgia, serif; margin: 16px 0 4px; }
+.letter-notes h4:first-child { margin-top: 0; }
+.picks { list-style: none; padding: 0; margin: 6px 0 0; display: grid; gap: 8px; }
+.picks li { display: grid; gap: 2px; padding: 10px 12px; background: var(--paper-step); }
+.picks span { font-size: var(--step-small); color: var(--paper-soft); }
 .letter h3 { font: 400 clamp(1.75rem, 1rem + 2vw, 3.25rem)/1 "Pixelify Sans", sans-serif; margin: 0 0 20px; }
 .letter-facts { display: grid; gap: 6px; margin: 0 0 24px; }
 .letter-facts div { display: grid; grid-template-columns: 6.5em 1fr; gap: 12px; }
@@ -483,6 +495,7 @@ section { padding: var(--section) var(--m); }
   .enc-index { display: none; }
   .enc-pick { display: grid; }
   .letter { padding: 24px 20px; }
+  .letter-head { flex-direction: column-reverse; align-items: flex-start; }
   .tier-bar { flex-wrap: wrap; }
   .tier-bar span { flex-basis: calc(50% - 2px); }
   .ticket-art img { aspect-ratio: 16 / 9; height: auto; }
