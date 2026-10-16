@@ -25,3 +25,4 @@ dist-ssr
 .taste-skill/
 scripts/.cache
 .playwright-cli/
+extension/dist
