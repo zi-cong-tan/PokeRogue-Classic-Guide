@@ -32,13 +32,24 @@ function nextBossWave(w, run) {
 // Bosses whose teams are known for this run, in wave order.
 function knownBosses(run) {
   const out = [];
-  // Rivals: prep the slots that are predictable (the bird and Rayquaza); the big pools are summed up in words.
+  // Rivals roll every slot fresh each fight, so the prep groups each slot by type: exact for the starter from fight 4,
+  // which Terastallizes to its first type; birds by their full typing; the big pools by their main type.
   for (const r of RIVALS) {
-    const small = r.slots.filter(s => s.pool.length <= 9).sort((a, b) => a.pool.length - b.pool.length); // Rayquaza first
-    const big = r.slots.filter(s => s.pool.length > 9);
-    out.push({ wave: r.wave, title: 'Your rival', rival: true,
-      extra: big.length ? `Plus ${big.length} more from big pools: their starter (one of ${big[0].pool.length})${big.length > 1 ? ` and ${big.length - 1} more from bigger pools` : ''}. See the run schedule.` : '',
-      slots: small.flatMap(s => s.pool.map(([name, id]) => [[name.replace(' (Mega)', '')], id, '', '', s.note])) });
+    const slots = r.slots.map((s, k) => [s, k]).sort((a, b) => (a[0].pool.length === 1 ? -1 : 0) - (b[0].pool.length === 1 ? -1 : 0)).flatMap(([s, k]) => {  // a fixed slot (Rayquaza) first
+      if (s.pool.length === 1) { const [n, id, types] = s.pool[0]; return [[[n.replace(' (Mega)', '')], id, '', '', s.note, types]]; }
+      const label = k === 0 ? 'Their starter' : k === 1 ? 'Their bird' : `Slot ${k + 1}`;
+      const groups = new Map();
+      for (const [n, id, types] of s.pool) {
+        const key = k === 1 ? types : types.split(' ')[0];
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push([n, id]);
+      }
+      return [...groups].sort((a, b) => b[1].length - a[1].length).map(([key, list]) => [
+        [`${label}, ${key.split(' ').map(cap).join('/')}${s.tera ? ' (Tera)' : k === 1 ? '' : ' type'}`], list[0][1], '', '',
+        `${list.length} of ${s.pool.length}: ${list.slice(0, 4).map(x => x[0]).join(', ')}${list.length > 4 ? '...' : ''}`, key]);
+    });
+    out.push({ wave: r.wave, title: 'Your rival', rival: true, slots,
+      extra: 'Each slot is grouped by type' + (r.wave >= 95 ? '; their starter Terastallizes, so it fights as one type.' : '.') });
   }
   const v = VILLAINS[run.villain];
   if (v) {
@@ -65,6 +76,23 @@ function nextText(f, w) {
 }
 
 const Chip = ({ t }) => <span className="ty" style={{ '--t': TYPE_COLOR[t], '--ti': typeInk(t) }}>{cap(t)}</span>;
+
+// Wave 200 is always Eternatus, and it changes to Eternamax Eternatus partway through (same types, much bulkier).
+function Final({ team, data }) {
+  if (!team.party.length) return null;
+  const ms = data ? members(team.party, team.builds, data) : null;
+  const [p] = ms ? bossPrep(ms, [{ name: 'Eternatus', types: ['poison', 'dragon'] }]) : [null];
+  return (
+    <div className="track-final">
+      <h3>Always last: Eternatus, wave 200</h3>
+      <p className="hint">Two phases, both Poison and Dragon: Eternatus (140 HP, 145 Sp. Atk, 130 Speed), then Eternamax (255 HP, 250 Defense and Sp. Def). Weak to Ground, Psychic, Ice and Dragon.</p>
+      {!p ? <p className="hint">Loading...</p> : (
+        <p>{p.best.mult >= 2 ? `Your best: ${p.best.mult}× with ${cap(p.best.type)} (${p.best.who}).` : 'No super-effective hit on your team yet: teach a Ground, Psychic, Ice or Dragon move.'}
+          {p.threatened.length ? ` Its types hit ${p.threatened.join(', ')} hard.` : ''}</p>
+      )}
+    </div>
+  );
+}
 
 function Body({ popped, onPop }) {
   const run = useRun();
@@ -95,7 +123,7 @@ function Body({ popped, onPop }) {
   let prep = null;
   if (boss && data && team.party.length) {
     const types = Object.fromEntries(Object.entries(data.SPECIES_TYPES).map(([k, v]) => [norm(k), v]));
-    const enemy = boss.slots.map(([names, id, tags, , odds]) => ({ name: names.join(' or '), id, tags, odds, types: (types[norm(names[0])] || 'normal').split(' ') }));
+    const enemy = boss.slots.map(([names, id, tags, , odds, typesOverride]) => ({ name: names.join(' or '), id, tags, odds, types: (typesOverride || types[norm(names[0])] || 'normal').split(' ') }));
     prep = bossPrep(members(team.party, team.builds, data), enemy);
   }
   const uncovered = prep ? prep.filter(p => p.best.mult < 2).length : 0;
@@ -167,6 +195,8 @@ function Body({ popped, onPop }) {
             </>}
         </div>
       )}
+
+      <Final team={team} data={data} />
 
       {!popped && onPop && <button type="button" className="mini-btn" onClick={onPop}>Pop out over the game</button>}
     </div>

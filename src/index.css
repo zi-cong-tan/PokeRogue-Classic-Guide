@@ -484,6 +484,8 @@ section { padding: var(--section) var(--m); }
 .prep .threat { color: #ffb4a8; }
 .prep .odds-note { color: var(--muted); }
 .tracker > .mini-btn { grid-column: 1 / -1; justify-self: start; }
+.track-final { grid-column: 1 / -1; background: var(--bg); padding: 16px 18px; display: grid; gap: 6px; }
+.track-final h3 { font-size: var(--step-body); margin: 0; }
 .tracker .hint { color: var(--muted); font-size: var(--step-small); }
 /* the pop-out window: one narrow column */
 .pip-body { margin: 0; background: var(--surface); color: var(--ink); padding: 14px; }

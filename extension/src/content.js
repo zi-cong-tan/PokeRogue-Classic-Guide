@@ -46,6 +46,7 @@ function comingUp(info) {
   return [
     next && ['Next fixed fight', `${next.title}, wave ${next.waves.filter(v => v >= w).join(' or ')}`],
     ['Boss wave ' + boss, (t => t[0].toUpperCase() + t.slice(1))(set || `${gym}a ${info.biome || 'biome'} boss${top?.length ? ` (rare ones: ${top.join(', ')})` : ''}`)],
+    w < 200 && ['Final boss, wave 200', 'Eternatus, then Eternamax: Poison/Dragon both phases, weak to Ground, Psychic, Ice and Dragon'],
   ].filter(Boolean);
 }
 
