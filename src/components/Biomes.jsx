@@ -7,7 +7,7 @@ import { BIOME_BOSSES } from '../data/biome-bosses';
 import { sprite } from '../art';
 import { Sheet } from './Trainer';
 
-const ASSETS = 'https://raw.githubusercontent.com/pagefaultgames/pokerogue-assets/beta/images/';
+const ASSETS = 'https://cdn.jsdelivr.net/gh/pagefaultgames/pokerogue-assets@beta/images/';
 
 
 const ODDS = { undefined: 'Always open', 2: 'Open 1 run in 2', 3: 'Open 1 run in 3' };

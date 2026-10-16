@@ -3,7 +3,7 @@ import { VILLAIN_FRAMES } from '../data/villains';
 import { trainerArt, sprite } from '../art';
 
 const ALL_FRAMES = { ...FRAMES, ...VILLAIN_FRAMES };
-const ASSETS = 'https://raw.githubusercontent.com/pagefaultgames/pokerogue-assets/beta/images/';
+const ASSETS = 'https://cdn.jsdelivr.net/gh/pagefaultgames/pokerogue-assets@beta/images/';
 
 // One frame cut from a sprite sheet, scaled by whole pixels to about `tall` px, no smoothing.
 // frame = [x, y, w, h, sheet width, sheet height].

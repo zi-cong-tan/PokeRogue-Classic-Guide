@@ -459,7 +459,7 @@ section { padding: var(--section) var(--m); }
 .rival-team li { display: grid; grid-template-columns: 140px 1fr; gap: 2px 12px; align-items: center; }
 .rival-slot { font-size: var(--step-small); color: var(--muted); }
 .rival-mons { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
-.rival-mons img { width: 48px; height: 48px; image-rendering: pixelated; }
+.rival-mons img { width: 48px; height: 48px; image-rendering: pixelated; display: block; }
 .rival-mons small { color: var(--muted); margin-left: 6px; }
 .rival-team strong, .rival-note { grid-column: 2; font-size: var(--step-small); }
 .rival-note { color: var(--accent); }
@@ -469,6 +469,7 @@ section { padding: var(--section) var(--m); }
 .track-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
 .track-head h2 { grid-column: 1 / 7; max-width: 11ch; }
 .track-head p { grid-column: 8 / 13; max-width: 44ch; }
+.tracker > * { min-width: 0; } /* wide children (cards, stat rows) wrap instead of widening the page */
 .tracker { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px var(--gap); margin-top: 48px; align-items: start; }
 .track-form { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 12px 20px; }
 .track-form label { display: grid; gap: 6px; font-weight: 600; }
@@ -499,6 +500,27 @@ section { padding: var(--section) var(--m); }
 .final-mons { display: flex; gap: 8px; }
 .final-mons figure { margin: 0; text-align: center; font-size: var(--step-small); color: var(--muted); }
 .final-mons img { width: 96px; height: 96px; image-rendering: pixelated; display: block; }
+/* clickable Pokémon and their close-up card */
+.mon-btn { all: unset; cursor: pointer; display: inline-flex; border-radius: 0; }
+.mon-btn:hover img { filter: brightness(1.15); }
+.mon-btn:focus-visible { outline: 2px solid var(--accent); }
+.mon-btn[aria-pressed="true"] { background: var(--accent); }
+.more-btn { all: unset; cursor: pointer; color: var(--muted); font-size: var(--step-small); padding: 8px 6px; text-decoration: underline; text-underline-offset: 3px; }
+.more-btn:focus-visible { outline: 2px solid var(--accent); }
+.mon-card { position: relative; display: flex; gap: 14px; align-items: flex-start; background: var(--paper); color: var(--paper-ink); padding: 14px 16px; margin-top: 8px; }
+.mon-card > img { width: 112px; height: 112px; image-rendering: pixelated; flex: none; }
+.mon-card-main { display: grid; gap: 6px; min-width: 0; font-size: var(--step-small); }
+.mon-card h4 { font: 400 var(--step-lead)/1.1 "Pixelify Sans", sans-serif; margin: 0; }
+.mon-card .chips { margin: 0; }
+.mon-card b { display: inline-block; min-width: 26px; }
+.mon-card .muted { color: var(--paper-soft); }
+.mon-card-close { all: unset; cursor: pointer; position: absolute; top: 4px; right: 6px; padding: 6px 10px; font-size: 20px; line-height: 1; }
+.mon-card-close:focus-visible { outline: 2px solid var(--paper-ink); }
+.mon-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 2px 10px; margin: 0; font-variant-numeric: tabular-nums; }
+.mon-stats dt { color: var(--paper-soft); }
+.mon-stats dd { margin: 0; display: flex; align-items: center; gap: 4px; }
+.mon-answer { font-weight: 600; }
+
 /* rival prep: a row per slot, a cell per type group */
 .rival-prep { display: grid; gap: 14px; margin-top: 12px; }
 .rival-row-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin-bottom: 6px; }
@@ -510,7 +532,8 @@ section { padding: var(--section) var(--m); }
 .rival-row li.gap .rival-answer { color: #ffd38a; }
 .rival-row .chips { margin: 0; }
 .rival-sprites { display: flex; align-items: center; min-height: 40px; }
-.rival-sprites img { width: 40px; height: 40px; image-rendering: pixelated; }
+.rival-sprites { flex-wrap: wrap; }
+.rival-sprites img { width: 40px; height: 40px; image-rendering: pixelated; display: block; }
 .rival-sprites small { color: var(--muted); margin-left: 4px; }
 .rival-answer { font-weight: 600; }
 .rival-row .threat { color: #ffb4a8; }
@@ -732,6 +755,7 @@ section { padding: var(--section) var(--m); }
   .items { grid-template-columns: 1fr; }
   .track-head > *, .tracker > * { grid-column: 1 / -1 !important; }
   .prep { grid-template-columns: 1fr; }
+  .mon-card { flex-direction: column; }
   .track-log li, .tracker-pop .track-log li { display: grid; gap: 2px; padding: 6px 0; }
   .track-log li > span:first-child { max-width: none; font-size: var(--step-small); color: var(--paper-soft); }
   .track-log li > span:last-child { text-align: left; }

@@ -6,7 +6,7 @@ import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import Party from './Party';
 import { Sheet } from './Trainer';
 
-const ASSETS = 'https://raw.githubusercontent.com/pagefaultgames/pokerogue-assets/beta/images/';
+const ASSETS = 'https://cdn.jsdelivr.net/gh/pagefaultgames/pokerogue-assets@beta/images/';
 const WAVES = [182, 184, 186, 188, 190];
 
 // One rung of the ladder: the wave, the trainer (or the two the game picks between) and their team.

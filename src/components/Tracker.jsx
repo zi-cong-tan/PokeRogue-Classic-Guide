@@ -10,6 +10,7 @@ import { sprite } from '../art';
 import { bossPrep } from '../advice';
 import { useRun, setRun, useTeam, waveRule, fits, biomeKey, runMembers, BOSS_TIERS } from '../run';
 import { BIOME_BOSSES } from '../data/biome-bosses';
+import MonCard from './MonCard';
 import { RIVALS } from '../data/rivals';
 
 const FIGHTS = [...RUN.flatMap(g => g.rows), FINAL].map(f => ({ ...f, waves: (f.at.match(/\d+/g) || [f.n]).map(Number) }));
@@ -38,13 +39,14 @@ function knownBosses(run) {
     const slots = r.slots.map((s, k) => {
       const label = s.pool.length === 1 ? s.pool[0][0] : k === 0 ? 'Their starter' : k === 1 ? 'Their bird' : `Slot ${k + 1}`;
       const groups = new Map();
-      for (const [n, id, types] of s.pool) {
+      for (const entry of s.pool) {
         // the starter fights as its first type from fight 4 (Tera); birds by full typing; big pools by main type
+        const types = entry[2];
         const key = s.pool.length === 1 || k === 1 ? types : types.split(' ')[0];
         if (!groups.has(key)) groups.set(key, []);
-        groups.get(key).push([n, id]);
+        groups.get(key).push(entry);
       }
-      return { label, note: s.note, size: s.pool.length,
+      return { label, note: s.note, size: s.pool.length, tera: s.tera,
         groups: [...groups].sort((a, b) => b[1].length - a[1].length).map(([types, list]) => ({ types: types.split(' '), list })) };
     }).sort((a, b) => (a.size === 1 ? -1 : 0) - (b.size === 1 ? -1 : 0)); // Rayquaza first
     out.push({ wave: r.wave, title: 'Your rival', rival: true, rivalSlots: slots, slots: [] });
@@ -81,6 +83,8 @@ const tidy = note => { const s = (note || '').replace(/^Their starter(, |; )?/, 
 
 // Rival prep: one row per slot, each type group a cell with your best answer, so gaps stand out at a glance.
 function RivalPrep({ slots, team }) {
+  const [open, setOpen] = useState(null);   // the Pokémon clicked, shown up close under its row
+  const [wide, setWide] = useState({});      // groups expanded to show every option
   return (
     <div className="rival-prep">
       {slots.map(slot => (
@@ -89,12 +93,18 @@ function RivalPrep({ slots, team }) {
           <ul>
             {slot.groups.map(g => {
               const [p] = bossPrep(team, [{ name: g.list[0][0], types: g.types }]);
+              const key = slot.label + g.types.join();
+              const shown = wide[key] ? g.list : g.list.slice(0, 3);
               return (
-                <li key={g.types.join()} className={p.best.mult < 2 ? 'gap' : undefined}>
+                <li key={key} className={p.best.mult < 2 ? 'gap' : undefined}>
                   <span className="chips">{g.types.map(t => <Chip key={t} t={t} />)}</span>
                   <span className="rival-sprites">
-                    {g.list.slice(0, 3).map(([n, id]) => <img key={n} src={sprite(id)} alt={n} title={n} width="96" height="96" loading="lazy" />)}
-                    {g.list.length > 3 && <small>+{g.list.length - 3}</small>}
+                    {shown.map(m => (
+                      <button key={m[0]} type="button" className="mon-btn" aria-pressed={open?.[0] === m[0]} onClick={() => setOpen(open?.[0] === m[0] ? null : m)} title={m[0]}>
+                        <img src={sprite(m[1])} alt={m[0]} width="96" height="96" loading="lazy" />
+                      </button>
+                    ))}
+                    {g.list.length > 3 && <button type="button" className="more-btn" onClick={() => setWide(w => ({ ...w, [key]: !w[key] }))}>{wide[key] ? 'less' : `+${g.list.length - 3}`}</button>}
                   </span>
                   <span className="rival-answer">{p.best.mult >= 2 ? `${p.best.mult}× ${cap(p.best.type)}, ${p.best.who}` : 'No good answer'}</span>
                   {p.threatened.length > 0 && <span className="threat">Hits {p.threatened.join(', ')}</span>}
@@ -102,6 +112,7 @@ function RivalPrep({ slots, team }) {
               );
             })}
           </ul>
+          {open && slot.groups.some(g => g.list.includes(open)) && <MonCard mon={open} team={team} tera={slot.tera} onClose={() => setOpen(null)} />}
         </div>
       ))}
     </div>
