@@ -48,6 +48,34 @@
   // Also the game's rules for when no ball can be thrown. Shiny bonus left out (it only makes it easier).
   const BALLS = [['Poké Ball', 1], ['Great Ball', 1.5], ['Ultra Ball', 2], ['Rogue Ball', 3], ['Master Ball', -1]];
   const STATUS_CATCH = [1, 1.5, 1.5, 1.5, 2.5, 2.5, 1.5];   // StatusEffect: none, poison, toxic, paralysis, sleep, freeze, burn
+  // Optional, off by default and never in Daily runs: whether this turn's throw will land. Each turn the game re-seeds its
+  // battle dice from the wave's seed and the turn number, and draws them in order. Before your throw, only the enemy's
+  // move choice draws (EnemyCommandPhase -> getNextMove), so this replays that choice, then draws the capture rolls
+  // (one critical-capture roll out of 256, then up to three shake rolls out of 65536), then puts every bit of state
+  // back. Once per turn, while you pick a command. Quick Claw or Quick Draw can draw first, so then it's flagged unsure.
+  let predict = false, rolled = null;
+  addEventListener('message', e => { if (e.source === window && e.data?.__prgOverlayCmd) predict = !!e.data.predict; });
+  function throwRolls(battle) {
+    const b = battle.currentBattle;
+    if (!predict || battle.gameMode?.isDaily) return null;
+    const phase = battle.phaseManager?.getCurrentPhase?.()?.phaseName;
+    if (rolled?.wave === b.waveIndex && rolled.turn === b.turn) return rolled;
+    if (phase && phase !== 'CommandPhase') return null;
+    const foes = battle.getEnemyField().filter(p => p && !p.isFainted?.());
+    const saved = b.battleSeedState, queues = foes.map(e => e.summonData?.moveQueue?.slice());
+    try {
+      foes.forEach(e => e.getNextMove());
+      const draws = [battle.randBattleSeedInt(256), battle.randBattleSeedInt(65536), battle.randBattleSeedInt(65536), battle.randBattleSeedInt(65536)];
+      const quick = [...battle.getPlayerField(), ...foes].some(p => p && !p.isFainted?.() && (
+        (p.getHeldItems?.() || []).some(m => m.type?.id === 'QUICK_CLAW') || [p.getAbility?.()?.name, p.getPassiveAbility?.()?.name].includes('Quick Draw')));
+      rolled = { wave: b.waveIndex, turn: b.turn, draws, unsure: quick };
+      return rolled;
+    } catch { return null; } finally {
+      b.battleSeedState = saved;
+      foes.forEach((e, i) => { if (e.summonData && queues[i]) e.summonData.moveQueue = queues[i]; });
+    }
+  }
+
   function catchOdds(battle, p, onField) {
     try {
       const b = battle.currentBattle;
@@ -61,15 +89,22 @@
       const dexMult = battle.gameMode?.isFreshStartChallenge?.() ? 0 : battle.gameMode?.isDaily || dex > 800 ? 2.5 : dex > 600 ? 2 : dex > 400 ? 1.5 : dex > 200 ? 1 : dex > 100 ? 0.5 : 0;
       const m3 = 3 * p.getMaxHp(), h2 = 2 * p.hp, status = STATUS_CATCH[p.status?.effect || 0] || 1;
       const counts = battle.pokeballCounts || {};
+      const r = strong ? null : throwRolls(battle);
+      const lands = (rate, shake, crit) => {
+        if (!r) return undefined;
+        const [c, s1, s2, s3] = r.draws;
+        if (rate >= 255) return true;
+        return c < crit ? s1 < shake : s1 < shake && s2 < shake && s3 < shake;
+      };
       return {
-        strong,
+        strong, predicted: !!r, unsure: !!r?.unsure, daily: predict && !!battle.gameMode?.isDaily,
         balls: BALLS.map(([name, mult], i) => {
-          if (mult === -1) return { name, odds: 1, have: counts[i] || 0 };
+          if (mult === -1) return { name, odds: 1, have: counts[i] || 0, lands: r ? true : undefined };
           if (strong) return { name, odds: null, have: counts[i] || 0 };
           const rate = Math.round(((m3 - h2) * p.species.catchRate * mult / m3) * status);
-          const shake = Math.round(65536 / Math.pow(255 / rate, 0.1875)) / 65536;
-          const crit = Math.floor((charm.value * dexMult * Math.min(255, rate)) / 6) / 256;
-          return { name, odds: rate >= 255 ? 1 : Math.min(1, crit * shake + (1 - crit) * shake ** 3), have: counts[i] || 0 };
+          const shakeN = Math.round(65536 / Math.pow(255 / rate, 0.1875)), critN = Math.floor((charm.value * dexMult * Math.min(255, rate)) / 6);
+          const shake = shakeN / 65536, crit = critN / 256;
+          return { name, odds: rate >= 255 ? 1 : Math.min(1, crit * shake + (1 - crit) * shake ** 3), have: counts[i] || 0, lands: lands(rate, shakeN, critN) };
         }),
       };
     } catch { return null; }

@@ -130,20 +130,24 @@ function rewardsPanel(info, rewards) {
 }
 
 // Each ball's chance to catch it now, from the game's own formula (page.js). "Certain" only when the game skips the roll.
-function catchPanel(e) {
+function catchPanel(e, predict) {
   const c = e.catch;
   if (!c) return '';
   if (c.blocked) return `<h4>Catching</h4><p class="muted">${esc(c.blocked)}</p>`;
   const rows = c.balls.filter(b => b.have || b.odds === 1 && b.name !== 'Master Ball').map(b => {
     const sure = b.odds === 1;
     const odds = b.odds == null ? 'too strong' : sure ? 'Certain' : `${b.odds < 0.01 ? '<1' : Math.round(b.odds * 100)}%`;
-    return `<li class="${sure ? 'ko' : ''}"><span>${esc(b.name)} <small>×${esc(b.have)}</small></span><span></span><strong>${odds}</strong></li>`;
+    const call = b.lands === undefined ? '' : b.lands ? 'Lands' : 'Breaks free';
+    return `<li class="${sure || b.lands ? 'ko' : ''}"><span>${esc(b.name)} <small>×${esc(b.have)}</small></span><span>${odds}</span><strong>${call}</strong></li>`;
   }).join('');
-  return `<h4>Catching</h4>${rows ? `<ul class="dmg">${rows}</ul>` : '<p class="muted">You have no balls.</p>'}
+  const toggle = `<button type="button" class="predict" aria-pressed="${predict}">${predict ? 'Throw check on: tap to turn off' : 'Check this turn’s throw'}</button>
+    ${c.daily ? '<p class="muted tiny">Off in Daily runs: they have a leaderboard.</p>'
+      : c.predicted ? `<p class="muted tiny">Read from this turn’s dice: it holds if you throw now, before anything else happens.${c.unsure ? ' A Quick Claw or Quick Draw on the field may roll first, so it could be wrong.' : ''} Using a move instead moves to the next turn’s dice.</p>` : ''}`;
+  return `<h4>Catching</h4>${rows ? `<ul class="dmg">${rows}</ul>` : '<p class="muted">You have no balls.</p>'}${c.strong ? '' : toggle}
     ${c.strong ? '<p class="muted tiny">Bosses only take a ball once down to their last bar (Master Ball works any time).</p>' : '<p class="muted tiny">From the game\'s catch formula: HP, status, ball, Pokédex size and Catching Charm. Lower its HP or put it to sleep to raise the odds.</p>'}`;
 }
 
-function enemyPanel(info, enemies, encounterId, rewards, calc) {
+function enemyPanel(info, enemies, encounterId, rewards, calc, predict) {
   if (rewards?.options?.length) return rewardsPanel(info, rewards);
   const me = ME_BY_ID[encounterId];
   if (me) {
@@ -165,7 +169,7 @@ function enemyPanel(info, enemies, encounterId, rewards, calc) {
         ${half.length || none.length ? `<p class="muted">${half.length ? `Resists ${half.map(cap).join(', ')}` : ''}${none.length ? `${half.length ? '; ' : ''}immune to ${none.map(cap).join(', ')}` : ''}</p>` : ''}
         <p class="pick">${top ? `Use <strong>${esc(top.best.name)}</strong> from ${esc(top.who)} (${x(top.best.eff)})` : 'No super-effective move on your team: use your strongest same-type move, or switch.'}</p>
         ${damagePanel(info, e, i, calc)}
-        ${catchPanel(e)}
+        ${catchPanel(e, predict)}
       </section>`;
     }).join('');
   }
@@ -248,6 +252,9 @@ figure img { width: 48px; height: 48px; image-rendering: pixelated; display: blo
 .drawer-body { overflow: auto; padding: 14px 18px; display: grid; gap: 8px; align-content: start; }
 .items { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; }
 .items li { display: flex; gap: 8px; background: #182d19; padding: 6px 8px; } .items p { font-size: 12px; color: #d4dbd4; }
+.predict { margin-top: 6px; width: 100%; font: inherit; font-size: 12px; padding: 6px 8px; border: 0; background: #2a442b; color: #e8efe8; cursor: pointer; }
+.predict[aria-pressed="true"] { background: #c6f19d; color: #0f1f10; }
+.predict:focus-visible { outline: 2px solid #c6f19d; outline-offset: 2px; }
 details { background: #182d19; padding: 6px 10px; } summary { cursor: pointer; font-weight: 600; }
 `;
 
@@ -266,8 +273,9 @@ function mount() {
   const drawer = root.querySelector('.drawer'), body = root.querySelector('.drawer-body');
   // folded: null until the player chooses, then remembered
   const saved = (() => { try { return JSON.parse(localStorage.getItem('prg-hud')) || {}; } catch { return {}; } })();
-  const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items' };
-  const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right })); } catch { /* storage blocked */ } };
+  const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items', predict: !!saved.predict };
+  const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right, predict: ui.predict })); } catch { /* storage blocked */ } };
+  const tellPage = () => window.postMessage({ __prgOverlayCmd: 1, predict: ui.predict }, location.origin);
   let state = { info: null, enemies: [], encounter: null, rewards: null, calc: null };
   let roomy = true;
 
@@ -306,7 +314,7 @@ function mount() {
     const { info, enemies, encounter } = state;
     const live = info && info.gameMode !== 'Title' && info.wave;
     root.querySelector('.l').innerHTML = live ? runPanel(info, enemies) : '<section><p class="muted">Start or continue a run: your wave, biome, team and the next fights show here.</p></section>';
-    root.querySelector('.r').innerHTML = live ? enemyPanel(info, enemies, encounter, state.rewards, state.calc) : '';
+    root.querySelector('.r').innerHTML = live ? enemyPanel(info, enemies, encounter, state.rewards, state.calc, ui.predict) : '';
     badges();
     right.dataset.hide = live ? '' : '1';
     if (!drawer.hidden) body.innerHTML = guideTab(ui.tab, info);
@@ -316,6 +324,10 @@ function mount() {
   const folds = root.querySelectorAll('.fold');
   folds[0].addEventListener('click', () => { ui.left = !left.classList.contains('folded'); save(); place(); });
   folds[1].addEventListener('click', () => { ui.right = !right.classList.contains('folded'); save(); place(); });
+  right.addEventListener('click', e => {
+    if (!e.target.closest('.predict')) return;
+    ui.predict = !ui.predict; save(); tellPage(); render();
+  });
   root.querySelector('.guide-btn').addEventListener('click', () => { drawer.hidden = false; body.innerHTML = guideTab(ui.tab, state.info); });
   root.querySelector('.close').addEventListener('click', () => { drawer.hidden = true; });
   root.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
@@ -334,6 +346,8 @@ function mount() {
     if (key !== last) { last = key; render(); } else { place(); badges(); }
   });
   render();
+  tellPage();
+  setInterval(tellPage, 5000);   // page.js may load after us
   document.documentElement.append(host);
 }
 
