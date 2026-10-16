@@ -2,9 +2,51 @@ import { useRef } from 'react';
 import { useReveal, gsap, MOTION_OK } from '../motion';
 import { BIOMES, BIOME_NAMES } from '../data/game';
 import { biomeArt } from '../art';
-import { useRun, setRun } from '../run';
+import { useRun, setRun, BOSS_TIERS } from '../run';
+import { BIOME_BOSSES } from '../data/biome-bosses';
+import { sprite } from '../art';
+import { Sheet } from './Trainer';
+
+const ASSETS = 'https://raw.githubusercontent.com/pagefaultgames/pokerogue-assets/beta/images/';
+
 
 const ODDS = { undefined: 'Always open', 2: 'Open 1 run in 2', 3: 'Open 1 run in 3' };
+
+// Who the boss waves here can be: wild boss Pokémon by rarity, and the gym leaders a gym wave here brings.
+function Bosses({ biome }) {
+  const b = BIOME_BOSSES[biome];
+  if (!b) return null;
+  const tiers = BOSS_TIERS.filter(([k]) => b.tiers[k].length);
+  return (
+    <div className="ticket-bosses">
+      {tiers.length > 0 && <>
+        <h4>Boss waves here</h4>
+        <p className="ticket-via">Waves ending in 0 that are not a set fight or a gym battle bring one of these as a boss.</p>
+        {tiers.map(([k, label, n]) => (
+          <div key={k} className="boss-tier">
+            <p><strong>{label}</strong> <span>{n} in 64</span></p>
+            <ul>
+              {b.tiers[k].map(([name, id, tod]) => (
+                <li key={name + tod}>
+                  <img src={sprite(id)} alt="" width="96" height="96" loading="lazy" />
+                  <span>{name}{tod && <small> ({tod} only)</small>}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </>}
+      {b.gyms.length > 0 && <>
+        <h4>Gym leaders here</h4>
+        <ul className="gyms">
+          {b.gyms.map(([name, art]) => (
+            <li key={name}>{art && <Sheet src={ASSETS + art[0]} frame={art[1]} label={name} tall={72} className="gym-sprite" />}<span>{name}</span></li>
+          ))}
+        </ul>
+      </>}
+    </div>
+  );
+}
 
 export default function Biomes() {
   const root = useReveal();
@@ -43,6 +85,7 @@ export default function Biomes() {
               </li>
             ))}
           </ol>
+          <Bosses biome={cur} />
         </div>
       </div>
 

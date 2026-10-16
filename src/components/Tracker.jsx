@@ -8,11 +8,25 @@ import { ENCOUNTERS } from '../data/encounters';
 import { TYPES, TYPE_COLOR, cap, typeInk, mult } from '../data/types';
 import { sprite } from '../art';
 import { bossPrep } from '../advice';
-import { useRun, setRun, useTeam, waveRule, fits, biomeKey, members } from '../run';
+import { useRun, setRun, useTeam, waveRule, fits, biomeKey, members, BOSS_TIERS } from '../run';
+import { BIOME_BOSSES } from '../data/biome-bosses';
 
 const FIGHTS = [...RUN.flatMap(g => g.rows), FINAL].map(f => ({ ...f, waves: (f.at.match(/\d+/g) || [f.n]).map(Number) }));
 const ODDS = { 2: ', 1 run in 2', 3: ', 1 run in 3' };
 const norm = s => s.replace(/’/g, "'");
+
+// The next wave ending in 0 and what it can be (isBoss / isTrainerBoss in the game's game-mode.ts): a set fight,
+// a gym leader on a gym wave (every 30 waves from 20, or from 30 in some runs), or a boss from the biome's list.
+function nextBossWave(w, run) {
+  const wave = Math.ceil(w / 10) * 10;
+  const set = { 190: 'the Champion', 200: 'Eternatus' }[wave];
+  if (set) return { wave, text: set };
+  const b = BIOME_BOSSES[run.biome];
+  const gymWave = wave % 30 === 20 || wave % 30 === 0;
+  const gyms = b?.gyms.map(g => g[0]).join(' or ');
+  const pool = run.biome ? `a boss from ${run.biome}'s list` : "a boss from your biome's list";
+  return { wave, text: gymWave && gyms ? `gym leader ${gyms} (if your gyms fall on this wave), or ${pool}` : gymWave ? `a gym leader, or ${pool}` : pool, biomeBoss: true };
+}
 
 // Bosses whose teams are known for this run, in wave order.
 function knownBosses(run) {
@@ -59,13 +73,20 @@ function Body({ popped, onPop }) {
   const next = FIGHTS.find(f => Math.max(...f.waves) >= w);
   const blocked = waveRule(run.wave);
   const canMeet = blocked ? [] : ENCOUNTERS.filter(e => fits(e, biomeKey(run.biome), run.wave));
-  const boss = knownBosses(run).find(b => b.wave >= w);
+  const bossWave = nextBossWave(w, run);
+  const named = knownBosses(run).find(b => b.wave >= w);
+  // Prep for the biome's possible bosses when that boss wave comes before the next named boss.
+  const pool = BIOME_BOSSES[run.biome];
+  const boss = bossWave.biomeBoss && pool && (!named || bossWave.wave < named.wave)
+    ? { wave: bossWave.wave, title: `${run.biome} boss, wave ${bossWave.wave}`, biome: true,
+        slots: BOSS_TIERS.flatMap(([k, label, n]) => pool.tiers[k].map(([name, id, tod]) => [[name], id, '', '', `${label}, ${n} in 64${tod ? `, ${tod} only` : ''}`])) }
+    : named;
   const nextBiomeWave = Math.floor(w / 10) * 10 + 10;
 
   let prep = null;
   if (boss && data && team.party.length) {
     const types = Object.fromEntries(Object.entries(data.SPECIES_TYPES).map(([k, v]) => [norm(k), v]));
-    const enemy = boss.slots.map(([names, id, tags]) => ({ name: names.join(' or '), id, tags, types: (types[norm(names[0])] || 'normal').split(' ') }));
+    const enemy = boss.slots.map(([names, id, tags, , odds]) => ({ name: names.join(' or '), id, tags, odds, types: (types[norm(names[0])] || 'normal').split(' ') }));
     prep = bossPrep(members(team.party, team.builds, data), enemy);
   }
   const uncovered = prep ? prep.filter(p => p.best.mult < 2).length : 0;
@@ -104,11 +125,12 @@ function Body({ popped, onPop }) {
           <li><span>Mystery encounters here</span><b aria-hidden="true" />
             <span>{blocked ? 'None on this wave' : `${canMeet.length} can show up`}</span></li>
           <li><span>Biome changes after wave</span><b aria-hidden="true" /><span>{nextBiomeWave}</span></li>
+          <li><span>Next boss wave</span><b aria-hidden="true" /><span>Wave {bossWave.wave}: {bossWave.text}</span></li>
           {run.biome && BIOMES[run.biome] && (
             <li><span>From {run.biome} you can go to</span><b aria-hidden="true" />
               <span>{BIOMES[run.biome].map(([d, n]) => d + (ODDS[n] || '')).join('; ')}</span></li>
           )}
-          {boss && <li><span>Next boss with a known team</span><b aria-hidden="true" /><span>{boss.title}, wave {boss.wave}</span></li>}
+          {named && <li><span>Next named boss</span><b aria-hidden="true" /><span>{named.title}, wave {named.wave}</span></li>}
         </ol>
         {!popped && canMeet.length > 0 && <p className="track-link"><a href="#encounters">See which encounters</a></p>}
       </div>
@@ -118,13 +140,14 @@ function Body({ popped, onPop }) {
           <h3>Boss prep: {boss.title}</h3>
           {!team.party.length ? <p className="hint">Pick your party in the starter planner (and set its moves in the build sheet) to see how it matches up.</p>
             : !prep ? <p className="hint">Loading the matchup...</p> : <>
-              <p className="hint">{uncovered ? `${uncovered} of ${prep.length} have no super-effective hit from your team. Teach a move of the type below them, or swap someone in.` : 'Your team can hit every one of them for at least double.'}</p>
+              <p className="hint">{boss.biome ? `One of these will show up (or the gym leader on a gym wave). ` : ''}{uncovered ? `${uncovered} of ${prep.length} have no super-effective hit from your team. Teach a move of the type below them, or swap someone in.` : 'Your team can hit every one of them for at least double.'}</p>
               <ul className="prep">
                 {prep.map(p => (
                   <li key={p.name} className={p.best.mult < 2 ? 'gap' : undefined}>
                     <img src={sprite(p.id)} alt="" width="96" height="96" loading="lazy" />
                     <div>
                       <strong>{p.name}</strong>
+                      {p.odds && <span className="odds-note">{p.odds}</span>}
                       <span className="chips">{p.types.map(t => <Chip key={t} t={t} />)}</span>
                       <span>{p.best.mult >= 2 ? `Your best: ${p.best.mult}× with ${cap(p.best.type)} (${p.best.who})` : `No hit above ${p.best.mult}×. Weak to ${TYPES.filter(t => mult(t, p.types) > 1).map(cap).join(', ')}`}</span>
                       {p.threatened.length > 0 && <span className="threat">Its own types hit {p.threatened.join(', ')} hard</span>}

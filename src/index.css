@@ -328,6 +328,21 @@ section { padding: var(--section) var(--m); }
 .atlas button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 
 /* ---------- types: one giant word, then a stack of bars ---------- */
+/* biome ticket: who the boss waves can be */
+.ticket-bosses { margin-top: 28px; padding-top: 20px; border-top: 4px dotted color-mix(in srgb, var(--paper-ink) 20%, transparent); }
+.ticket-bosses h4 { font: 600 var(--step-body)/1.3 "Source Serif 4", Georgia, serif; margin: 16px 0 4px; }
+.ticket-bosses h4:first-child { margin-top: 0; }
+.ticket-bosses .ticket-via { margin: 0 0 10px; font-size: var(--step-small); }
+.boss-tier { margin-top: 10px; }
+.boss-tier p { display: flex; gap: 10px; align-items: baseline; font-size: var(--step-small); }
+.boss-tier p span { color: var(--paper-soft); font-variant-numeric: tabular-nums; }
+.boss-tier ul, .gyms { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.boss-tier li { display: flex; flex-direction: column; align-items: center; width: 84px; background: var(--paper-step); padding: 0 4px 6px; text-align: center; font-size: var(--step-small); line-height: 1.2; }
+.boss-tier li img { width: 72px; height: 72px; image-rendering: pixelated; margin-bottom: -4px; }
+.boss-tier li small { display: block; color: var(--paper-soft); }
+.gyms li { display: flex; align-items: flex-end; gap: 8px; background: var(--paper-step); padding: 6px 12px 8px 6px; font-weight: 600; }
+.gym-sprite { width: var(--w); height: var(--h); background-repeat: no-repeat; image-rendering: pixelated; }
+
 /* ---------- the shop: item tiers as a printed price list, Pokérus and fusion in the margin ---------- */
 .shop { background: var(--paper); color: var(--paper-ink); }
 .shop-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
@@ -387,6 +402,7 @@ section { padding: var(--section) var(--m); }
 .prep strong { font-size: var(--step-body); }
 .prep .chips { margin: 0; }
 .prep .threat { color: #ffb4a8; }
+.prep .odds-note { color: var(--muted); }
 .tracker > .mini-btn { grid-column: 1 / -1; justify-self: start; }
 .tracker .hint { color: var(--muted); font-size: var(--step-small); }
 /* the pop-out window: one narrow column */

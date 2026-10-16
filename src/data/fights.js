@@ -2,8 +2,8 @@
 // Gym leaders: the first lands on wave 20 or 30 at random, then one every 30 waves.
 // n = the wave the counter lands on; at = what the itinerary prints.
 const gym = (a, b, who, name) => ({
-  n: a, at: `${a} or ${b}`, title: 'Gym leader', kind: 'gym', who, shown: `Shown: ${name}. Leaders come from every region at random.`,
-  text: `A gym leader on wave ${a} or ${b}, decided by the run. Leaders keep coming every 30 waves after the first.`,
+  n: a, at: `${a} or ${b}`, title: 'Gym leader', kind: 'gym', who, shown: `Shown: ${name}. The leader depends on the biome you are in: each biome has its own.`,
+  text: `A gym leader on wave ${a} or ${b}, decided by the run, then every 30 waves. Which leader depends on your biome (see the biome ticket).`,
 });
 
 const ROCKET = 'Shown: a Team Rocket grunt. Your run may meet a different villain team.';

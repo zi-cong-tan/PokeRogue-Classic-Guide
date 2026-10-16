@@ -73,3 +73,6 @@ export function members(party, builds, data) {
 
 
 export const biomeKey = name => (name ? name.toUpperCase().replace(/ /g, '_') : '');
+
+// Boss tiers and their odds out of 64 (generateBossBiomeTier in src/field/arena.ts); an empty tier falls to the next one down.
+export const BOSS_TIERS = [['BOSS', 'Usual', 44], ['BOSS_RARE', 'Rare', 14], ['BOSS_SUPER_RARE', 'Super rare', 5], ['BOSS_ULTRA_RARE', 'Ultra rare', 1]];
