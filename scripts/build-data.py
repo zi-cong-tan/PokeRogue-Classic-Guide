@@ -211,11 +211,31 @@ api = {p["name"]: int(p["url"].rstrip("/").rsplit("/", 1)[1])
        for p in json.loads(fetch("https://pokeapi.co/api/v2/pokemon?limit=2000"))["results"]}
 
 
+# Forms whose PokeAPI name isn't the obvious one.
+SPRITE_NAMES = {"PALDEA_TAUROS": "tauros-paldea-combat-breed", "HISUI_BASCULIN": "basculin-white-striped",
+                "GALAR_DARMANITAN": "darmanitan-galar-standard", "ETERNAL_FLOETTE": "floette-eternal",
+                "BLOODMOON_URSALUNA": "ursaluna-bloodmoon", "BATTLE_BOND_GRENINJA": "greninja-battle-bond"}
+
+
 def sprite_id(sid, fallback):
+    """PokeAPI id for a species key: special names, then regional forms (also matching their first sub-form, like
+    tauros-paldea-combat-breed), then the national dex number, then the base species of a special variant."""
+    if SPRITE_NAMES.get(sid) in api:
+        return api[SPRITE_NAMES[sid]]
     for prefix, suffix in (("ALOLA_", "-alola"), ("GALAR_", "-galar"), ("HISUI_", "-hisui"), ("PALDEA_", "-paldea")):
         if sid.startswith(prefix):
-            return api.get(sid[len(prefix):].lower().replace("_", "-") + suffix, fallback)
-    return species_ids.get(sid, fallback) if species_ids.get(sid, 99999) < 10000 else fallback
+            name = sid[len(prefix):].lower().replace("_", "-") + suffix
+            if name in api:
+                return api[name]
+            forms_of = sorted(n for n in api if n.startswith(name + "-"))
+            if forms_of:
+                return api[forms_of[0]]
+            return species_ids.get(sid[len(prefix):], fallback)
+    n = species_ids.get(sid, 99999)
+    if n < 2000:
+        return n
+    base = sid.split("_", 1)[-1]  # e.g. ETERNAL_FLOETTE -> FLOETTE
+    return species_ids[base] if species_ids.get(base, 99999) < 2000 else fallback
 
 
 move_list, move_ix = [], {}

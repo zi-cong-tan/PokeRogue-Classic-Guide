@@ -46,7 +46,7 @@ function knownBosses(run) {
         if (!groups.has(key)) groups.set(key, []);
         groups.get(key).push(entry);
       }
-      return { label, note: s.note, size: s.pool.length, tera: s.tera,
+      return { index: k, label, note: s.note, size: s.pool.length, tera: s.tera,
         groups: [...groups].sort((a, b) => b[1].length - a[1].length).map(([types, list]) => ({ types: types.split(' '), list })) };
     }).sort((a, b) => (a.size === 1 ? -1 : 0) - (b.size === 1 ? -1 : 0)); // Rayquaza first
     out.push({ wave: r.wave, title: 'Your rival', rival: true, rivalSlots: slots, slots: [] });
@@ -82,39 +82,65 @@ const Chip = ({ t }) => <span className="ty" style={{ '--t': TYPE_COLOR[t], '--t
 const tidy = note => { const s = (note || '').replace(/^Their starter(, |; )?/, '').replace(/^Always a bird(; )?/, ''); return s && s[0].toUpperCase() + s.slice(1); };
 
 // Rival prep: one row per slot, each type group a cell with your best answer, so gaps stand out at a glance.
-function RivalPrep({ slots, team }) {
+// Rival prep: one row per slot, each type group a cell with your best answer, so gaps stand out at a glance.
+// Seen their team? Mark each Pokémon from its card: that slot then shows only it, saved per fight in your run.
+function RivalPrep({ slots, team, wave, run }) {
   const [open, setOpen] = useState(null);   // the Pokémon clicked, shown up close under its row
   const [wide, setWide] = useState({});      // groups expanded to show every option
+  const [all, setAll] = useState({});        // marked slots opened back up to every option
+  const picks = run.rivalPicks?.[wave] || {};
+  const mark = (slot, name) => {
+    const next = { ...picks };
+    if (next[slot] === name) delete next[slot]; else next[slot] = name;
+    setRun({ rivalPicks: { ...(run.rivalPicks || {}), [wave]: next } });
+  };
+  const marked = Object.keys(picks).length;
+  const cell = (key, types, list, slot) => {
+    const [p] = bossPrep(team, [{ name: list[0][0], types }]);
+    const shown = wide[key] ? list : list.slice(0, 3);
+    return (
+      <li key={key} className={p.best.mult < 2 ? 'gap' : undefined}>
+        <span className="chips">{types.map(t => <Chip key={t} t={t} />)}</span>
+        <span className="rival-sprites">
+          {shown.map(m => (
+            <button key={m[0]} type="button" className="mon-btn" aria-pressed={open?.mon[0] === m[0]} onClick={() => setOpen(open?.mon[0] === m[0] ? null : { mon: m, slot })} title={m[0]}>
+              <img src={sprite(m[1])} alt={m[0]} width="96" height="96" loading="lazy" />
+            </button>
+          ))}
+          {list.length > 3 && <button type="button" className="more-btn" onClick={() => setWide(w => ({ ...w, [key]: !w[key] }))}>{wide[key] ? 'less' : `+${list.length - 3}`}</button>}
+        </span>
+        <span className="rival-answer">{p.best.mult >= 2 ? `${p.best.mult}× ${cap(p.best.type)}, ${p.best.who}` : 'No good answer'}</span>
+        {p.threatened.length > 0 && <span className="threat">Hits {p.threatened.join(', ')}</span>}
+      </li>
+    );
+  };
   return (
     <div className="rival-prep">
-      {slots.map(slot => (
-        <div key={slot.label} className="rival-row">
-          <p className="rival-row-head"><strong>{slot.label}</strong>{slot.size > 1 && <span> one of {slot.size}</span>}{tidy(slot.note) && <small>{tidy(slot.note)}</small>}</p>
-          <ul>
-            {slot.groups.map(g => {
-              const [p] = bossPrep(team, [{ name: g.list[0][0], types: g.types }]);
-              const key = slot.label + g.types.join();
-              const shown = wide[key] ? g.list : g.list.slice(0, 3);
-              return (
-                <li key={key} className={p.best.mult < 2 ? 'gap' : undefined}>
-                  <span className="chips">{g.types.map(t => <Chip key={t} t={t} />)}</span>
-                  <span className="rival-sprites">
-                    {shown.map(m => (
-                      <button key={m[0]} type="button" className="mon-btn" aria-pressed={open?.[0] === m[0]} onClick={() => setOpen(open?.[0] === m[0] ? null : m)} title={m[0]}>
-                        <img src={sprite(m[1])} alt={m[0]} width="96" height="96" loading="lazy" />
-                      </button>
-                    ))}
-                    {g.list.length > 3 && <button type="button" className="more-btn" onClick={() => setWide(w => ({ ...w, [key]: !w[key] }))}>{wide[key] ? 'less' : `+${g.list.length - 3}`}</button>}
-                  </span>
-                  <span className="rival-answer">{p.best.mult >= 2 ? `${p.best.mult}× ${cap(p.best.type)}, ${p.best.who}` : 'No good answer'}</span>
-                  {p.threatened.length > 0 && <span className="threat">Hits {p.threatened.join(', ')}</span>}
-                </li>
-              );
-            })}
-          </ul>
-          {open && slot.groups.some(g => g.list.includes(open)) && <MonCard mon={open} team={team} tera={slot.tera} onClose={() => setOpen(null)} />}
-        </div>
-      ))}
+      <p className="hint">{marked ? `Marked ${marked} of ${slots.length} slots for this fight.` : 'Seen their team? Tap each Pokémon you see and mark it: that slot then shows only that one.'}</p>
+      {slots.map(slot => {
+        const pickName = picks[slot.index];
+        const pick = pickName && slot.groups.flatMap(g => g.list).find(m => m[0] === pickName);
+        const single = pick && !all[slot.index];
+        return (
+          <div key={slot.label} className={single ? 'rival-row marked' : 'rival-row'}>
+            <p className="rival-row-head">
+              <strong>{slot.label}</strong>
+              {single ? <span> marked: {pick[0]} <button type="button" className="more-btn" onClick={() => setAll(a => ({ ...a, [slot.index]: true }))}>change</button></span>
+                : slot.size > 1 && <span> one of {slot.size}{pick && <> <button type="button" className="more-btn" onClick={() => setAll(a => ({ ...a, [slot.index]: false }))}>show marked only</button></>}</span>}
+              {tidy(slot.note) && <small>{tidy(slot.note)}</small>}
+            </p>
+            <ul>
+              {single
+                ? cell(slot.label + pick[0], slot.tera ? pick[2].split(' ').slice(0, 1) : pick[2].split(' '), [pick], slot.index)
+                : slot.groups.map(g => cell(slot.label + g.types.join(), g.types, g.list, slot.index))}
+            </ul>
+            {open && open.slot === slot.index && (
+              <MonCard mon={open.mon} team={team} tera={slot.tera} onClose={() => setOpen(null)}
+                marked={picks[slot.index] === open.mon[0]} onMark={() => { mark(slot.index, open.mon[0]); setAll(a => ({ ...a, [slot.index]: false })); setOpen(null); }} />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -249,7 +275,7 @@ function Body({ popped, onPop }) {
       {boss && (
         <div className="track-prep">
           <h3>Boss prep: {boss.title}</h3>
-          {boss.rival && ms ? <><p className="hint">Each slot is rolled fresh every fight. Its options are grouped by type, with your best answer to each.</p><RivalPrep slots={boss.rivalSlots} team={ms} /></>
+          {boss.rival && ms ? <><p className="hint">Each slot is rolled fresh every fight. Its options are grouped by type, with your best answer to each.</p><RivalPrep slots={boss.rivalSlots} team={ms} wave={boss.wave} run={run} /></>
             : !team.party.length && !run.caught?.length ? <p className="hint">Pick your starters in the planner, or add what you caught below, to see how your team matches up.</p>
             : !prep ? <p className="hint">Loading the matchup...</p> : <>
               <p className="hint">{boss.extra ? `${boss.extra} ` : ''}{boss.biome ? `One of these will show up (or the gym leader on a gym wave). ` : ''}{uncovered ? `${uncovered} of ${prep.length} have no super-effective hit from your team. Teach a move of the type below them, or swap someone in.` : 'Your team can hit every one of them for at least double.'}</p>

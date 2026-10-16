@@ -8,7 +8,7 @@ const Chip = ({ t }) => <span className="ty" style={{ '--t': TYPE_COLOR[t], '--t
 // One Pokémon up close: types, base stats, what hits it hard, and (given your team) your best answer to it.
 // mon: [name, PokeAPI id, "type1 type2", [six base stats]]
 // tera: it Terastallizes to its first type (the rival's starter from fight 4), so it's matched as that one type.
-export default function MonCard({ mon, team, tera, onClose }) {
+export default function MonCard({ mon, team, tera, onClose, marked, onMark }) {
   const [name, id, typeStr, stats] = mon;
   const own = typeStr.split(' ');
   const types = tera ? own.slice(0, 1) : own;
@@ -33,6 +33,11 @@ export default function MonCard({ mon, team, tera, onClose }) {
         {by(4).length > 0 && <p><b>4×</b> {by(4).map(t => <Chip key={t} t={t} />)}</p>}
         {by(2).length > 0 && <p><b>2×</b> {by(2).map(t => <Chip key={t} t={t} />)}</p>}
         <p className="muted">Resists {[...by(0.5), ...by(0.25)].map(cap).join(', ') || 'nothing'}{by(0).length ? `; immune to ${by(0).map(cap).join(', ')}` : ''}</p>
+        {onMark && (
+          <button type="button" className="mini-btn mark-btn" aria-pressed={!!marked} onClick={onMark}>
+            {marked ? 'Marked as in their team (tap to undo)' : 'This is in their team'}
+          </button>
+        )}
         {prep && (
           <p className="mon-answer">
             {prep.best.mult >= 2 ? `Your best: ${prep.best.mult}× with ${cap(prep.best.type)} (${prep.best.who}).` : 'No super-effective hit on your team.'}
