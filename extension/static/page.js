@@ -46,19 +46,20 @@
   // Damage from the game itself: each move of your Pokémon on the field against each enemy, through the game's own
   // getAttackDamage in simulated mode (no random roll, nothing changes): abilities, held items, weather, terrain, Tera
   // and each move's special rules are all applied. Once normally and once as a critical hit.
+  // In doubles both of yours are worked out; `active` is the one choosing a move now (the command and fight menus keep
+  // its field index), remembered between menus.
+  let active = 0;
   function damageCalc() {
     const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
     if (!battle?.currentBattle) return null;
     try {
-      const me = battle.getPlayerField?.().find(p => p && !p.isFainted?.());
-      if (!me) return null;
+      const h = battle.ui?.getHandler?.();
+      if (typeof h?.fieldIndex === 'number' && h.active) active = h.fieldIndex;
+      const field = battle.getPlayerField?.() || [];
       const foes = battle.getEnemyField().filter(p => p && !p.isFainted?.());
-      const moves = me.getMoveset?.().filter(Boolean) || [];
-      return {
-        attacker: me.name,
-        weather: WEATHER[battle.arena?.weatherType] || '',
-        terrain: TERRAIN[battle.arena?.terrainType] || '',
-        foes: foes.map(e => moves.map(pm => {
+      const attackers = field.map(me => !me || me.isFainted?.() ? null : {
+        name: me.name,
+        foes: foes.map(e => (me.getMoveset?.().filter(Boolean) || []).map(pm => {
           const mv = pm.getMove();
           if (mv.category === 2) return { name: mv.name, status: true };   // MoveCategory.STATUS
           try {
@@ -67,6 +68,13 @@
             return { name: mv.name, max: hit.damage, crit: crit.damage, multi: !!mv.hasAttr?.('MultiHitAttr') };
           } catch { return { name: mv.name, error: true }; }
         })),
+      });
+      const me = attackers[active] || attackers.find(Boolean);
+      if (!me) return null;
+      return {
+        attacker: me.name, foes: me.foes,
+        weather: WEATHER[battle.arena?.weatherType] || '',
+        terrain: TERRAIN[battle.arena?.terrainType] || '',
       };
     } catch { return null; }
   }
