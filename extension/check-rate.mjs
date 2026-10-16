@@ -15,4 +15,6 @@ assert.equal(rateItem({ id: 'REVIVE' }, { ...run, party: [{ ...run.party[0], cur
 assert.equal(rateItem({ id: 'GREAT_BALL' }, run).tier, 'B');                               // early, room on the team
 assert.equal(rateItem({ moveType: 'fire' }, run).tier, 'A');                                // Charcoal for a Fire team
 assert.equal(rateItem({ moveType: 'ice' }, run).tier, 'E');
+assert.equal(rateItem({ name: 'Revive', shop: true }, run).why, 'Nobody has fainted.');   // shop items have no id
+assert.match(rateItem({ name: 'Potion', shop: true }, run).why, /missing/);
 console.log('ok');

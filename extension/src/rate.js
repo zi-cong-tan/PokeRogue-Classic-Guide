@@ -2,6 +2,10 @@
 // reason, built from the run (wave, money, held items), your party (HP, fainted, types, moves, abilities) and the item.
 import { ALL_MOVES } from '../../src/data/all-moves.js';
 import { SPECIAL_FORMS } from '../../src/data/megas.js';
+import { ITEM_TIERS } from '../../src/data/items.js';
+
+// Shop items come without the game's item id, so fall back to the name ("Potion" -> POTION).
+const ID_BY_NAME = Object.fromEntries(Object.values(ITEM_TIERS).flat().map(([key, name]) => [name.toLowerCase(), key]));
 
 export const TIERS = ['E', 'D', 'C', 'B', 'A', 'S'];
 const at = (t, why) => ({ tier: t, why });
@@ -42,7 +46,7 @@ export function rateItem(o, run) {
   const statused = alive.some(p => p.status);
   const early = run.wave < 100;
   const types = new Set(party.flatMap(p => (p.types || []).map(t => t.toLowerCase())));
-  const id = o.id || '';
+  const id = o.id || ID_BY_NAME[(o.name || '').toLowerCase()] || '';
 
   // Healing and revives: worth as much as your team is hurt.
   if (/POTION|FULL_RESTORE/.test(id)) {
@@ -96,5 +100,5 @@ export function rateItem(o, run) {
     const have = (run.held || []).filter(h => h === id).length;
     return at(have >= 3 ? shift(t, -1) : t, why + (have ? ` You already have ${have}.` : ''));
   }
-  return at('C', 'No rule for this one yet.');
+  return at('C', 'Not rated yet: an average pick.');
 }
