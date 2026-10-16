@@ -61,22 +61,31 @@ function damage(attacker, move, enemy) {
 }
 
 // Each move of your Pokémon on the field against this enemy: a range in % of its HP and whether it knocks it out.
-function damagePanel(info, e) {
+// Uses the game's own calculation when page.js could run it (abilities, items, weather, terrain, special moves);
+// otherwise falls back to the plain formula above.
+function damagePanel(info, e, i, calc) {
+  if (!e.hp || !e.maxHp) return '';
+  const pct = v => Math.round((v / e.maxHp) * 100);
+  const game = calc?.foes?.[i];
   const me = (info.party || []).find(p => p.currentHP > 0);
-  if (!me || !e.hp || !e.maxHp || !e.def) return '';
-  const rows = (me.moveset || []).map(name => {
-    const d = damage(me, name, e);
-    if (!d) return `<li><span>${esc(name)}</span><span class="muted">status or varies</span></li>`;
-    if (!d.eff) return `<li><span>${esc(name)}</span><span class="muted">no effect</span></li>`;
-    const pct = v => Math.round((v / e.maxHp) * 100);
-    const hits = Math.ceil(e.hp / Math.max(1, d.min));
-    const verdict = e.boss ? `${pct(d.min)}–${pct(d.max)}% of its HP, stops at each bar`
-      : d.min >= e.hp ? 'KO' : d.max >= e.hp ? 'Can KO' : `${hits} hits`;
-    return `<li class="${!e.boss && d.min >= e.hp ? 'ko' : !e.boss && d.max >= e.hp ? 'maybe' : ''}"><span>${esc(name)} <small>${x(d.eff)}</small></span>
-      <span>${pct(d.min)}–${pct(d.max)}%</span><strong>${esc(verdict)}</strong></li>`;
+  const rows = (game || (me?.moveset || []).map(name => {
+    const d = me && e.def ? damage(me, name, e) : null;
+    return d ? { name, max: d.max, crit: Math.floor(d.max * 1.5), eff: d.eff } : { name, status: true };
+  })).map(m => {
+    if (m.status) return `<li><span>${esc(m.name)}</span><span class="muted">status</span><span></span></li>`;
+    if (m.error) return `<li><span>${esc(m.name)}</span><span class="muted">can't tell</span><span></span></li>`;
+    if (!m.max) return `<li><span>${esc(m.name)}</span><span class="muted">no effect</span><span></span></li>`;
+    const min = Math.floor(m.max * 0.85);
+    const hits = Math.ceil(e.hp / Math.max(1, min));
+    const per = m.multi ? ' a hit' : '';
+    const verdict = e.boss ? 'stops at each bar'
+      : min >= e.hp ? 'KO' : m.max >= e.hp ? 'Can KO' : m.multi ? (hits <= 5 ? `KO if it hits ${hits}+ times` : `about ${Math.ceil(hits / 3)} uses`) : m.crit >= e.hp ? 'KO on a crit' : `${hits} hits`;
+    return `<li class="${!e.boss && min >= e.hp ? 'ko' : !e.boss && m.max >= e.hp ? 'maybe' : ''}"><span>${esc(m.name)}</span>
+      <span>${pct(min)}–${pct(m.max)}%${per}</span><strong>${esc(verdict)}</strong></li>`;
   }).join('');
-  return `<h4>${esc(me.nickname || me.name)}'s moves on it <small>(it has ${Math.round((e.hp / e.maxHp) * 100)}% HP)</small></h4><ul class="dmg">${rows}</ul>
-    <p class="muted tiny">Estimate: no crits, abilities, items or weather.</p>`;
+  const field = [calc?.weather, calc?.terrain].filter(Boolean).join(', ');
+  return `<h4>${esc(calc?.attacker || me?.nickname || me?.name || 'Your')}'s moves on it <small>(it has ${pct(e.hp)}% HP)</small></h4><ul class="dmg">${rows}</ul>
+    <p class="muted tiny">${game ? `From the game's own damage calculation: abilities, held items, weather, terrain and move rules included${field ? ` (now: ${esc(field)})` : ''}. Range is the 85-100% damage roll; crits count only in "KO on a crit".` : 'Estimate: no crits, abilities, items or weather.'}</p>`;
 }
 
 // ---- left band: your run and your team
@@ -120,7 +129,7 @@ function rewardsPanel(info, rewards) {
     <p class="muted tiny">Rules of thumb for this run: your wave, HP, fainted, types, moves and items. TMs don't check who can learn them.</p></section>`;
 }
 
-function enemyPanel(info, enemies, encounterId, rewards) {
+function enemyPanel(info, enemies, encounterId, rewards, calc) {
   if (rewards?.options?.length) return rewardsPanel(info, rewards);
   const me = ME_BY_ID[encounterId];
   if (me) {
@@ -132,7 +141,7 @@ function enemyPanel(info, enemies, encounterId, rewards) {
   }
   if (enemies.length) {
     const party = info.party || [];
-    return enemies.map(e => {
+    return enemies.map((e, i) => {
       const top = answers(party, e.types).sort((a, b) => (b.best?.score || 0) - (a.best?.score || 0)).find(a => a.best && a.best.eff >= 2);
       const half = [...by(e.types, 0.5), ...by(e.types, 0.25)], none = by(e.types, 0);
       return `<section class="enemy"><h3>${esc(e.species || e.name)} <small>Lv ${esc(e.level)}${e.boss ? `, boss${e.bars > 1 ? ` (${esc(e.bars)} bars)` : ''}` : ''}</small></h3>
@@ -141,7 +150,7 @@ function enemyPanel(info, enemies, encounterId, rewards) {
         ${by(e.types, 2).length ? `<p><b>2×</b> ${by(e.types, 2).map(chip).join('')}</p>` : ''}
         ${half.length || none.length ? `<p class="muted">${half.length ? `Resists ${half.map(cap).join(', ')}` : ''}${none.length ? `${half.length ? '; ' : ''}immune to ${none.map(cap).join(', ')}` : ''}</p>` : ''}
         <p class="pick">${top ? `Use <strong>${esc(top.best.name)}</strong> from ${esc(top.who)} (${x(top.best.eff)})` : 'No super-effective move on your team: use your strongest same-type move, or switch.'}</p>
-        ${damagePanel(info, e)}
+        ${damagePanel(info, e, i, calc)}
       </section>`;
     }).join('');
   }
@@ -244,7 +253,7 @@ function mount() {
   const saved = (() => { try { return JSON.parse(localStorage.getItem('prg-hud')) || {}; } catch { return {}; } })();
   const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items' };
   const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right })); } catch { /* storage blocked */ } };
-  let state = { info: null, enemies: [], encounter: null, rewards: null };
+  let state = { info: null, enemies: [], encounter: null, rewards: null, calc: null };
   let roomy = true;
 
   // Tier badges over each reward item, at the item's place on the canvas; hover for the reason.
@@ -282,7 +291,7 @@ function mount() {
     const { info, enemies, encounter } = state;
     const live = info && info.gameMode !== 'Title' && info.wave;
     root.querySelector('.l').innerHTML = live ? runPanel(info, enemies) : '<section><p class="muted">Start or continue a run: your wave, biome, team and the next fights show here.</p></section>';
-    root.querySelector('.r').innerHTML = live ? enemyPanel(info, enemies, encounter, state.rewards) : '';
+    root.querySelector('.r').innerHTML = live ? enemyPanel(info, enemies, encounter, state.rewards, state.calc) : '';
     badges();
     right.dataset.hide = live ? '' : '1';
     if (!drawer.hidden) body.innerHTML = guideTab(ui.tab, info);
@@ -305,7 +314,7 @@ function mount() {
   let last = '';
   addEventListener('message', e => {
     if (e.source !== window || !e.data?.__prgOverlay) return;
-    state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null, rewards: e.data.rewards ?? null };
+    state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null, rewards: e.data.rewards ?? null, calc: e.data.calc ?? null };
     const key = JSON.stringify(state);
     if (key !== last) { last = key; render(); } else { place(); badges(); }
   });

@@ -3,7 +3,7 @@
 //  - window.gameInfo, which the game itself publishes: mode, biome, wave, luck and your party
 //  - the enemies on the field, limited to what the battle screen shows: name, level, HP, types, boss bars
 //  - which Mystery Encounter is on screen, if any
-//  - the enemy's defences and exact HP, for the damage estimate
+//  - the enemy's defences and exact HP, and your moves' damage from the game's own damage calculation
 //  - on the reward screen, the items offered and where they sit
 (() => {
   const TYPES = ['normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass',
@@ -40,6 +40,37 @@
     } catch { return []; }
   }
 
+  const WEATHER = ['', 'Sun', 'Rain', 'Sandstorm', 'Hail', 'Snow', 'Fog', 'Heavy rain', 'Harsh sun', 'Strong winds'];
+  const TERRAIN = ['', 'Misty Terrain', 'Electric Terrain', 'Grassy Terrain', 'Psychic Terrain'];
+
+  // Damage from the game itself: each move of your Pokémon on the field against each enemy, through the game's own
+  // getAttackDamage in simulated mode (no random roll, nothing changes): abilities, held items, weather, terrain, Tera
+  // and each move's special rules are all applied. Once normally and once as a critical hit.
+  function damageCalc() {
+    const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
+    if (!battle?.currentBattle) return null;
+    try {
+      const me = battle.getPlayerField?.().find(p => p && !p.isFainted?.());
+      if (!me) return null;
+      const foes = battle.getEnemyField().filter(p => p && !p.isFainted?.());
+      const moves = me.getMoveset?.().filter(Boolean) || [];
+      return {
+        attacker: me.name,
+        weather: WEATHER[battle.arena?.weatherType] || '',
+        terrain: TERRAIN[battle.arena?.terrainType] || '',
+        foes: foes.map(e => moves.map(pm => {
+          const mv = pm.getMove();
+          if (mv.category === 2) return { name: mv.name, status: true };   // MoveCategory.STATUS
+          try {
+            const hit = e.getAttackDamage({ source: me, move: mv, simulated: true });
+            const crit = e.getAttackDamage({ source: me, move: mv, isCritical: true, simulated: true });
+            return { name: mv.name, max: hit.damage, crit: crit.damage, multi: !!mv.hasAttr?.('MultiHitAttr') };
+          } catch { return { name: mv.name, error: true }; }
+        })),
+      };
+    } catch { return null; }
+  }
+
   // The Mystery Encounter on screen, as the game's MysteryEncounterType number (or null).
   function encounter() {
     const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
@@ -74,6 +105,6 @@
 
   setInterval(() => {
     hook();
-    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards() }, location.origin);
+    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards(), calc: damageCalc() }, location.origin);
   }, 1000);
 })();
