@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useReveal } from '../motion';
 import { ITEM_TIERS } from '../data/items';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
-import { sprite } from '../art';
+import { sprite, itemArt } from '../art';
 import { fuse } from '../advice';
 
 const TIERS = ['COMMON', 'GREAT', 'ULTRA', 'ROGUE', 'MASTER'];
@@ -76,7 +76,12 @@ export default function Shop() {
             {TIERS.map(t => <button key={t} type="button" aria-pressed={t === tier} onClick={() => setTier(t)}>{cap(t.toLowerCase())}</button>)}
           </div>
           <dl className="items">
-            {ITEM_TIERS[tier].map(([k, name, text]) => <div key={k}><dt>{name}</dt><dd>{text}</dd></div>)}
+            {ITEM_TIERS[tier].map(([k, name, text, icon]) => (
+              <div key={k}>
+                {icon && <img className="item-icon" src={itemArt(icon)} alt="" width="32" height="32" loading="lazy" />}
+                <dt>{name}</dt><dd>{text}</dd>
+              </div>
+            ))}
           </dl>
         </div>
 

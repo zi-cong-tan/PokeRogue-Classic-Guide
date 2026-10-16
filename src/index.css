@@ -351,8 +351,10 @@ section { padding: var(--section) var(--m); }
 .shop-body { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); margin-top: 48px; align-items: start; }
 .shop-body > div:first-child { grid-column: 1 / 8; }
 .items { margin: 20px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
-.items div { padding: 12px 0; border-bottom: 4px dotted color-mix(in srgb, var(--paper-ink) 18%, transparent); break-inside: avoid; }
-.items dt { font-weight: 600; }
+.items div { display: grid; grid-template-columns: 40px 1fr; column-gap: 10px; align-items: start; padding: 12px 0; border-bottom: 4px dotted color-mix(in srgb, var(--paper-ink) 18%, transparent); break-inside: avoid; }
+.items dt { font-weight: 600; grid-column: 2; }
+.items dd { grid-column: 2; }
+.item-icon { grid-row: span 2; width: 32px; height: 32px; margin: 2px 0 0 4px; image-rendering: pixelated; object-fit: contain; }
 .items dd { margin: 2px 0 0; font-size: var(--step-small); color: var(--paper-soft); }
 .shop-side { grid-column: 9 / 13; background: var(--paper-step); padding: 24px; }
 .shop-side h3 { font: 400 var(--step-lead)/1.1 "Pixelify Sans", sans-serif; margin: 0 0 12px; }
