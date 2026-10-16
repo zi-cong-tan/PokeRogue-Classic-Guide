@@ -94,7 +94,7 @@ export default function Shop() {
           </ul>
 
           <h3>Fusion</h3>
-          <p>DNA Splicers (Great tier while two or more of your Pokémon are unfused, and Master tier) fuse two Pokémon. In the game's words: it transfers the ability, splits base stats and types, and shares the move pool.</p>
+          <p>In Classic, DNA Splicers are a Master-tier reward (Great tier only during fusion events), and only once two or more of your Pokémon are unfused. They fuse two Pokémon; in the game's words, the fusion transfers the ability, splits base stats and types, and shares the move pool.</p>
           <FusionCalc />
         </aside>
       </div>

@@ -201,3 +201,31 @@ export function fuse(a, b) {
   const second = b2 && b2 !== a1 ? b2 : b1 !== a1 ? b1 : a.types[1];
   return { types: [a1, second].filter(Boolean), stats: a.stats.map((s, i) => Math.ceil((s + b.stats[i]) / 2)) };
 }
+
+// Luck, as the game counts it (getPartyLuckValue in src/modifier/modifier-type.ts): each shiny party member adds
+// 1, 2 or 3 for a standard, rare or epic shiny (a shiny fusion partner adds its own too), capped at 14.
+export const LUCK_GRADES = ['D', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A', 'A+', 'A++', 'S', 'S+', 'SS', 'SS+', 'SSS'];
+export const partyLuck = tiers => Math.min(14, tiers.reduce((s, t) => s + t, 0));
+
+// Each reward item: a tier rolled out of 1024, then while randInt(floor(128 / ((luck + 4) / 4))) < 4 it moves up a tier.
+const ITEM_BASE = [768, 195, 48, 12, 1]; // Common, Great, Ultra, Rogue, Master, out of 1024
+export function itemOdds(luck) {
+  const odds = Math.floor(128 / ((luck + 4) / 4));
+  const p = 4 / odds;
+  const out = [0, 0, 0, 0, 0];
+  ITEM_BASE.forEach((w, b) => {
+    if (b === 4) { out[4] += w / 1024; return; } // a Master roll never upgrades
+    for (let t = b; t < 4; t++) out[t] += (w / 1024) * (1 - p) * p ** (t - b);
+    out[4] += (w / 1024) * p ** (4 - b);
+  });
+  return { upgradeOneIn: odds / 4, tiers: out };
+}
+
+// A boss wave's rarity: randInt(64 - luck / 2); 0 is ultra rare, 1 to 5 super rare, 6 to 19 rare (src/field/arena.ts).
+export function bossOdds(luck) {
+  const m = 64 - luck * 0.5;
+  return { usual: (m - 20) / m, rare: 14 / m, superRare: 5 / m, ultraRare: 1 / m };
+}
+
+// Wild shiny chance: 64 / 65536 (1 in 1024), doubled 1 + n times by n Shiny Charms (up to 4).
+export const shinyOneIn = charms => 1024 / (charms ? 2 ** (1 + charms) : 1);

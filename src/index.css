@@ -88,7 +88,7 @@ section { padding: var(--section) var(--m); }
 .mark { font: 700 var(--step-body) "Pixelify Sans", sans-serif; text-decoration: none; }
 .links { display: flex; gap: 28px; }
 .links a { text-decoration: none; color: var(--ink); transition: color .15s; white-space: nowrap; }
-@media (max-width: 1100px) { .letter-head { flex-direction: column-reverse; align-items: flex-start; } .rung { grid-template-columns: 1fr; gap: 10px; } .rung .party ul { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); } .shop-body > div:first-child, .shop-side { grid-column: 1 / -1; } .links { display: none; } .rung-trainer { grid-template-columns: 1fr; } .track-log, .track-prep { grid-column: 1 / -1; } } /* six links stop fitting beside the wordmark and button */
+@media (max-width: 1100px) { .luck-set, .luck-sheet { grid-column: 1 / -1; } .letter-head { flex-direction: column-reverse; align-items: flex-start; } .rung { grid-template-columns: 1fr; gap: 10px; } .rung .party ul { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); } .shop-body > div:first-child, .shop-side { grid-column: 1 / -1; } .links { display: none; } .rung-trainer { grid-template-columns: 1fr; } .track-log, .track-prep { grid-column: 1 / -1; } } /* six links stop fitting beside the wordmark and button */
 .links a:hover { color: var(--accent); }
 .btn {
   background: var(--accent); color: var(--accent-ink); text-decoration: none; font-weight: 600;
@@ -165,6 +165,8 @@ section { padding: var(--section) var(--m); }
 .total-side > :last-child { position: sticky; top: 32px; }
 .total-side h2 { max-width: 12ch; }
 .total-side p { max-width: 38ch; margin-top: 20px; }
+.total-side .community { font-size: var(--step-small); color: var(--muted); }
+.total-side .community a { color: inherit; text-underline-offset: 3px; }
 .total { font: 600 var(--step-giant)/0.8 "Source Serif 4", Georgia, serif; font-variant-numeric: lining-nums tabular-nums; letter-spacing: -0.03em; margin: 0 !important; }
 .total-cap { font-size: var(--step-lead); margin-top: 18px !important; }
 .receipt-col { grid-column: 10 / 13; max-width: 420px; width: 100%; justify-self: end; align-self: start; display: grid; gap: 28px; }
@@ -375,6 +377,34 @@ section { padding: var(--section) var(--m); }
 .fuse-stats thead th { font-weight: 600; border-bottom: 2px solid var(--paper-ink); }
 .fuse-stats .sum th, .fuse-stats .sum td { border-top: 2px solid var(--paper-ink); font-weight: 600; }
 .shop .hint { color: var(--paper-soft); font-size: var(--step-small); }
+
+/* ---------- shinies and luck: party slots on the left, the odds printed on a slip ---------- */
+.luck-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); align-items: end; }
+.luck-head h2 { grid-column: 1 / 7; max-width: 9ch; }
+.luck-head p { grid-column: 8 / 13; max-width: 46ch; }
+.luck-body { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); margin-top: 48px; align-items: start; }
+.luck-set { grid-column: 1 / 7; display: grid; gap: 20px; }
+.luck-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.luck-slots label, .luck-charms { display: grid; gap: 6px; font-weight: 600; font-size: var(--step-small); }
+.luck-slots select, .luck-charms select { font: inherit; font-weight: 400; font-size: var(--step-body); color: var(--paper-ink); background: var(--paper); border: 0; padding: 8px 10px; min-height: 44px; width: 100%; }
+.luck-charms { max-width: 220px; }
+.shiny-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0; }
+.shiny-tiers div { background: var(--surface); padding: 12px 14px; }
+.shiny-tiers dt { font-weight: 600; }
+.shiny-tiers dd { margin: 4px 0 0; font-size: var(--step-small); color: var(--muted); }
+.luck .hint { color: var(--muted); font-size: var(--step-small); max-width: 60ch; }
+.luck-sheet { grid-column: 8 / 13; }
+.luck-score { font: 400 var(--step-lead)/1.1 "Pixelify Sans", sans-serif; margin-bottom: 12px; }
+.luck-score span { font: 600 var(--step-head)/1 "Source Serif 4", Georgia, serif; font-variant-numeric: tabular-nums; margin-right: 8px; }
+.luck-sheet li { display: flex; align-items: baseline; gap: 10px; padding: 6px 0; }
+.luck-sheet li b { flex: 1; min-width: 16px; border-bottom: 4px dotted currentColor; opacity: .3; transform: translateY(-5px); }
+.luck-sheet li > span:last-child { font-weight: 600; text-align: right; }
+.tier-odds { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: var(--step-small); margin-bottom: 10px; }
+.tier-odds th, .tier-odds td { text-align: right; padding: 5px 6px; }
+.tier-odds th:first-child { text-align: left; }
+.tier-odds thead th { border-bottom: 2px solid var(--paper-ink); }
+.tier-odds td:last-child { font-weight: 600; background: var(--accent); }
+.luck-sheet .hint { color: var(--paper-soft); }
 
 /* ---------- your run: a log slip that follows the game, with the boss prep beside it ---------- */
 .track { background: var(--surface); }
@@ -610,7 +640,13 @@ section { padding: var(--section) var(--m); }
   .slip { padding: 16px 12px; }
 
   .ticket { grid-template-columns: 1fr; border-radius: 22px; }
-  .enc-head, .enc-body, .league-head, .track-head, .tracker, .shop-head, .shop-body { grid-template-columns: 1fr; }
+  .enc-head, .enc-body, .league-head, .track-head, .tracker, .shop-head, .shop-body, .luck-head, .luck-body { grid-template-columns: 1fr; }
+  .luck-head > *, .luck-body > * { grid-column: 1 / -1 !important; }
+  .luck-slots { grid-template-columns: 1fr 1fr; }
+  .shiny-tiers { grid-template-columns: 1fr; }
+  .luck-sheet li { display: grid; gap: 2px; }
+  .luck-sheet li b { display: none; }
+  .luck-sheet li > span:last-child { text-align: left; }
   .shop-head > *, .shop-body > * { grid-column: 1 / -1 !important; }
   .items { grid-template-columns: 1fr; }
   .track-head > *, .tracker > * { grid-column: 1 / -1 !important; }

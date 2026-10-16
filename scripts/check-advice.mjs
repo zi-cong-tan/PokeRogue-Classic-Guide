@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import * as L from '../src/data/learnsets.js';
 import { STARTERS } from '../src/data/starters.js';
 import { BUILDS } from '../src/data/builds.js';
-import { suggestNature, suggestMoves, evolveAdvice, teamReport, learnable, bossPrep, fuse } from '../src/advice.js';
+import { suggestNature, suggestMoves, evolveAdvice, teamReport, learnable, bossPrep, fuse, itemOdds, bossOdds, partyLuck, shinyOneIn } from '../src/advice.js';
 
 const at = n => STARTERS.findIndex(s => s[0] === n);
 const name = m => L.MOVE_LIST[m][0];
@@ -40,6 +40,15 @@ assert.deepEqual(prep[1].threatened, ['Lapras']);                               
 assert.deepEqual(fuse({ types: ['dragon', 'ground'], stats: [108, 130, 95, 80, 85, 102] }, { types: ['water', 'ice'], stats: [130, 85, 80, 85, 95, 60] }).types, ['dragon', 'ice']);
 assert.deepEqual(fuse({ types: ['water'], stats: [1, 1, 1, 1, 1, 1] }, { types: ['water'], stats: [2, 2, 2, 2, 2, 2] }), { types: ['water'], stats: [2, 2, 2, 2, 2, 2] });
 assert.deepEqual(fuse({ types: ['grass', 'poison'], stats: [0, 0, 0, 0, 0, 0] }, { types: ['grass'], stats: [0, 0, 0, 0, 0, 0] }).types, ['grass', 'poison']);
+
+// Luck: no luck means 1 in 32 upgrades and the base odds; the odds always add up to 1.
+assert.equal(itemOdds(0).upgradeOneIn, 32);
+assert.equal(itemOdds(14).upgradeOneIn, 7);
+for (const L of [0, 7, 14]) assert.ok(Math.abs(itemOdds(L).tiers.reduce((a, b) => a + b) - 1) < 1e-9);
+assert.ok(itemOdds(14).tiers[3] > itemOdds(0).tiers[3]);
+assert.equal(bossOdds(0).ultraRare, 1 / 64);
+assert.equal(partyLuck([3, 3, 3, 3, 3, 3]), 14);
+assert.equal(shinyOneIn(0), 1024); assert.equal(shinyOneIn(4), 32);
 
 console.log('Garchomp:', gm.map(x => `${name(x.m)} (${x.label})`).join(', '));
 console.log('Ivysaur ->', evo.map(e => `${e.name} by ${e.how}; keep ${e.keep.map(k => name(k.m) + ' @' + k.lvl).join(', ') || 'nothing'}`).join(' | '));

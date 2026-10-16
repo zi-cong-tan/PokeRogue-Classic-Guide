@@ -81,6 +81,11 @@ export default function Planner() {
         <div>
           <h2 id="starters-title" data-reveal>Spend your 10 points</h2>
           <p data-reveal>Classic gives you 10 starter points and Endless gives 15. Each starter has a cost, and candy can lower it twice. Pick up to six below.</p>
+          <p className="community" data-reveal>
+            Player favourites for Classic, from the <a href="https://pokerogue-tierlist.vercel.app/" target="_blank" rel="noreferrer">community tier list</a> (86 players, 11,465 votes, September 2026):
+            with no unlocks, Zacian, Miraidon, Kyogre, Yveltal and Koraidon; fully unlocked, Yveltal, Kyogre, Zacian, Miraidon and Rayquaza.
+            Opinions, not game data.
+          </p>
         </div>
         <div data-reveal>
           <p className="total" ref={total} aria-hidden="true">{left}</p>
