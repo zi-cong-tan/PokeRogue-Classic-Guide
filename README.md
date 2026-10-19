@@ -27,7 +27,15 @@
 
 ## Browser extension
 
-`extension/` holds a read-only Chrome extension that puts a small panel over PokeRogue itself: the enemy's weaknesses, your best move, who it threatens and what fight comes next. See `extension/README.md`.
+A read-only overlay for PokeRogue itself, in Chrome, Edge, Brave or Arc:
+
+- **Damage beside your moves:** open Fight and each move shows its damage range and hits to KO, from the game's own damage calculation (abilities, items, IVs, weather, Tera and all). Works in double battles.
+- **Catch odds beside each ball:** open Ball and each ball shows its chance to catch, from the game's catch formula, with an optional check of whether this turn's throw is caught.
+- **Panels beside the game:** your run (wave, biome, next fight and boss), your team, the enemy's weaknesses, Mystery Encounter advice, and a tier badge on every reward item.
+
+**[Download the extension zip](https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/releases/latest)**, unzip it, then in `chrome://extensions` turn on Developer mode and **Load unpacked** the folder. Full feature list and details in [`extension/README.md`](extension/README.md).
+
+It isn't on the Chrome Web Store yet: publishing there has a registration fee I can't fund right now. If you'd like to sponsor it, [open an issue](https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/issues) and it can be a one-click install.
 
 ## Where the numbers come from
 

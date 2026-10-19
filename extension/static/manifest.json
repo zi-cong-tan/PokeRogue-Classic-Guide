@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "PokeRogue Field Guide overlay",
-  "version": "0.1.0",
-  "description": "A small panel over PokeRogue: what the enemy on the field is weak to, your party's best move against it, who it threatens, and what fight comes next. Read-only.",
+  "version": "1.0.0",
+  "description": "Read-only PokeRogue overlay: damage beside your moves and catch odds beside each ball, from the game's own formulas.",
   "icons": { "16": "icon16.png", "48": "icon48.png", "128": "icon128.png" },
   "content_scripts": [
     { "matches": ["https://pokerogue.net/*", "https://www.pokerogue.net/*"], "js": ["page.js"], "world": "MAIN", "run_at": "document_idle" },
