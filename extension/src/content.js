@@ -246,6 +246,9 @@ b { display: inline-block; min-width: 24px; }
 .badge { position: fixed; width: 34px; height: 34px; font-size: 20px; transform: translate(-50%, -110%); pointer-events: auto; cursor: help;
   box-shadow: 0 2px 8px rgba(0,0,0,.5); outline: 2px solid #0f1f10; }
 .badge { transform: translate(-50%, -50%); }
+.ballpct { position: fixed; transform: translate(-100%, -50%); background: #0f1f10; color: #fff; font: 700 15px/1 Georgia, serif; padding: 6px 8px;
+  white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.5); font-variant-numeric: tabular-nums; }
+.ballpct.good { background: #c6f19d; color: #0f1f10; }
 .opt { background: #182d19; padding: 6px 8px; } .opt p { color: #d4dbd4; font-size: 12px; }
 .mons { display: flex; flex-wrap: wrap; gap: 2px; } figure { margin: 0; width: 64px; text-align: center; font-size: 11px; }
 figure img { width: 48px; height: 48px; image-rendering: pixelated; display: block; margin: 0 auto; }
@@ -286,7 +289,7 @@ function mount() {
   const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items', predict: !!saved.predict };
   const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right, predict: ui.predict })); } catch { /* storage blocked */ } };
   const tellPage = () => window.postMessage({ __prgOverlayCmd: 1, predict: ui.predict }, location.origin);
-  let state = { info: null, enemies: [], encounter: null, rewards: null, calc: null };
+  let state = { info: null, enemies: [], encounter: null, rewards: null, balls: null, calc: null };
   let roomy = true;
 
   // Tier badges over each reward item, at the item's place on the canvas; hover for the reason.
@@ -296,7 +299,7 @@ function mount() {
   function badges() {
     const rw = state.rewards;
     const c = document.querySelector('canvas');
-    if (!rw?.options?.length || !c || !state.info) { badgeLayer.innerHTML = ''; return; }
+    if (!rw?.options?.length || !c || !state.info) { badgeLayer.innerHTML = ballBadges(); return; }
     const r = c.getBoundingClientRect();
     const run = { ...state.info, held: rw.held };
     badgeLayer.innerHTML = rw.options.filter(o => o.x != null).map(o => {
@@ -304,6 +307,21 @@ function mount() {
       // just above the item's icon, kept inside the game area
       const top = Math.max(r.top + 4, r.top + o.y * r.height - 0.075 * r.height);
       return `<span class="badge t${t.tier}" style="left:${r.left + o.x * r.width}px;top:${top}px" title="${esc(`${o.name}: ${t.why}`)}">${t.tier}</span>`;
+    }).join('');
+  }
+
+  // Catch odds beside each ball while the ball menu is open, just left of the menu window.
+  function ballBadges() {
+    const bm = state.balls, c = document.querySelector('canvas');
+    const odds = state.enemies.length === 1 ? state.enemies[0].catch : null;
+    if (!bm || !c || !odds?.balls) return '';
+    const r = c.getBoundingClientRect();
+    return odds.balls.map((b, i) => {
+      if (bm.ys[i] == null) return '';
+      const text = odds.blocked ? '' : b.odds == null ? 'too strong' : b.odds === 1 ? 'Certain' : `${b.odds < 0.01 ? '<1' : Math.round(b.odds * 100)}%`;
+      if (!text) return '';
+      const call = b.lands === undefined ? '' : b.lands ? ' · Lands' : ' · Breaks free';
+      return `<span class="ballpct${b.odds === 1 || b.lands ? ' good' : ''}" style="left:${r.left + bm.left * r.width - 6}px;top:${r.top + bm.ys[i] * r.height}px">${text}${call}</span>`;
     }).join('');
   }
 
@@ -353,7 +371,7 @@ function mount() {
   let last = '';
   addEventListener('message', e => {
     if (e.source !== window || !e.data?.__prgOverlay) return;
-    state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null, rewards: e.data.rewards ?? null, calc: e.data.calc ?? null };
+    state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null, rewards: e.data.rewards ?? null, balls: e.data.balls ?? null, calc: e.data.calc ?? null };
     const key = JSON.stringify(state);
     if (key !== last) { last = key; render(); } else { place(); badges(); }
   });

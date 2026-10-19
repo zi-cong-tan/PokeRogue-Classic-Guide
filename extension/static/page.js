@@ -5,6 +5,7 @@
 //  - which Mystery Encounter is on screen, if any
 //  - the enemy's defences and exact HP, and your moves' damage from the game's own damage calculation
 //  - on the reward screen, the items offered and where they sit
+//  - when the ball menu is open, where each ball sits
 (() => {
   const TYPES = ['normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass',
     'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']; // PokemonType enum order in the game
@@ -181,8 +182,21 @@
     };
   }
 
+  // The ball menu (BallUiHandler): each ball icon's point on the canvas (0 to 1) and the menu's left edge, so the HUD
+  // can put each ball's catch odds beside it. Null when the menu isn't open.
+  function ballMenu() {
+    const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
+    const h = battle?.ui?.getHandler?.();
+    if (!h?.active || !Array.isArray(h.pokeballImages) || !h.pokeballSelectBg) return null;
+    const W = scenes.game?.config?.width || 1920, H = scenes.game?.config?.height || 1080;
+    try {
+      const left = h.pokeballSelectBg.getWorldTransformMatrix().tx / W;
+      return { left, ys: h.pokeballImages.map(b => b.getWorldTransformMatrix().ty / H) };
+    } catch { return null; }
+  }
+
   setInterval(() => {
     hook();
-    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards(), calc: damageCalc() }, location.origin);
+    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards(), balls: ballMenu(), calc: damageCalc() }, location.origin);
   }, 1000);
 })();
