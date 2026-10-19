@@ -374,7 +374,7 @@ function mount() {
     badgeLayer.innerHTML = rw.options.filter(o => o.x != null).map(o => {
       const t = rateItem(o, run);
       // just above the item's icon, kept inside the game area
-      const top = Math.max(r.top + 4, r.top + o.y * r.height - 0.075 * r.height);
+      const top = Math.max(r.top + 21, r.top + o.y * r.height - 0.075 * r.height);   // 21: half the 34px badge + 4, so the top shop row is not cut off
       return `<span class="badge t${t.tier}" style="left:${r.left + o.x * r.width}px;top:${top}px" title="${esc(`${o.name}: ${t.why}`)}">${t.tier}</span>`;
     }).join('');
   }
