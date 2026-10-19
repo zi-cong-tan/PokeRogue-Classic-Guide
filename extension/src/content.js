@@ -260,14 +260,21 @@ b { display: inline-block; min-width: 24px; }
 .ballpct { position: fixed; transform: translate(-100%, -50%); background: #0f1f10; color: #fff; font: 700 15px/1 Georgia, serif; padding: 6px 8px;
   white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.5); font-variant-numeric: tabular-nums; }
 .ballpct.good { background: #c6f19d; color: #0f1f10; }
-.abil { position: fixed; z-index: 2147483000; display: grid; gap: 4px; justify-items: start; }
+.abil { position: fixed; z-index: 2147483000; }
 .abil[hidden] { display: none; }
-.abil ul { list-style: none; margin: 0; padding: 6px; display: grid; gap: 3px; overflow: auto; background: #0f1f10; box-shadow: 0 4px 16px rgba(0,0,0,.35); max-height: inherit; }
+.abil ul, .abil .now { list-style: none; margin: 0; padding: 0; background: #0f1f10; box-shadow: 0 4px 16px rgba(0,0,0,.35); }
+.abil .now { display: grid; grid-template-columns: 1fr auto; align-items: start; max-height: var(--h); overflow: hidden; }
+.abil .now li { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }
+.abil .list { position: absolute; left: 0; right: 0; bottom: calc(100% + 4px); max-height: var(--up); overflow: auto; padding: 6px; display: grid; gap: 3px; }
 .abil li { background: #182d19; color: #fff; padding: 5px 8px; display: grid; gap: 1px; font: 12px/1.35 Georgia, serif; }
+.abil .now li { background: none; display: block; }
+.abil .now li span { display: block; }
 .abil li small { color: #d4dbd4; font-size: 11px; }
 .abil li span { color: #e8efe8; }
-.abil li.on { background: #c6f19d; color: #0f1f10; } .abil li.on small, .abil li.on span { color: #0f1f10; }
-.abil.folded ul { display: none; }
+.abil .list li.on { background: #c6f19d; color: #0f1f10; } .abil .list li.on small, .abil .list li.on span { color: #0f1f10; }
+.abil .now b { color: #c6f19d; }
+.abil .all { all: unset; cursor: pointer; background: #c6f19d; color: #0f1f10; font: 700 12px/1 Georgia, serif; padding: 6px 10px; margin: 5px 5px 0 0; }
+.abil .all:focus-visible { outline: 2px solid #fff; }
 .movepct { position: fixed; transform: translateY(-50%); display: grid; gap: 2px; font: 700 13px/1 Georgia, serif; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .movepct span { background: #0f1f10; color: #fff; padding: 4px 6px; box-shadow: 0 2px 8px rgba(0,0,0,.5); }
 .movepct .ko { background: #c6f19d; color: #0f1f10; } .movepct .maybe { outline: 2px solid #c6f19d; outline-offset: -2px; }
@@ -314,8 +321,9 @@ function mount() {
   let state = { info: null, enemies: [], encounter: null, rewards: null, balls: null, moves: null, calc: null };
   let roomy = true;
 
-  // Starter select: every ability of the starter under the cursor with its description, the one it is set to marked,
-  // just above the game's Ability box (left panel, about 70% down the canvas). Follows E (cycle ability) within 0.25 s.
+  // Starter select. A strip under the game's Ability box (over the G / N / V key hints, about 86-100% down the canvas, so
+  // the egg moves and types stay visible) shows the ability the starter is set to, following E within 0.25 s. "All"
+  // opens the full list (both abilities, hidden, passive) upward over the left panel when you want to compare.
   const abilCard = document.createElement('div');
   abilCard.className = 'abil';
   root.append(abilCard);
@@ -334,20 +342,23 @@ function mount() {
     const i = pick ? starterIndex(pick) : -1;
     if (!pick || !c || i < 0) { abilCard.hidden = true; return; }
     const [[a1, a2, hid], passive] = BUILDS[i];
-    const rows = [[a1, 'Ability 1', 0], [a2 && a2 !== a1 ? a2 : null, 'Ability 2', 1], [hid, 'Hidden ability', 2]]
-      .filter(([k]) => k).map(([k, label, slot]) => {
-        const [name, desc] = ABILITIES[k] || [k, ''];
-        const on = slot === pick.index || (slot === 0 && pick.index === 1 && !(a2 && a2 !== a1));
-        return `<li class="${on ? 'on' : ''}"><b>${esc(name)}</b> <small>${label}${pick.unlocked[slot] ? '' : ', locked'}${on ? ', selected' : ''}</small><span>${esc(desc)}</span></li>`;
-      });
-    if (passive) { const [name, desc] = ABILITIES[passive] || [passive, '']; rows.push(`<li><b>${esc(name)}</b> <small>Passive${pick.passive ? '' : ', locked'}</small><span>${esc(desc)}</span></li>`); }
-    const r = c.getBoundingClientRect();
+    const two = a2 && a2 !== a1;
+    const slots = [[a1, 'Ability 1', 0], [two ? a2 : null, 'Ability 2', 1], [hid, 'Hidden ability', 2]].filter(([k]) => k)
+      .map(([k, label, slot]) => ({ k, label, slot, on: slot === pick.index || (slot === 0 && pick.index === 1 && !two), locked: !pick.unlocked[slot] }));
+    const row = ({ k, label, on, locked }, extra = '') => {
+      const [name, desc] = ABILITIES[k] || [k, ''];
+      return `<li class="${on ? 'on' : ''}"><b>${esc(name)}</b> <small>${label}${locked ? ', locked' : ''}${extra}</small><span>${esc(desc)}</span></li>`;
+    };
+    const cur = slots.find(x => x.on) || slots[0];
+    let list = slots.map(x => row(x, x.on ? ', selected' : '')).join('');
+    if (passive) list += row({ k: passive, label: 'Passive', on: false, locked: !pick.passive });
+    const r = c.getBoundingClientRect(), top = r.top + 0.865 * r.height;
     abilCard.hidden = false;
-    abilCard.classList.toggle('folded', ui.abil);
-    abilCard.style.cssText = `left:${r.left + 0.015 * r.width}px;bottom:${innerHeight - (r.top + 0.7 * r.height) + 6}px;width:${0.315 * r.width}px;max-height:${0.6 * r.height}px`;
-    abilCard.innerHTML = `<button type="button" class="fold">Abilities</button><ul>${rows.join('')}</ul>`;
+    abilCard.style.cssText = `left:${r.left + 0.015 * r.width}px;top:${top}px;width:${0.315 * r.width}px;--h:${r.bottom - top - 4}px;--up:${0.62 * r.height}px`;
+    abilCard.innerHTML = `<div class="now">${row(cur, slots.length > 1 ? ' · E to cycle' : '')}<button type="button" class="all" aria-expanded="${ui.abil}">${ui.abil ? 'Close' : 'All'}</button></div>`
+      + (ui.abil ? `<ul class="list">${list}</ul>` : '');
   }
-  abilCard.addEventListener('click', e => { if (e.target.closest('.fold')) { ui.abil = !ui.abil; save(); abilityCard(); } });
+  abilCard.addEventListener('click', e => { if (e.target.closest('.all')) { ui.abil = !ui.abil; save(); abilityCard(); } });
   addEventListener('message', e => { if (e.source === window && e.data?.__prgStarter) { pick = e.data.pick; abilityCard(); } });
 
   // Tier badges over each reward item, at the item's place on the canvas; hover for the reason.

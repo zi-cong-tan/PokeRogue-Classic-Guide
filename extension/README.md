@@ -26,9 +26,9 @@ own menus.
   reason when no ball can be thrown (trainer battle, two enemies, a boss with bars left).
 - **Throw check (off by default):** the game's battle dice are fixed for each turn, so with this on, each ball also says
   whether this turn's throw is caught or breaks free. Never runs in Daily runs, which have a leaderboard.
-- **Abilities when picking starters:** on the starter-select screen, a card above the game's Ability box lists the
-  starter's Ability 1, Ability 2, hidden ability and passive, each with its description and whether it's unlocked. The
-  one it's set to is highlighted and follows you as you cycle abilities with E. Fold it with its **Abilities** tab.
+- **Abilities when picking starters:** on the starter-select screen, a strip under the game's Ability box shows the
+  ability the starter is set to and what it does, and follows you as you cycle with E. **All** opens the full list: both
+  abilities, the hidden ability and the passive, each with its description and whether it's unlocked.
 - **Reward screen:** a tier badge (S to E) on every item offered and in the shop, rated for your run: your wave, team HP,
   fainted Pokémon, types, moves, abilities and items you already hold. Hover a badge for the reason.
 - **Every mode:** Classic shows its fixed fights; Endless and Spliced Endless show their own boss waves (Eternatus every
