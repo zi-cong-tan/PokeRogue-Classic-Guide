@@ -36,6 +36,9 @@ own menus.
   abilities, the hidden ability and the passive, each with its description and whether it's unlocked.
 - **Reward screen:** a tier badge (S to E) on every item offered and in the shop, rated for your run: your wave, team HP,
   fainted Pokémon, types, moves, abilities and items you already hold. Hover a badge for the reason.
+
+  ![Tier badges (S to E) on the reward screen, rated for your run](../docs/overlay-rewards.png)
+
 - **Every mode:** Classic shows its fixed fights; Endless and Spliced Endless show their own boss waves (Eternatus every
   250 waves, Eternamax every 1000); Daily hides the Classic-only fights.
 - **Guide button:** items by tier with icons, every Mystery Encounter's advice, Mega and Gigantamax forms of your party,

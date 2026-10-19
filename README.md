@@ -45,6 +45,8 @@ A second, separate guide that lives inside the game: a read-only overlay for pok
 
 - **Catch odds beside each ball:** open Ball and each ball shows its chance to catch, from the game's catch formula, with an optional check of whether this turn's throw is caught.
 - **Abilities while picking starters:** every ability, the hidden one and the passive with their descriptions, following the one you cycle to.
+![Tier badges (S to E) on the reward screen, rated for your run](docs/overlay-rewards.png)
+
 - **Panels beside the game:** your run (wave, biome, next fight and boss), your team, the enemy's weaknesses, Mystery Encounter advice, and a tier badge on every reward item.
 
 **[Download the extension zip](https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/releases/latest)**, unzip it, then in `chrome://extensions` turn on Developer mode and **Load unpacked** the folder. Full feature list and details in [`extension/README.md`](extension/README.md).
