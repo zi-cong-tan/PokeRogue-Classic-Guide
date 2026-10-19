@@ -46,7 +46,7 @@ A second, separate guide that lives inside the game: a read-only overlay for pok
 
 ![Catch odds beside each ball in the Ball menu, with the throw check on](docs/overlay-ball.png)
 
-**Item rankings.** Every reward and shop item gets a tier badge (S to E), rated for your run.
+**Item rankings.** Every reward and shop item gets a tier badge (S to E), rated for your run: your wave, team, items and moves.
 
 ![Tier badges (S to E) on the reward screen, rated for your run](docs/overlay-rewards.png)
 
