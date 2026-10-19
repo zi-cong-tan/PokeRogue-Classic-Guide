@@ -158,7 +158,7 @@ function catchPanel(e, predict) {
     ${c.daily ? '<p class="muted tiny">Off in Daily runs: they have a leaderboard.</p>'
       : c.predicted ? `<p class="muted tiny">Read from this turn’s dice: it holds if you throw now, before anything else happens.${c.unsure ? ' A Quick Claw or Quick Draw on the field may roll first, so it could be wrong.' : ''} Using a move instead moves to the next turn’s dice.</p>` : ''}`;
   return `<h4>Catching</h4>${rows ? `<ul class="dmg">${rows}</ul>` : '<p class="muted">You have no balls.</p>'}${c.strong ? '' : toggle}
-    ${c.strong ? '<p class="muted tiny">Bosses only take a ball once down to their last bar (Master Ball works any time).</p>' : '<p class="muted tiny">From the game\'s catch formula: HP, status, ball, Pokédex size and Catching Charm. Lower its HP or put it to sleep to raise the odds.</p>'}`;
+    ${c.strong ? '<p class="muted tiny">Bosses only take a ball once down to their last bar (Master Ball works any time).</p>' : '<p class="muted tiny">From the game\'s catch formula: HP, status, ball, Pokédex size and Catching Charm' + (c.shiny ? ', plus 2× for a shiny' : '') + '. Lower its HP or put it to sleep to raise the odds.</p>'}`;
 }
 
 function enemyPanel(info, enemies, encounterId, rewards, calc, predict) {

@@ -54,7 +54,8 @@
   // Catch odds for each ball, by the game's own formula (phases/attempt-capture-phase.ts, data/pokeball.ts):
   // rate = round((3·maxHP − 2·HP)·catchRate·ball / (3·maxHP) · status); each of 3 shakes passes with
   // round(65536 / (255/rate)^0.1875) / 65536; a critical capture (by Pokédex size and Catching Charm) needs one shake.
-  // Also the game's rules for when no ball can be thrown. Shiny bonus left out (it only makes it easier).
+  // Also the game's rules for when no ball can be thrown. Shinies catch at 2x (SHINY_CATCH_RATE_MULTIPLIER); events can
+  // raise that, which the game keeps out of reach here, so during one the real odds are a little better than shown.
   const BALLS = [['Poké Ball', 1], ['Great Ball', 1.5], ['Ultra Ball', 2], ['Rogue Ball', 3], ['Master Ball', -1]];
   const STATUS_CATCH = [1, 1.5, 1.5, 1.5, 2.5, 2.5, 1.5];   // StatusEffect: none, poison, toxic, paralysis, sleep, freeze, burn
   // Optional, off by default and never in Daily runs: whether this turn's throw will land. Each turn the game re-seeds its
@@ -96,7 +97,7 @@
       const charm = { value: 1 };
       battle.findModifier?.(m => m.is?.('CriticalCatchChanceBoosterModifier'))?.apply(charm);
       const dexMult = battle.gameMode?.isFreshStartChallenge?.() ? 0 : battle.gameMode?.isDaily || dex > 800 ? 2.5 : dex > 600 ? 2 : dex > 400 ? 1.5 : dex > 200 ? 1 : dex > 100 ? 0.5 : 0;
-      const m3 = 3 * p.getMaxHp(), h2 = 2 * p.hp, status = STATUS_CATCH[p.status?.effect || 0] || 1;
+      const m3 = 3 * p.getMaxHp(), h2 = 2 * p.hp, status = STATUS_CATCH[p.status?.effect || 0] || 1, shiny = p.isShiny?.() ? 2 : 1;
       const counts = battle.pokeballCounts || {};
       const r = strong ? null : throwRolls(battle);
       const lands = (rate, shake, crit) => {
@@ -106,11 +107,11 @@
         return c < crit ? s1 < shake : s1 < shake && s2 < shake && s3 < shake;
       };
       return {
-        strong, predicted: !!r, unsure: !!r?.unsure, daily: predict && !!battle.gameMode?.isDaily,
+        strong, shiny: shiny > 1, predicted: !!r, unsure: !!r?.unsure, daily: predict && !!battle.gameMode?.isDaily,
         balls: BALLS.map(([name, mult], i) => {
           if (mult === -1) return { name, odds: 1, have: counts[i] || 0, lands: r ? true : undefined };
           if (strong) return { name, odds: null, have: counts[i] || 0 };
-          const rate = Math.round(((m3 - h2) * p.species.catchRate * mult / m3) * status);
+          const rate = Math.round(((m3 - h2) * p.species.catchRate * mult / m3) * status * shiny);
           const shakeN = Math.round(65536 / Math.pow(255 / rate, 0.1875)), critN = Math.floor((charm.value * dexMult * Math.min(255, rate)) / 6);
           const shake = shakeN / 65536, crit = critN / 256;
           return { name, odds: rate >= 255 ? 1 : Math.min(1, crit * shake + (1 - crit) * shake ** 3), have: counts[i] || 0, lands: lands(rate, shakeN, critN) };
