@@ -74,7 +74,10 @@ function moveVerdict(m, e) {
   const hits = Math.ceil(e.hp / Math.max(1, min));
   const verdict = e.boss ? 'stops at each bar'
     : min >= e.hp ? 'KO' : m.max >= e.hp ? 'Can KO' : m.multi ? (hits <= 5 ? `KO if it hits ${hits}+ times` : `about ${Math.ceil(hits / 3)} uses`) : m.crit >= e.hp ? 'KO on a crit' : `${hits} hits`;
-  return { range: `${pct(min)}–${pct(m.max)}%${m.multi ? ' a hit' : ''}`, verdict, cls: !e.boss && min >= e.hp ? 'ko' : !e.boss && m.max >= e.hp ? 'maybe' : '' };
+  // a KO call can still be undone by what the enemy holds
+  const kos = /KO/.test(verdict) && !e.boss;
+  const saves = kos ? [e.band ? `Focus Band ${Math.min(5, e.band) * 10}% to hang on` : '', e.seed ? 'Reviver Seed: back at ½ HP' : ''].filter(Boolean) : [];
+  return { range: `${pct(min)}–${pct(m.max)}%${m.multi ? ' a hit' : ''}`, verdict: [verdict, ...saves].join(' · '), cls: !e.boss && min >= e.hp ? 'ko' : !e.boss && m.max >= e.hp ? 'maybe' : '' };
 }
 
 function damagePanel(info, e, i, calc) {

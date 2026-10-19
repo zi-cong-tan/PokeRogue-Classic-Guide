@@ -24,6 +24,12 @@
 
   const typeNames = list => (list || []).map(t => TYPES[t]).filter(Boolean);
 
+  // Stacks of a held item on an enemy (0 if none). Enemy items live in their own list, apart from yours.
+  function held(battle, p, kind) {
+    try { return (battle.enemyModifiers || []).filter(m => m.pokemonId === p.id && m.is?.(kind)).reduce((n, m) => n + (m.stackCount || 1), 0); }
+    catch { return 0; }
+  }
+
   function enemies() {
     const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
     if (!battle?.currentBattle) return [];
@@ -37,6 +43,8 @@
           boss: !!p.isBoss?.(), bars: p.bossSegments || 0, barIndex: p.bossSegmentIndex ?? 0, terastallized: !!p.isTerastallized,
           // for the damage estimate: defences and their stat changes (Stat enum: DEF 2, SPDEF 4)
           catch: catchOdds(battle, p, field.length),
+          // held items that undo a KO: Focus Band (each stack 1 in 10 to hang on at 1 HP, up to 5) and Reviver Seed (back at half HP)
+          band: held(battle, p, 'SurviveDamageModifier'), seed: held(battle, p, 'PokemonInstantReviveModifier'),
           def: p.getStat?.(2), spDef: p.getStat?.(4), defStage: p.getStatStage?.(2) ?? 0, spDefStage: p.getStatStage?.(4) ?? 0,
         };
       });
