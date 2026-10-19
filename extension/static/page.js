@@ -5,7 +5,7 @@
 //  - which Mystery Encounter is on screen, if any
 //  - the enemy's defences and exact HP, and your moves' damage from the game's own damage calculation
 //  - on the reward screen, the items offered and where they sit
-//  - when the ball menu is open, where each ball sits
+//  - when the ball menu is open, where each ball sits; when the fight menu is open, where each move name sits
 (() => {
   const TYPES = ['normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass',
     'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']; // PokemonType enum order in the game
@@ -198,8 +198,23 @@
     } catch { return null; }
   }
 
+  // The fight menu (FightUiHandler): each move name's box on the canvas (0 to 1), so the HUD can put its damage beside
+  // it. Null when the menu isn't open or the move info overlay is covering the names.
+  function fightMenu() {
+    const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
+    const h = battle?.ui?.getHandler?.();
+    if (!h?.active || !h.movesContainer?.visible || !Array.isArray(h.movesContainer.list)) return null;
+    const W = scenes.game?.config?.width || 1920, H = scenes.game?.config?.height || 1080;
+    try {
+      return h.movesContainer.list.slice(0, 4).map(t => {
+        const b = t.getBounds();
+        return { right: (b.x + b.width) / W, y: (b.y + b.height / 2) / H };
+      });
+    } catch { return null; }
+  }
+
   setInterval(() => {
     hook();
-    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards(), balls: ballMenu(), calc: damageCalc() }, location.origin);
+    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards(), balls: ballMenu(), moves: fightMenu(), calc: damageCalc() }, location.origin);
   }, 1000);
 })();

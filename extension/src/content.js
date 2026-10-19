@@ -63,6 +63,20 @@ function damage(attacker, move, enemy) {
 // Each move of your Pokémon on the field against this enemy: a range in % of its HP and whether it knocks it out.
 // Uses the game's own calculation when page.js could run it (abilities, items, weather, terrain, special moves);
 // otherwise falls back to the plain formula above.
+// One move against one enemy: damage range in % of its max HP, the verdict, and a class for KO colouring.
+// Shared by the side panel and the tags beside the fight menu.
+function moveVerdict(m, e) {
+  if (m.status) return { range: 'status', verdict: '', cls: '' };
+  if (m.error) return { range: "can't tell", verdict: '', cls: '' };
+  if (!m.max) return { range: 'no effect', verdict: '', cls: '' };
+  const pct = v => Math.round((v / e.maxHp) * 100);
+  const min = Math.floor(m.max * 0.85);
+  const hits = Math.ceil(e.hp / Math.max(1, min));
+  const verdict = e.boss ? 'stops at each bar'
+    : min >= e.hp ? 'KO' : m.max >= e.hp ? 'Can KO' : m.multi ? (hits <= 5 ? `KO if it hits ${hits}+ times` : `about ${Math.ceil(hits / 3)} uses`) : m.crit >= e.hp ? 'KO on a crit' : `${hits} hits`;
+  return { range: `${pct(min)}–${pct(m.max)}%${m.multi ? ' a hit' : ''}`, verdict, cls: !e.boss && min >= e.hp ? 'ko' : !e.boss && m.max >= e.hp ? 'maybe' : '' };
+}
+
 function damagePanel(info, e, i, calc) {
   if (!e.hp || !e.maxHp) return '';
   const pct = v => Math.round((v / e.maxHp) * 100);
@@ -72,16 +86,8 @@ function damagePanel(info, e, i, calc) {
     const d = me && e.def ? damage(me, name, e) : null;
     return d ? { name, max: d.max, crit: Math.floor(d.max * 1.5), eff: d.eff } : { name, status: true };
   })).map(m => {
-    if (m.status) return `<li><span>${esc(m.name)}</span><span class="muted">status</span><span></span></li>`;
-    if (m.error) return `<li><span>${esc(m.name)}</span><span class="muted">can't tell</span><span></span></li>`;
-    if (!m.max) return `<li><span>${esc(m.name)}</span><span class="muted">no effect</span><span></span></li>`;
-    const min = Math.floor(m.max * 0.85);
-    const hits = Math.ceil(e.hp / Math.max(1, min));
-    const per = m.multi ? ' a hit' : '';
-    const verdict = e.boss ? 'stops at each bar'
-      : min >= e.hp ? 'KO' : m.max >= e.hp ? 'Can KO' : m.multi ? (hits <= 5 ? `KO if it hits ${hits}+ times` : `about ${Math.ceil(hits / 3)} uses`) : m.crit >= e.hp ? 'KO on a crit' : `${hits} hits`;
-    return `<li class="${!e.boss && min >= e.hp ? 'ko' : !e.boss && m.max >= e.hp ? 'maybe' : ''}"><span>${esc(m.name)}</span>
-      <span>${pct(min)}–${pct(m.max)}%${per}</span><strong>${esc(verdict)}</strong></li>`;
+    const v = moveVerdict(m, e);
+    return `<li class="${v.cls}"><span>${esc(m.name)}</span><span${v.verdict ? '' : ' class="muted"'}>${esc(v.range)}</span><strong>${esc(v.verdict)}</strong></li>`;
   }).join('');
   const field = [calc?.weather, calc?.terrain].filter(Boolean).join(', ');
   return `<h4>${esc(calc?.attacker || me?.nickname || me?.name || 'Your')}'s moves on it <small>(it has ${pct(e.hp)}% HP)</small></h4><ul class="dmg">${rows}</ul>
@@ -249,6 +255,9 @@ b { display: inline-block; min-width: 24px; }
 .ballpct { position: fixed; transform: translate(-100%, -50%); background: #0f1f10; color: #fff; font: 700 15px/1 Georgia, serif; padding: 6px 8px;
   white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.5); font-variant-numeric: tabular-nums; }
 .ballpct.good { background: #c6f19d; color: #0f1f10; }
+.movepct { position: fixed; transform: translateY(-50%); display: grid; gap: 2px; font: 700 13px/1 Georgia, serif; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.movepct span { background: #0f1f10; color: #fff; padding: 4px 6px; box-shadow: 0 2px 8px rgba(0,0,0,.5); }
+.movepct .ko { background: #c6f19d; color: #0f1f10; } .movepct .maybe { outline: 2px solid #c6f19d; outline-offset: -2px; }
 .opt { background: #182d19; padding: 6px 8px; } .opt p { color: #d4dbd4; font-size: 12px; }
 .mons { display: flex; flex-wrap: wrap; gap: 2px; } figure { margin: 0; width: 64px; text-align: center; font-size: 11px; }
 figure img { width: 48px; height: 48px; image-rendering: pixelated; display: block; margin: 0 auto; }
@@ -289,7 +298,7 @@ function mount() {
   const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items', predict: !!saved.predict };
   const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right, predict: ui.predict })); } catch { /* storage blocked */ } };
   const tellPage = () => window.postMessage({ __prgOverlayCmd: 1, predict: ui.predict }, location.origin);
-  let state = { info: null, enemies: [], encounter: null, rewards: null, balls: null, calc: null };
+  let state = { info: null, enemies: [], encounter: null, rewards: null, balls: null, moves: null, calc: null };
   let roomy = true;
 
   // Tier badges over each reward item, at the item's place on the canvas; hover for the reason.
@@ -299,7 +308,7 @@ function mount() {
   function badges() {
     const rw = state.rewards;
     const c = document.querySelector('canvas');
-    if (!rw?.options?.length || !c || !state.info) { badgeLayer.innerHTML = ballBadges(); return; }
+    if (!rw?.options?.length || !c || !state.info) { badgeLayer.innerHTML = ballBadges() + moveBadges(); return; }
     const r = c.getBoundingClientRect();
     const run = { ...state.info, held: rw.held };
     badgeLayer.innerHTML = rw.options.filter(o => o.x != null).map(o => {
@@ -307,6 +316,23 @@ function mount() {
       // just above the item's icon, kept inside the game area
       const top = Math.max(r.top + 4, r.top + o.y * r.height - 0.075 * r.height);
       return `<span class="badge t${t.tier}" style="left:${r.left + o.x * r.width}px;top:${top}px" title="${esc(`${o.name}: ${t.why}`)}">${t.tier}</span>`;
+    }).join('');
+  }
+
+  // Damage beside each move name while the fight menu is open. calc follows whichever of your Pokémon is choosing
+  // (doubles too); with two enemies each tag has a line per enemy, named. Both lists drop fainted enemies, so they line up.
+  function moveBadges() {
+    const mv = state.moves, c = document.querySelector('canvas'), foes = state.calc?.foes;
+    if (!mv || !c || !foes?.length) return '';
+    const r = c.getBoundingClientRect(), two = state.enemies.length > 1;
+    return mv.map((pos, i) => {
+      const lines = state.enemies.map((e, f) => {
+        const m = foes[f]?.[i];
+        if (!m || m.status || !e.maxHp) return '';
+        const v = moveVerdict(m, e);
+        return `<span class="${v.cls}">${two ? `${esc(e.name)}: ` : ''}${esc(v.range)}${v.verdict ? ` · ${esc(v.verdict)}` : ''}</span>`;
+      }).filter(Boolean);
+      return lines.length ? `<span class="movepct" style="left:${r.left + pos.right * r.width + 8}px;top:${r.top + pos.y * r.height}px">${lines.join('')}</span>` : '';
     }).join('');
   }
 
@@ -372,7 +398,7 @@ function mount() {
   let last = '';
   addEventListener('message', e => {
     if (e.source !== window || !e.data?.__prgOverlay) return;
-    state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null, rewards: e.data.rewards ?? null, balls: e.data.balls ?? null, calc: e.data.calc ?? null };
+    state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null, rewards: e.data.rewards ?? null, balls: e.data.balls ?? null, moves: e.data.moves ?? null, calc: e.data.calc ?? null };
     const key = JSON.stringify(state);
     if (key !== last) { last = key; render(); } else { place(); badges(); }
   });
