@@ -1,5 +1,8 @@
 # PokeRogue Field Guide overlay (Chrome extension)
 
+The second of the two Field Guides: this one runs inside the game while you play. The first is the
+[website](https://zi-cong-tan.github.io/PokeRogue-Guide-Aesthetic/) for planning a run.
+
 A heads-up display for [PokeRogue](https://pokerogue.net), like a game overlay: panels in the empty bands beside the
 game (or folded into corner tabs on small windows) that follow your run, plus small tags drawn right next to the game's
 own menus.

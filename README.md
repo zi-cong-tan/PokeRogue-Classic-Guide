@@ -1,12 +1,21 @@
 # PokeRogue Field Guide
 
-**200 waves to Eternatus, mapped out.** A good-looking, interactive guide to a [PokeRogue](https://pokerogue.net) Classic run, printed like the paperwork of the trip.
+Two guides for [PokeRogue](https://pokerogue.net), from the same game data:
 
-**[Open the guide](https://zi-cong-tan.github.io/PokeRogue-Guide-Aesthetic/)**
+| | **1. The website** | **2. The in-game overlay** |
+|---|---|---|
+| What it is | An interactive guide to plan a Classic run | A Chrome extension that draws the numbers on top of the game |
+| Use it | Before and between runs, in any browser | While you play, on pokerogue.net |
+| Highlights | Every fixed fight, villain teams, starter planner, build sheet, team check | Damage beside your moves, catch odds beside each ball, item rankings, run panels |
+| Get it | **[Open the website](https://zi-cong-tan.github.io/PokeRogue-Guide-Aesthetic/)** | **[Download the extension zip](https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/releases/latest)** |
+
+## 1. The website
+
+**200 waves to Eternatus, mapped out.** A good-looking, interactive guide to a Classic run, printed like the paperwork of the trip.
 
 ![The run card: 200 waves to Eternatus](docs/screenshot.png)
 
-## What's in it
+### What's in it
 
 - **Your run, right now.** Set your wave, biome, villain team and league region: see the next fight, which encounters can appear, where you can go, and boss prep (your team against the next boss, Pokémon by Pokémon). Pop it out into a small window that stays on top of the game.
 - **The run, wave by wave.** Every fixed fight in Classic on one itinerary slip: rivals, gym leaders, the evil team, the Elite Four, the Champion and Eternatus. Click a fight to see the trainer.
@@ -25,9 +34,9 @@
 - **The shop, Pokérus and fusion.** Every reward item by tier, how Pokérus spreads, and a fusion calculator using the game's own fusion maths.
 - **Types.** Pick one or two types to see what hits them hard and what they hit hard.
 
-## Browser extension
+## 2. The in-game overlay (browser extension)
 
-A read-only overlay for PokeRogue itself, in Chrome, Edge, Brave or Arc:
+A second, separate guide that lives inside the game: a read-only overlay for pokerogue.net, in Chrome, Edge, Brave or Arc.
 
 - **Damage beside your moves:** open Fight and each move shows its damage range and hits to KO, from the game's own damage calculation (abilities, items, IVs, weather, Tera and all). Works in double battles.
 - **Catch odds beside each ball:** open Ball and each ball shows its chance to catch, from the game's catch formula, with an optional check of whether this turn's throw is caught.
