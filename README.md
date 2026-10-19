@@ -41,6 +41,8 @@ A second, separate guide that lives inside the game: a read-only overlay for pok
 ![The overlay in a battle: damage beside each move in the Fight menu, and the Enemy panel with weaknesses, damage and catch odds](docs/overlay-fight.png)
 
 - **Damage beside your moves:** open Fight and each move shows its damage range and hits to KO, from the game's own damage calculation (abilities, items, IVs, weather, Tera and all). Works in double battles.
+![Catch odds beside each ball in the Ball menu, with the throw check on](docs/overlay-ball.png)
+
 - **Catch odds beside each ball:** open Ball and each ball shows its chance to catch, from the game's catch formula, with an optional check of whether this turn's throw is caught.
 - **Abilities while picking starters:** every ability, the hidden one and the passive with their descriptions, following the one you cycle to.
 - **Panels beside the game:** your run (wave, biome, next fight and boss), your team, the enemy's weaknesses, Mystery Encounter advice, and a tier badge on every reward item.

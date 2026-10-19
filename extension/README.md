@@ -26,6 +26,9 @@ own menus.
 - **Catch odds beside each ball:** open Ball and each ball gets its chance to catch, from the game's catch formula
   (HP, status, ball, Pokédex size, Catching Charm, and 2× for a shiny). "Certain" when the game skips the roll, and the
   reason when no ball can be thrown (trainer battle, two enemies, a boss with bars left).
+
+  ![Catch odds beside each ball in the Ball menu, with the throw check on](../docs/overlay-ball.png)
+
 - **Throw check (off by default):** the game's battle dice are fixed for each turn, so with this on, each ball also says
   whether this turn's throw is caught or breaks free. Never runs in Daily runs, which have a leaderboard.
 - **Abilities when picking starters:** on the starter-select screen, a strip under the game's Ability box shows the
