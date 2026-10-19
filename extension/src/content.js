@@ -318,9 +318,10 @@ function mount() {
     const r = c.getBoundingClientRect();
     return odds.balls.map((b, i) => {
       if (bm.ys[i] == null) return '';
-      const text = odds.blocked ? '' : b.odds == null ? 'too strong' : b.odds === 1 ? 'Certain' : `${b.odds < 0.01 ? '<1' : Math.round(b.odds * 100)}%`;
+      const text = odds.blocked ? '' : b.odds == null ? 'too strong' : b.odds === 1 ? 'Certain' : `${b.odds < 0.01 ? '<1' : Math.round(b.odds * 100)}% to catch`;
       if (!text) return '';
-      const call = b.lands === undefined ? '' : b.lands ? ' · Lands' : ' · Breaks free';
+      // the throw check's call for this turn's dice, separate from the odds
+      const call = b.lands === undefined ? '' : b.lands ? ' · this throw: caught' : ' · this throw: breaks free';
       return `<span class="ballpct${b.odds === 1 || b.lands ? ' good' : ''}" style="left:${r.left + bm.left * r.width - 6}px;top:${r.top + bm.ys[i] * r.height}px">${text}${call}</span>`;
     }).join('');
   }
