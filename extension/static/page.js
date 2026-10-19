@@ -182,16 +182,19 @@
     };
   }
 
-  // The ball menu (BallUiHandler): each ball icon's point on the canvas (0 to 1) and the menu's left edge, so the HUD
+  // The ball menu (BallUiHandler): each ball row's point on the canvas (0 to 1) and the menu's left edge, so the HUD
   // can put each ball's catch odds beside it. Null when the menu isn't open.
   function ballMenu() {
     const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
     const h = battle?.ui?.getHandler?.();
-    if (!h?.active || !Array.isArray(h.pokeballImages) || !h.pokeballSelectBg) return null;
+    if (!h?.active || !h.pokeballSelectBg || !h.countsText) return null;
     const W = scenes.game?.config?.width || 1920, H = scenes.game?.config?.height || 1080;
     try {
-      const left = h.pokeballSelectBg.getWorldTransformMatrix().tx / W;
-      return { left, ys: h.pokeballImages.map(b => b.getWorldTransformMatrix().ty / H) };
+      const left = h.pokeballSelectBg.getBounds().x / W;
+      // beta draws ball icons; the live game only has the "×97" counts column, one line per ball
+      if (Array.isArray(h.pokeballImages)) return { left, ys: h.pokeballImages.map(b => b.getWorldTransformMatrix().ty / H) };
+      const b = h.countsText.getBounds(), n = h.countsText.text.split('\n').length;
+      return { left, ys: Array.from({ length: n }, (_, i) => (b.y + (i + 0.5) * b.height / n) / H) };
     } catch { return null; }
   }
 
