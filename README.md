@@ -38,6 +38,8 @@ Two guides for [PokeRogue](https://pokerogue.net), from the same game data:
 
 A second, separate guide that lives inside the game: a read-only overlay for pokerogue.net, in Chrome, Edge, Brave or Arc.
 
+![The overlay in a battle: damage beside each move in the Fight menu, and the Enemy panel with weaknesses, damage and catch odds](docs/overlay-fight.png)
+
 - **Damage beside your moves:** open Fight and each move shows its damage range and hits to KO, from the game's own damage calculation (abilities, items, IVs, weather, Tera and all). Works in double battles.
 - **Catch odds beside each ball:** open Ball and each ball shows its chance to catch, from the game's catch formula, with an optional check of whether this turn's throw is caught.
 - **Abilities while picking starters:** every ability, the hidden one and the passive with their descriptions, following the one you cycle to.

@@ -9,6 +9,8 @@ own menus.
 
 ## What it shows
 
+![Damage beside each move in the Fight menu, and the Enemy panel with weaknesses, damage and catch odds](../docs/overlay-fight.png)
+
 - **Left panel:** wave, biome, next fight, next boss wave (with this biome's gym leaders), next biomes, luck; your team with
   HP and each member's best move against the enemy.
 - **Right panel:** the enemy's weaknesses and the move to use, your active Pokémon's moves as a damage range (% of the
