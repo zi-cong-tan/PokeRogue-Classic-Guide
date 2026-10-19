@@ -222,6 +222,29 @@
     } catch { return null; }
   }
 
+  // The starter-select screen: the starter under the cursor, the ability slot it is set to (0, 1, hidden 2; the game's
+  // default is the first unlocked one) and which slots and the passive are unlocked. Null on any other screen.
+  function starterPick() {
+    const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
+    const h = battle?.ui?.getHandler?.();
+    if (!h?.active || !Array.isArray(h.starterContainers) || h.lastStarterId == null) return null;
+    try {
+      const sp = h.starterContainers.find(c => c.species?.speciesId === h.lastStarterId)?.species;
+      if (!sp) return null;
+      const data = battle.gameData?.starterData?.[h.lastStarterId] || {}, attr = data.abilityAttr || 0;
+      const pref = h.starterPreferences?.[h.lastStarterId]?.abilityIndex;
+      const index = pref ?? (attr & 1 ? 0 : !sp.ability2 || attr & 2 ? 1 : 2);   // getStarterDefaultAbilityIndex
+      return { id: sp.speciesId, name: sp.name, index, unlocked: [!!(attr & 1), !!(attr & 2), !!(attr & 4)], passive: !!((data.passiveAttr || 0) & 1) };
+    } catch { return null; }
+  }
+  // Cycling the ability (E) should show at once, so this one is read four times a second, sent only when it changes.
+  let lastPick = '';
+  setInterval(() => {
+    hook();
+    const pick = starterPick(), key = JSON.stringify(pick);
+    if (key !== lastPick) { lastPick = key; window.postMessage({ __prgStarter: 1, pick }, location.origin); }
+  }, 250);
+
   setInterval(() => {
     hook();
     window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards(), balls: ballMenu(), moves: fightMenu(), calc: damageCalc() }, location.origin);

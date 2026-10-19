@@ -11,6 +11,8 @@ import { ENCOUNTER_NOTES } from '../../src/data/encounter-notes.js';
 import { ITEM_TIERS } from '../../src/data/items.js';
 import { SPECIAL_FORMS } from '../../src/data/megas.js';
 import { rateItem } from './rate.js';
+import { STARTERS } from '../../src/data/starters.js';
+import { BUILDS, ABILITIES } from '../../src/data/builds.js';
 
 const GUIDE = 'https://zi-cong-tan.github.io/PokeRogue-Guide-Aesthetic/';
 const CDN = 'https://cdn.jsdelivr.net/gh/';
@@ -258,6 +260,14 @@ b { display: inline-block; min-width: 24px; }
 .ballpct { position: fixed; transform: translate(-100%, -50%); background: #0f1f10; color: #fff; font: 700 15px/1 Georgia, serif; padding: 6px 8px;
   white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.5); font-variant-numeric: tabular-nums; }
 .ballpct.good { background: #c6f19d; color: #0f1f10; }
+.abil { position: fixed; z-index: 2147483000; display: grid; gap: 4px; justify-items: start; }
+.abil[hidden] { display: none; }
+.abil ul { list-style: none; margin: 0; padding: 6px; display: grid; gap: 3px; overflow: auto; background: #0f1f10; box-shadow: 0 4px 16px rgba(0,0,0,.35); max-height: inherit; }
+.abil li { background: #182d19; color: #fff; padding: 5px 8px; display: grid; gap: 1px; font: 12px/1.35 Georgia, serif; }
+.abil li small { color: #d4dbd4; font-size: 11px; }
+.abil li span { color: #e8efe8; }
+.abil li.on { background: #c6f19d; color: #0f1f10; } .abil li.on small, .abil li.on span { color: #0f1f10; }
+.abil.folded ul { display: none; }
 .movepct { position: fixed; transform: translateY(-50%); display: grid; gap: 2px; font: 700 13px/1 Georgia, serif; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .movepct span { background: #0f1f10; color: #fff; padding: 4px 6px; box-shadow: 0 2px 8px rgba(0,0,0,.5); }
 .movepct .ko { background: #c6f19d; color: #0f1f10; } .movepct .maybe { outline: 2px solid #c6f19d; outline-offset: -2px; }
@@ -298,11 +308,47 @@ function mount() {
   const drawer = root.querySelector('.drawer'), body = root.querySelector('.drawer-body');
   // folded: null until the player chooses, then remembered
   const saved = (() => { try { return JSON.parse(localStorage.getItem('prg-hud')) || {}; } catch { return {}; } })();
-  const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items', predict: !!saved.predict };
-  const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right, predict: ui.predict })); } catch { /* storage blocked */ } };
+  const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items', predict: !!saved.predict, abil: !!saved.abil };
+  const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right, predict: ui.predict, abil: ui.abil })); } catch { /* storage blocked */ } };
   const tellPage = () => window.postMessage({ __prgOverlayCmd: 1, predict: ui.predict }, location.origin);
   let state = { info: null, enemies: [], encounter: null, rewards: null, balls: null, moves: null, calc: null };
   let roomy = true;
+
+  // Starter select: every ability of the starter under the cursor with its description, the one it is set to marked,
+  // just above the game's Ability box (left panel, about 70% down the canvas). Follows E (cycle ability) within 0.25 s.
+  const abilCard = document.createElement('div');
+  abilCard.className = 'abil';
+  root.append(abilCard);
+  let pick = null;
+  // Game species ids below 2000 are the national dex number (= the guide's sprite id). Regional forms sit above:
+  // 2xxx Alolan, 4xxx Galarian, 6xxx Hisuian, 8xxx Paldean, plus two specials; match those by the guide's name.
+  const SPECIAL = { 2670: 'Eternal Floette', 8901: 'Bloodmoon Ursaluna' };
+  const REGION = { 2: 'Alolan', 4: 'Galarian', 6: 'Hisuian', 8: 'Paldean' };
+  function starterIndex({ id, name }) {
+    if (id < 2000) return STARTERS.findIndex(s => s[1] === id);
+    const want = SPECIAL[id] || (name.startsWith(REGION[Math.floor(id / 1000)]) ? name : `${REGION[Math.floor(id / 1000)]} ${name}`);
+    return STARTERS.findIndex(s => s[0] === want);
+  }
+  function abilityCard() {
+    const c = document.querySelector('canvas');
+    const i = pick ? starterIndex(pick) : -1;
+    if (!pick || !c || i < 0) { abilCard.hidden = true; return; }
+    const [[a1, a2, hid], passive] = BUILDS[i];
+    const rows = [[a1, 'Ability 1', 0], [a2 && a2 !== a1 ? a2 : null, 'Ability 2', 1], [hid, 'Hidden ability', 2]]
+      .filter(([k]) => k).map(([k, label, slot]) => {
+        const [name, desc] = ABILITIES[k] || [k, ''];
+        const on = slot === pick.index || (slot === 0 && pick.index === 1 && !(a2 && a2 !== a1));
+        return `<li class="${on ? 'on' : ''}"><b>${esc(name)}</b> <small>${label}${pick.unlocked[slot] ? '' : ', locked'}${on ? ', selected' : ''}</small><span>${esc(desc)}</span></li>`;
+      });
+    if (passive) { const [name, desc] = ABILITIES[passive] || [passive, '']; rows.push(`<li><b>${esc(name)}</b> <small>Passive${pick.passive ? '' : ', locked'}</small><span>${esc(desc)}</span></li>`); }
+    const r = c.getBoundingClientRect();
+    abilCard.hidden = false;
+    abilCard.classList.toggle('folded', ui.abil);
+    abilCard.style.cssText = `left:${r.left + 0.015 * r.width}px;bottom:${innerHeight - (r.top + 0.7 * r.height) + 6}px;width:${0.315 * r.width}px;max-height:${0.6 * r.height}px`;
+    abilCard.innerHTML = `<button type="button" class="fold">Abilities</button><ul>${rows.join('')}</ul>`;
+  }
+  abilCard.addEventListener('click', e => { if (e.target.closest('.fold')) { ui.abil = !ui.abil; save(); abilityCard(); } });
+  addEventListener('message', e => { if (e.source === window && e.data?.__prgStarter) { pick = e.data.pick; abilityCard(); } });
 
   // Tier badges over each reward item, at the item's place on the canvas; hover for the reason.
   const badgeLayer = document.createElement('div');
@@ -396,7 +442,7 @@ function mount() {
     body.innerHTML = guideTab(ui.tab, state.info);
   }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !drawer.hidden) drawer.hidden = true; });
-  addEventListener('resize', () => { place(); badges(); });
+  addEventListener('resize', () => { place(); badges(); abilityCard(); });
 
   let last = '';
   addEventListener('message', e => {

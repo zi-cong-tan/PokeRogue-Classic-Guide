@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PokeRogue Field Guide overlay",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Read-only PokeRogue overlay: damage beside your moves and catch odds beside each ball, from the game's own formulas.",
   "icons": { "16": "icon16.png", "48": "icon48.png", "128": "icon128.png" },
   "content_scripts": [
