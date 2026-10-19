@@ -374,7 +374,9 @@ function mount() {
     badgeLayer.innerHTML = rw.options.filter(o => o.x != null).map(o => {
       const t = rateItem(o, run);
       // just above the item's icon, kept inside the game area
-      const top = Math.max(r.top + 21, r.top + o.y * r.height - 0.075 * r.height);   // 21: half the 34px badge + 4, so the top shop row is not cut off
+      // 21: half the 34px badge + 4. The canvas can start above the window (it is taller than the viewport), so clamp to
+      // whichever top edge is lower, or the top shop row's badges get cut off.
+      const top = Math.max(Math.max(r.top, 0) + 21, r.top + o.y * r.height - 0.075 * r.height);
       return `<span class="badge t${t.tier}" style="left:${r.left + o.x * r.width}px;top:${top}px" title="${esc(`${o.name}: ${t.why}`)}">${t.tier}</span>`;
     }).join('');
   }
