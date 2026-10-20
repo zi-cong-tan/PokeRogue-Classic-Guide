@@ -9,6 +9,10 @@ Two guides for [PokeRogue](https://pokerogue.net), from the same game data:
 | Highlights | Every fixed fight, villain teams, starter planner, build sheet, team check | Damage beside your moves, catch odds beside each ball, ability descriptions at starter select, item rankings, run panels |
 | Get it | **[Open the website](https://zi-cong-tan.github.io/PokeRogue-Guide-Aesthetic/)** | **[Download the extension zip](https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/releases/latest)** |
 
+## Why I made this
+
+I've been a Pokémon fan since I was a kid. Recently I got hooked on PokeRogue, and every run had me jumping between tabs: which gym leader is next, what that villain boss brings at wave 165, whether my last ball will actually catch. So I built the guide I wanted to have open while playing, with every number taken straight from the game's own code. I hope it helps your runs too.
+
 ## 1. The website
 
 **200 waves to Eternatus, mapped out.** A good-looking, interactive guide to a Classic run, printed like the paperwork of the trip.
