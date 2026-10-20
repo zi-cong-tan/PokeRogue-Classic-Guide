@@ -11,7 +11,7 @@ Two guides for [PokeRogue](https://pokerogue.net), from the same game data:
 
 ## Why I made this
 
-I've been a Pokémon fan since I was a kid, starting with Pokémon LeafGreen (and my favourite is still Mudkip, specifically Zuzu from the Pokémon Adventures manga; if you know, you know). Recently I got hooked on PokeRogue, and every run had me jumping between tabs: which gym leader is next, what that villain boss brings at wave 165, whether my last ball will actually catch. So I built the guide I wanted to have open while playing, with every number taken straight from the game's own code. I hope it helps your runs too.
+I've been a Pokémon fan since I was a kid. My first game was Pokémon LeafGreen, and my favourite Pokémon is Mudkip, specifically Zuzu from the Pokémon Adventures manga (if you know, you know). Recently I got hooked on PokeRogue, and every run had me jumping between tabs: which gym leader is next, what that villain boss brings at wave 165, whether my last ball will actually catch. So I built the guide I wanted to have open while playing, with every number taken straight from the game's own code. I hope it helps your runs too.
 
 ## 1. The website
 
