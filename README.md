@@ -13,6 +13,8 @@ Two guides for [PokeRogue](https://pokerogue.net), from the same game data:
 
 I've been a Pokémon fan since I was a kid. My first game was Pokémon LeafGreen, and my favourite Pokémon is Mudkip, specifically Zuzu from the Pokémon Adventures manga (if you know, you know). Recently I got hooked on PokeRogue, and every run had me jumping between tabs: which gym leader is next, what that villain boss brings at wave 165, whether my last ball will actually catch. So I built the guide I wanted to have open while playing, with every number taken straight from the game's own code. I hope it helps your runs too.
 
+And it works: with both guides open, I won my first Classic run, all 200 waves to Eternatus. 🏆
+
 ## 1. The website
 
 **200 waves to Eternatus, mapped out.** A good-looking, interactive guide to a Classic run, printed like the paperwork of the trip.
