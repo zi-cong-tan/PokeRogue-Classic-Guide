@@ -440,6 +440,8 @@ function mount() {
     place();
   }
 
+  // mouse clicks don't take focus, so Space (the game's action key) can't re-press an overlay button
+  root.addEventListener('mousedown', e => { if (e.target.closest('button, summary')) e.preventDefault(); });
   const folds = root.querySelectorAll('.fold');
   folds[0].addEventListener('click', () => { ui.left = !left.classList.contains('folded'); save(); place(); });
   folds[1].addEventListener('click', () => { ui.right = !right.classList.contains('folded'); save(); place(); });
@@ -454,7 +456,11 @@ function mount() {
     root.querySelectorAll('[data-tab]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
     body.innerHTML = guideTab(ui.tab, state.info);
   }));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !drawer.hidden) drawer.hidden = true; });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !drawer.hidden) drawer.hidden = true;
+    // Space is the game's action key: drop focus so it never presses an overlay button (Enter still does)
+    if (e.key === ' ') root.activeElement?.blur();
+  }, true);
   addEventListener('resize', () => { place(); badges(); abilityCard(); });
 
   let last = '';
