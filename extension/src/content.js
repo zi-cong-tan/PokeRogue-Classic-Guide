@@ -14,7 +14,7 @@ import { rateItem } from './rate.js';
 import { STARTERS } from '../../src/data/starters.js';
 import { BUILDS, ABILITIES } from '../../src/data/builds.js';
 
-const GUIDE = 'https://zi-cong-tan.github.io/PokeRogue-Guide-Aesthetic/';
+const GUIDE = 'https://zi-cong-tan.github.io/PokeRogue-Classic-Guide/';
 const CDN = 'https://cdn.jsdelivr.net/gh/';
 const sprite = id => `${CDN}PokeAPI/sprites@master/sprites/pokemon/${id}.png`;
 const itemArt = id => `${CDN}pagefaultgames/pokerogue-assets@beta/images/items/${id}.png`;

@@ -21,8 +21,8 @@ export default function Footer() {
         </div>
         <div className="back-addr">
           <img className="stamp" src={biomeArt('Space')} alt="The Space biome, as a stamp" width="88" height="117" loading="lazy" />
-          <a href="https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic">This guide on GitHub</a>
-          <a href="https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/issues">Report a change</a>
+          <a href="https://github.com/zi-cong-tan/PokeRogue-Classic-Guide">This guide on GitHub</a>
+          <a href="https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/issues">Report a change</a>
           <a href="https://github.com/pagefaultgames/pokerogue">PokeRogue source code</a>
           <a href="https://github.com/PokeAPI/sprites">PokeAPI sprites</a>
         </div>

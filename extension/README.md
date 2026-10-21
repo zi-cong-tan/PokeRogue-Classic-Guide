@@ -1,7 +1,7 @@
 # PokeRogue Field Guide overlay (Chrome extension)
 
 The second of the two Field Guides: this one runs inside the game while you play. The first is the
-[website](https://zi-cong-tan.github.io/PokeRogue-Guide-Aesthetic/) for planning a run.
+[website](https://zi-cong-tan.github.io/PokeRogue-Classic-Guide/) for planning a run.
 
 A heads-up display for [PokeRogue](https://pokerogue.net), like a game overlay: panels in the empty bands beside the
 game (or folded into corner tabs on small windows) that follow your run, plus small tags drawn right next to the game's
@@ -42,12 +42,12 @@ own menus.
 - **Every mode:** Classic shows its fixed fights; Endless and Spliced Endless show their own boss waves (Eternatus every
   250 waves, Eternamax every 1000); Daily hides the Classic-only fights.
 - **Guide button:** items by tier with icons, every Mystery Encounter's advice, Mega and Gigantamax forms of your party,
-  and a link to the [full guide](https://zi-cong-tan.github.io/PokeRogue-Guide-Aesthetic/).
+  and a link to the [full guide](https://zi-cong-tan.github.io/PokeRogue-Classic-Guide/).
 
 ## Install (Chrome, Edge, Brave, Arc)
 
 1. Download **`pokerogue-field-guide-extension.zip`** from the
-   [latest release](https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/releases/latest) and unzip it.
+   [latest release](https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/releases/latest) and unzip it.
 2. Open `chrome://extensions` (or `edge://extensions`) and turn on **Developer mode** (top right).
 3. Click **Load unpacked** and pick the unzipped folder.
 4. Open or reload [pokerogue.net](https://pokerogue.net). Click the **Field Guide** and **Enemy** tabs to open or fold
@@ -59,7 +59,7 @@ To update, download the new zip, replace the folder, and click the ↻ button on
 
 It could be there, so installing would be one click. Publishing on the Chrome Web Store needs a Google developer
 account with a registration fee, and I don't have the funds for it right now. If you'd like to sponsor it, please
-[open an issue](https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/issues) and I'll put it up. Until then,
+[open an issue](https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/issues) and I'll put it up. Until then,
 the zip above is the same extension.
 
 ## Read-only, and what it reads

@@ -7,7 +7,7 @@ Two guides for [PokeRogue](https://pokerogue.net), from the same game data:
 | What it is | An interactive guide to plan a Classic run | A Chrome extension that draws the numbers on top of the game |
 | Use it | Before and between runs, in any browser | While you play, on pokerogue.net |
 | Highlights | Every fixed fight, villain teams, starter planner, build sheet, team check | Damage beside your moves, catch odds beside each ball, ability descriptions at starter select, item rankings, run panels |
-| Get it | **[Open the website](https://zi-cong-tan.github.io/PokeRogue-Guide-Aesthetic/)** | **[Download the extension zip](https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/releases/latest)** |
+| Get it | **[Open the website](https://zi-cong-tan.github.io/PokeRogue-Classic-Guide/)** | **[Download the extension zip](https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/releases/latest)** |
 
 ## Why I made this
 
@@ -58,13 +58,13 @@ A second, separate guide that lives inside the game: a read-only overlay for pok
 
 **Also:** every ability (hidden and passive included) with descriptions while you pick starters, following the one you cycle to; and panels beside the game for your run, your team, the enemy's weaknesses and Mystery Encounter advice.
 
-**[Download the extension zip](https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/releases/latest)**, unzip it, then in `chrome://extensions` turn on Developer mode and **Load unpacked** the folder. Full feature list and details in [`extension/README.md`](extension/README.md).
+**[Download the extension zip](https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/releases/latest)**, unzip it, then in `chrome://extensions` turn on Developer mode and **Load unpacked** the folder. Full feature list and details in [`extension/README.md`](extension/README.md).
 
-It isn't on the Chrome Web Store yet: publishing there has a registration fee I can't fund right now. If you'd like to sponsor it, [open an issue](https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/issues) and it can be a one-click install.
+It isn't on the Chrome Web Store yet: publishing there has a registration fee I can't fund right now. If you'd like to sponsor it, [open an issue](https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/issues) and it can be a one-click install.
 
 ## Where the numbers come from
 
-Everything is read from the [PokeRogue source code](https://github.com/pagefaultgames/pokerogue) (October 2026), not copied from wikis. The game updates often. `scripts/build-data.py` rebuilds the starter data (abilities, passives, moves, egg moves, evolutions, learnsets, TMs, base stats) from the latest source and flags anything that stopped matching. The suggested natures and movesets are rules of thumb built on that data (stats, move power, type coverage), not tier lists. If something looks out of date, please [open an issue](https://github.com/zi-cong-tan/PokeRogue-Guide-Aesthetic/issues).
+Everything is read from the [PokeRogue source code](https://github.com/pagefaultgames/pokerogue) (October 2026), not copied from wikis. The game updates often. `scripts/build-data.py` rebuilds the starter data (abilities, passives, moves, egg moves, evolutions, learnsets, TMs, base stats) from the latest source and flags anything that stopped matching. The suggested natures and movesets are rules of thumb built on that data (stats, move power, type coverage), not tier lists. If something looks out of date, please [open an issue](https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/issues).
 
 ## Run it yourself
 
