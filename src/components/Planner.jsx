@@ -186,7 +186,7 @@ export default function Planner() {
     while ((pick = options(p, pts)[0])) { p = [...p, pick.i]; pts -= pick.cost; }
     setParty(p);
   };
-  const catches = useMemo(() => (bosses && party.length ? catchList(bosses, data.BIOME_BOSSES, data) : []), [bosses && JSON.stringify(bosses.map(b => b.answer?.score)), data, party.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  const catches = useMemo(() => (bosses && party.length ? catchList(bosses, data.BIOME_BOSSES, data, 6, new Set([...party, ...(game ? game.own.flatMap((o, i) => (o?.caught ? [i] : [])) : [])])) : []), [bosses && JSON.stringify(bosses.map(b => b.answer?.score)), data, party.length, game?.at]); // eslint-disable-line react-hooks/exhaustive-deps
   const worst = report.rows.filter(r => r.weak > r.resist).sort((a, b) => b.weak - b.resist - (a.weak - a.resist)).slice(0, 5);
 
   return (
@@ -271,7 +271,7 @@ export default function Planner() {
         </>}
         {catches.length > 0 && <>
           <h3>Catch on the way</h3>
-          <p>Wild Pokémon that add the most against Rayquaza and Eternatus, easiest to find first. Wild catches get ability 1 or 2, no passive and no egg moves.</p>
+          <p>Wild Pokémon you don't have yet that add the most against Rayquaza and Eternatus, easiest to find first. Catching one also unlocks it as a starter. Wild catches get ability 1 or 2, no passive and no egg moves.</p>
           <ol className="tally ideas">
             {catches.map(c => (
               <li key={c.sp}>

@@ -164,7 +164,8 @@ export const bossGain = (now, r) => Math.max(0, r.score - (now?.score || 0)) + r
 // Wild Pokémon worth catching for the two fights, from every biome's wild pool (biome-bosses.js `wild`).
 // Wild catches roll ability 1 or 2 (the hidden one is rare), with no passive and no egg moves. Common beats rare at the same value.
 const TIER = { COMMON: [1, 'common'], UNCOMMON: [0.9, 'uncommon'], RARE: [0.75, 'rare'], SUPER_RARE: [0.55, 'super rare'], ULTRA_RARE: [0.4, 'ultra rare'] };
-export function catchList(team, biomes, D, limit = 6) {
+// skip: starter-line indexes to leave out (your party, and the starters you own: you can just pick those).
+export function catchList(team, biomes, D, limit = 6, skip = new Set()) {
   const lineOf = {};
   D.LINES.forEach((l, i) => l.forEach(f => { lineOf[f] = i; }));
   const seen = {};
@@ -177,7 +178,7 @@ export function catchList(team, biomes, D, limit = 6) {
   const out = [];
   for (const [sp, where] of Object.entries(seen)) {
     const i = lineOf[sp];
-    if (i === undefined) continue;
+    if (i === undefined || skip.has(i)) continue;
     const vs = BOSSES.map(boss => lineVsBoss(boss, i, { slots: [0, 1], passive: false, eggs: [], from: sp, ivs: [15, 15, 15, 15, 15, 15], natures: [] }, D));  // wild: average IVs, random nature
     const gain = vs.reduce((s, r, k) => s + bossGain(team[k].answer, r), 0);
     const rate = Math.max(...where.map(w => TIER[w.tier][0]));
