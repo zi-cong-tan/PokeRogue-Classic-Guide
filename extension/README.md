@@ -49,6 +49,8 @@ own menus.
   unlocked abilities, passives, egg moves, natures, best IVs, shiny tiers, candy cost cuts, and today's Pokérus starters once you open starter select) and hands them to the
   [Field Guide](https://zi-cong-tan.github.io/PokeRogue-Classic-Guide/) planner when you open it, so suggestions only use
   what you have. Kept in the extension's own storage in your browser; nothing is uploaded.
+  If it doesn't sync: after updating the extension, refresh the PokeRogue tab and keep it in front for a few seconds
+  (the game pauses in background tabs), then refresh the guide. The guide must be open in the same browser.
 - **Guide button:** items by tier with icons, every Mystery Encounter's advice, Mega and Gigantamax forms of your party,
   and a link to the [full guide](https://zi-cong-tan.github.io/PokeRogue-Classic-Guide/).
 
