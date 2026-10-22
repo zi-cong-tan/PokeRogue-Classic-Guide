@@ -422,6 +422,9 @@ const ABILITY_RANK = {
   HADRON_ENGINE: [3, 'Sets Electric Terrain and boosts its Sp. Atk on it.'],
   CONTRARY: [2, 'Stat drops become boosts (great with Leaf Storm or Overheat).'],
   PICKUP: [1, 'Can pick up an item after battle.'],
+  FLASH_FIRE: [2, 'Immune to Fire, and its own Fire moves get stronger after it absorbs one.'],
+  HEATPROOF: [1, 'Takes half from Fire.'],
+  WATER_BUBBLE: [3, 'Takes half from Fire, its Water moves do double, and it can\'t be burned.'],
   TRUANT: [-4, 'Only acts every other turn.'],
   SLOW_START: [-3, 'Half Attack and Speed for its first five turns in.'],
   DEFEATIST: [-2, 'Attack and Sp. Atk halve below half HP.'],
@@ -440,6 +443,7 @@ export function suggestAbility(abilities, unlocked) {
   return best;
 }
 export const abilityRank = a => (ABILITY_RANK[a] || [0])[0];
+export const abilityWhy = a => (ABILITY_RANK[a] || [])[1] || '';
 
 // The best nature you've caught when the suggested one isn't among them. owned: 25 booleans in NATURES order.
 // Raising the stat the suggestion raises scores most, then its main attack stat (or Speed if it's fast); lowering a

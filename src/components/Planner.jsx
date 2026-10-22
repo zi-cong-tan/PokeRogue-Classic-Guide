@@ -3,7 +3,7 @@ import { useReveal, countTo } from '../motion';
 import { STARTERS, LIMIT, MAX_PARTY, MAX_CUTS, cutCost, fmtPts } from '../data/starters';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import { sprite } from '../art';
-import { teamReport, teammates } from '../advice';
+import { teamReport, teammates, abilityRank, abilityWhy } from '../advice';
 import { members } from '../run';
 import { useSave } from '../save';
 import { BOSSES, lineVsBoss, teamVsBosses, bossGain, catchList } from '../boss-plan';
@@ -37,7 +37,10 @@ const Tys = ({ list }) => list.map(t => <Ty key={t} t={t} />);
 // Why a Pokémon is suggested, as short labelled rows with type chips: what it adds to the team, its best hit on
 // each boss and what of the boss's it resists, and the abilities that help.
 function Why({ team, vs, data }) {
-  const helps = [...new Set(vs.flatMap(r => r.helps.map(a => (data.ABILITIES[a]?.[0] || a) + (a === r.ability ? (r.slot === 2 ? ' (hidden)' : '') : ' (passive)'))))];
+  // The ability to pick (the better-ranked of the two boss fights' picks) and its passive, each with the reason.
+  const pick = vs.reduce((a, r) => (abilityRank(r.ability) > abilityRank(a.ability) ? r : a), vs[0]);
+  const abName = a => data.ABILITIES[a]?.[0] || a;
+  const reason = a => abilityWhy(a) || (data.ABILITIES[a]?.[1] || '').split(/(?<=\.)\s/)[0];
   return (
     <dl className="why">
       {team && (team.covers.length > 0 || team.hitsGaps.length > 0) && (
@@ -59,7 +62,19 @@ function Why({ team, vs, data }) {
           </dd>
         </div>
       ))}
-      {helps.length > 0 && <div className="why-row"><dt>Ability</dt><dd><span>{helps.join(', ')}</span></dd></div>}
+      {pick.ability && (
+        <div className="why-row">
+          <dt>Ability</dt>
+          <dd>
+            <span><b className="ab">{abName(pick.ability)}{pick.slot === 2 ? ' (hidden)' : ''}</b></span>
+            {reason(pick.ability) && <span className="sub">{reason(pick.ability)}</span>}
+            {pick.passive && pick.passive !== pick.ability && <>
+              <span>Passive: <b className="ab">{abName(pick.passive)}</b></span>
+              {reason(pick.passive) && <span className="sub">{reason(pick.passive)}</span>}
+            </>}
+          </dd>
+        </div>
+      )}
       {(vs[0].ivNote || vs[0].natNote) && <div className="why-row"><dt>Your copy</dt><dd>{vs[0].ivNote && <span>{vs[0].ivNote}</span>}{vs[0].natNote && <span>{vs[0].natNote}</span>}</dd></div>}
     </dl>
   );

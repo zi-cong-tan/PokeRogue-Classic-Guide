@@ -4,7 +4,7 @@
 // movesets, and Strong Winds halving moves that are super effective on Flying), init-abilities.ts (Delta Stream).
 // ponytail: a scoring model, not a battle simulator. Items, Tera, natures and stat boosts are left out.
 import { mult } from './data/types.js';
-import { learnable, AWKWARD, NOT_SELF_HEAL, NATURES, suggestNature, bestOwnedNature } from './advice.js';
+import { learnable, AWKWARD, NOT_SELF_HEAL, NATURES, suggestNature, bestOwnedNature, abilityRank } from './advice.js';
 
 export const BOSSES = [
   {
@@ -122,7 +122,8 @@ export function lineVsBoss(boss, i, { slots = [0, 1, 2], passive = true, eggs = 
       const want = suggestNature(FORMS[f][3]).nature;
       const nat = nature || (natures ? bestOwned(want, FORMS[f][3], natures) : want);
       const r = fight(boss, f, list, moves, D, ivs, nat);
-      if (!top || r.score > top.score) top = { ...r, form: f, name: FORMS[f][0], ability: a, slot: abs[s] ? s : 0, passive: passive ? pass : null, ...(notes ? statNotes(r, ivs, nat, natures ? want : null) : {}) };
+      // equal for the fight (the ability doesn't matter there): prefer the generally stronger ability
+      if (!top || r.score > top.score + 1e-9 || (Math.abs(r.score - top.score) < 1e-9 && abilityRank(a) > abilityRank(top.ability))) top = { ...r, form: f, name: FORMS[f][0], ability: a, slot: abs[s] ? s : 0, passive: passive ? pass : null, ...(notes ? statNotes(r, ivs, nat, natures ? want : null) : {}) };
     }
   }
   return top;
