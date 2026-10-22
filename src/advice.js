@@ -440,3 +440,20 @@ export function suggestAbility(abilities, unlocked) {
   return best;
 }
 export const abilityRank = a => (ABILITY_RANK[a] || [0])[0];
+
+// The best nature you've caught when the suggested one isn't among them. owned: 25 booleans in NATURES order.
+// Raising the stat the suggestion raises scores most, then its main attack stat (or Speed if it's fast); lowering a
+// stat it relies on costs a lot; a neutral nature beats one that hurts it. null if you have none.
+export function bestOwnedNature(suggested, stats, owned) {
+  const [up, down] = NATURES.find(n => n[0] === suggested)?.slice(1) || [];
+  const [, atk, , spa, , spe] = stats;
+  const main = atk >= spa ? 'Atk' : 'SpA', other = main === 'Atk' ? 'SpA' : 'Atk';
+  const needs = new Set([main, ...(Math.abs(atk - spa) < atk * 0.1 ? [other] : []), ...(spe >= 90 ? ['Spe'] : [])]);
+  let best = null, top = -Infinity;
+  NATURES.forEach(([name, u, d], k) => {
+    if (!owned[k]) return;
+    const score = !u ? 0.5 : (u === up ? 3 : needs.has(u) ? 2 : 0) + (d === down ? 1 : needs.has(d) ? -3 : 0);
+    if (score > top) { top = score; best = name; }
+  });
+  return best;
+}

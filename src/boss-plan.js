@@ -4,7 +4,7 @@
 // movesets, and Strong Winds halving moves that are super effective on Flying), init-abilities.ts (Delta Stream).
 // ponytail: a scoring model, not a battle simulator. Items, Tera, natures and stat boosts are left out.
 import { mult } from './data/types.js';
-import { learnable, AWKWARD, NOT_SELF_HEAL, NATURES, suggestNature } from './advice.js';
+import { learnable, AWKWARD, NOT_SELF_HEAL, NATURES, suggestNature, bestOwnedNature } from './advice.js';
 
 export const BOSSES = [
   {
@@ -128,13 +128,9 @@ export function lineVsBoss(boss, i, { slots = [0, 1, 2], passive = true, eggs = 
   return top;
 }
 
-// The suggested nature if you've caught it; otherwise one you have that raises its stronger attack stat without
-// lowering the other attack stat it might use (e.g. Adamant when Jolly is suggested but missing). null if none.
+// The suggested nature if you've caught it, otherwise the best one you have (bestOwnedNature). null if none.
 function bestOwned(want, base, natures) {
-  const has = name => natures[NATURES.findIndex(n => n[0] === name)];
-  if (has(want)) return want;
-  const main = base[1] >= base[3] ? 'Atk' : 'SpA';
-  return NATURES.find((n, k) => natures[k] && n[1] === main && n[2] !== (main === 'Atk' ? 'Atk' : 'SpA'))?.[0] || null;
+  return natures[NATURES.findIndex(n => n[0] === want)] ? want : bestOwnedNature(want, base, natures);
 }
 
 const NAT_UP = Object.fromEntries(NATURES.filter(n => n[1]).map(n => [n[0], { Atk: 'Attack', Def: 'Defense', SpA: 'Sp. Atk', SpD: 'Sp. Def', Spe: 'Speed' }[n[1]]]));
@@ -144,7 +140,7 @@ function statNotes(r, ivs, nat, wanted) {
   const k = r.best.cat === 'S' ? 3 : 1, stat = k === 3 ? 'Sp. Atk' : 'Attack';
   const ivNote = ivs && ivs[k] <= 10 ? `${stat} IV is only ${ivs[k]}, so it hits a little weaker. A better one from an egg would help.` : null;
   const n = NAT_UP[nat], w = NAT_UP[wanted];
-  const natNote = nat ? `Uses your ${nat} nature (+10% ${n}).`
+  const natNote = nat ? (n ? `Uses your ${nat} nature (+10% ${n}).` : `Uses your ${nat} nature (no stat change).`)
     : wanted ? `A ${wanted} one (+10% ${w}) would help; you haven't caught that nature yet.` : null;
   return { ivNote, natNote };
 }

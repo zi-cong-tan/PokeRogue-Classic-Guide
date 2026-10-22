@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react';
 import { STARTERS } from '../data/starters';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
-import { NATURES, STATS, suggestNature, suggestMoves, suggestAbility, abilityRank, evolveAdvice, learnable } from '../advice';
+import { NATURES, STATS, suggestNature, bestOwnedNature, suggestMoves, suggestAbility, abilityRank, evolveAdvice, learnable } from '../advice';
 import { useShinySprite } from '../shiny';
 import { GAME_IDS } from '../data/game-ids';
 
@@ -15,6 +15,10 @@ const finalForm = (form, F) => (F[form][6].length ? finalForm(F[form][6][0][0], 
 
 // Shiny tiers: each adds that much luck (1, 2, 3) while in the party.
 const SHINY_TIERS = ['No', 'Standard (+1 luck)', 'Rare (+2 luck)', 'Epic (+3 luck)'];
+
+// "Raises Attack, lowers Sp. Atk." for a nature name, or "No stat change." for a neutral one.
+const STAT_WORD = { Atk: 'Attack', Def: 'Defense', SpA: 'Sp. Atk', SpD: 'Sp. Def', Spe: 'Speed' };
+const natText = name => { const [, u, d] = NATURES.find(n => n[0] === name); return u ? `Raises ${STAT_WORD[u]}, lowers ${STAT_WORD[d]}.` : 'No stat change.'; };
 
 // A starter's sprite at its shiny tier (rare and epic shinies have their own colours in PokeRogue).
 function Sprite({ i, tier, alt }) {
@@ -79,6 +83,7 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
   const unlockedEggs = eggMoves.filter((_, k) => b.egg[k]);
   const ahead = finalForm(form, FORMS);
   const nature = suggestNature(FORMS[ahead][3]);
+  const fallback = own ? bestOwnedNature(nature.nature, FORMS[ahead][3], own.natures) : null;
   const learn = learnable(line, form, unlockedEggs, data);
   const suggested = suggestMoves(line, form, unlockedEggs, data);
   const evolving = evolveAdvice(form, data);
@@ -170,9 +175,14 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
           <div className="suggest">
             <p><strong>Suggested: {nature.nature}</strong>{ahead !== line[0] && <small> for {FORMS[ahead][0]}</small>}</p>
             <p className="hint">{nature.why}</p>
-            {b.nature !== nature.nature && (own && !own.natures[NATURES.findIndex(n => n[0] === nature.nature)]
-              ? <p className="hint">You haven't caught a {nature.nature} {name} yet.</p>
-              : <button type="button" className="mini-btn" onClick={() => set({ nature: nature.nature })}>Use {nature.nature}</button>)}
+            {own && !own.natures[NATURES.findIndex(n => n[0] === nature.nature)] ? <>
+              <p className="hint">You haven't caught a {nature.nature} {name} yet. It's still the one to aim for.</p>
+              {fallback && <>
+                <p><strong>Best you have: {fallback}</strong></p>
+                <p className="hint">{natText(fallback)}</p>
+                {b.nature !== fallback && <button type="button" className="mini-btn" onClick={() => set({ nature: fallback })}>Use {fallback}</button>}
+              </>}
+            </> : b.nature !== nature.nature && <button type="button" className="mini-btn" onClick={() => set({ nature: nature.nature })}>Use {nature.nature}</button>}
           </div>
         </fieldset>
 
