@@ -4,7 +4,7 @@
 // movesets, and Strong Winds halving moves that are super effective on Flying), init-abilities.ts (Delta Stream).
 // ponytail: a scoring model, not a battle simulator. Items, Tera, natures and stat boosts are left out.
 import { mult } from './data/types.js';
-import { learnable, AWKWARD, NOT_SELF_HEAL } from './advice.js';
+import { learnable, AWKWARD, NOT_SELF_HEAL, NATURES, suggestNature } from './advice.js';
 
 export const BOSSES = [
   {
@@ -38,8 +38,18 @@ const AB = {
 
 // Everything one Pokémon brings to a boss fight: its best attack and how hard the boss hits back.
 // form: FORMS key. abilities: ability keys it has (its ability plus its passive). moves: Map of move index -> source.
-function fight(boss, form, abilities, moves, L) {
-  const [, , typeStr, st] = L.FORMS[form];
+// Your Pokémon's own stats: each IV moves its stat by about (2 × base + IV) / (2 × base + 31) of a perfect one, and the
+// nature raises one stat by 10% and lowers another by 10%. ivs: [6] or null (= perfect 31s); nature: its name or null.
+const STAT_AT = { HP: 0, Atk: 1, Def: 2, SpA: 3, SpD: 4, Spe: 5 };
+export function ownStats(base, ivs, nature) {
+  const n = nature && NATURES.find(x => x[0] === nature);
+  return base.map((b, k) => b * (ivs ? (2 * b + ivs[k]) / (2 * b + 31) : 1)
+    * (n?.[1] && STAT_AT[n[1]] === k ? 1.1 : n?.[2] && STAT_AT[n[2]] === k ? 0.9 : 1));
+}
+
+function fight(boss, form, abilities, moves, L, ivs = null, nature = null) {
+  const [, , typeStr, base] = L.FORMS[form];
+  const st = ownStats(base, ivs, nature);
   const types = typeStr.split(' ');
   const mods = abilities.map(a => AB[a]).filter(Boolean);
   const has = k => mods.find(m => m[k]);
@@ -90,7 +100,9 @@ function fight(boss, form, abilities, moves, L) {
 
 // A starter line's best showing against a boss: each final form, each ability it could have (+ passive).
 // slots: which ability slots to try (a party member's chosen one, or all three). Returns the best, with the form and ability.
-export function lineVsBoss(boss, i, { slots = [0, 1, 2], passive = true, eggs = null, from } = {}, D) {
+// ivs: your best IVs for the species (null = perfect). nature: the nature you'd use, or natures: the ones you've caught
+// (25 booleans, NATURES order), in which case it picks the suggested nature if you have it, else none.
+export function lineVsBoss(boss, i, { slots = [0, 1, 2], passive = true, eggs = null, from, ivs = null, nature = null, natures = null, notes = false } = {}, D) {
   const { FORMS, LINES, BUILDS, EVOS } = D;
   const line = LINES[i];
   const reach = new Set();
@@ -107,11 +119,34 @@ export function lineVsBoss(boss, i, { slots = [0, 1, 2], passive = true, eggs = 
     for (const s of slots) {
       const a = abs[s] || abs[0];
       const list = passive && pass ? [a, pass] : [a];
-      const r = fight(boss, f, list, moves, D);
-      if (!top || r.score > top.score) top = { ...r, form: f, name: FORMS[f][0], ability: a, slot: abs[s] ? s : 0, passive: passive ? pass : null };
+      const want = suggestNature(FORMS[f][3]).nature;
+      const nat = nature || (natures ? bestOwned(want, FORMS[f][3], natures) : want);
+      const r = fight(boss, f, list, moves, D, ivs, nat);
+      if (!top || r.score > top.score) top = { ...r, form: f, name: FORMS[f][0], ability: a, slot: abs[s] ? s : 0, passive: passive ? pass : null, ...(notes ? statNotes(r, ivs, nat, natures ? want : null) : {}) };
     }
   }
   return top;
+}
+
+// The suggested nature if you've caught it; otherwise one you have that raises its stronger attack stat without
+// lowering the other attack stat it might use (e.g. Adamant when Jolly is suggested but missing). null if none.
+function bestOwned(want, base, natures) {
+  const has = name => natures[NATURES.findIndex(n => n[0] === name)];
+  if (has(want)) return want;
+  const main = base[1] >= base[3] ? 'Atk' : 'SpA';
+  return NATURES.find((n, k) => natures[k] && n[1] === main && n[2] !== (main === 'Atk' ? 'Atk' : 'SpA'))?.[0] || null;
+}
+
+const NAT_UP = Object.fromEntries(NATURES.filter(n => n[1]).map(n => [n[0], { Atk: 'Attack', Def: 'Defense', SpA: 'Sp. Atk', SpD: 'Sp. Def', Spe: 'Speed' }[n[1]]]));
+
+// What to say about its own stats: an IV of 10 or less in the stat its best attack uses, and the nature.
+function statNotes(r, ivs, nat, wanted) {
+  const k = r.best.cat === 'S' ? 3 : 1, stat = k === 3 ? 'Sp. Atk' : 'Attack';
+  const ivNote = ivs && ivs[k] <= 10 ? `${stat} IV is only ${ivs[k]}, so it hits a little weaker. A better one from an egg would help.` : null;
+  const n = NAT_UP[nat], w = NAT_UP[wanted];
+  const natNote = nat ? `Uses your ${nat} nature (+10% ${n}).`
+    : wanted ? `A ${wanted} one (+10% ${w}) would help; you haven't caught that nature yet.` : null;
+  return { ivNote, natNote };
 }
 
 // How the current team does against each boss: its best answer and who takes double from the boss's attacks.
@@ -119,7 +154,7 @@ export function teamVsBosses(party, builds, D) {
   return BOSSES.map(boss => {
     const rows = party.map(i => {
       const b = builds[i] || {};
-      return { i, ...lineVsBoss(boss, i, { slots: [b.ability || 0], passive: !!b.passive, eggs: b.egg || [], from: b.form }, D) };
+      return { i, ...lineVsBoss(boss, i, { slots: [b.ability || 0], passive: !!b.passive, eggs: b.egg || [], from: b.form, ivs: b.ivs || null, nature: b.nature && b.nature !== 'Hardy' ? b.nature : null, notes: true }, D) };
     });
     const answer = rows.reduce((a, r) => (!a || r.score > a.score ? r : a), null);
     return { boss, rows, answer, hit: rows.reduce((a, r) => (!a || r.best.val > a.best.val ? r : a), null) };
@@ -146,7 +181,7 @@ export function catchList(team, biomes, D, limit = 6) {
   for (const [sp, where] of Object.entries(seen)) {
     const i = lineOf[sp];
     if (i === undefined) continue;
-    const vs = BOSSES.map(boss => lineVsBoss(boss, i, { slots: [0, 1], passive: false, eggs: [], from: sp }, D));
+    const vs = BOSSES.map(boss => lineVsBoss(boss, i, { slots: [0, 1], passive: false, eggs: [], from: sp, ivs: [15, 15, 15, 15, 15, 15], natures: [] }, D));  // wild: average IVs, random nature
     const gain = vs.reduce((s, r, k) => s + bossGain(team[k].answer, r), 0);
     const rate = Math.max(...where.map(w => TIER[w.tier][0]));
     out.push({ sp, name: D.FORMS[sp][0], vs, gain: gain * rate, where: where.sort((a, b) => TIER[b.tier][0] - TIER[a.tier][0]) });

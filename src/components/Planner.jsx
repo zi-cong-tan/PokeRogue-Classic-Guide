@@ -60,6 +60,7 @@ function Why({ team, vs, data }) {
         </div>
       ))}
       {helps.length > 0 && <div className="why-row"><dt>Ability</dt><dd><span>{helps.join(', ')}</span></dd></div>}
+      {(vs[0].ivNote || vs[0].natNote) && <div className="why-row"><dt>Your copy</dt><dd>{vs[0].ivNote && <span>{vs[0].ivNote}</span>}{vs[0].natNote && <span>{vs[0].natNote}</span>}</dd></div>}
     </dl>
   );
 }
@@ -151,7 +152,7 @@ export default function Planner() {
     const o = game?.own[i];
     if (!o) return {};
     const slots = [0, 1, 2].filter(k => o.ab[k]);
-    return { slots: slots.length ? slots : [0], passive: o.passive, eggs: o.eggs };
+    return { slots: slots.length ? slots : [0], passive: o.passive, eggs: o.eggs, ivs: o.ivs, natures: o.natures, notes: true };
   };
   const solo = useMemo(() => data && STARTERS.map((_, i) => BOSSES.map(boss => lineVsBoss(boss, i, unlocks(i), data))), [data, game?.at]); // eslint-disable-line react-hooks/exhaustive-deps
   const bosses = data ? teamVsBosses(party, builds, data) : null;
