@@ -286,3 +286,21 @@ export function fusionPicks(members) {
   }
   return picks.sort((x, y) => y.score - x.score);
 }
+
+// Building around a starter: rank the starters you can still afford by how well they patch the team's holes.
+// Covering a shared weakness counts most, then hitting a type nobody can hit for double, then not doubling up on types.
+// Stronger (costlier) starters break ties, so the points get spent. candidates: [{ i, name, types, cost }].
+// ponytail: uses each starter's first-stage types; evolutions that change type (Charmander -> Charizard) are judged as the first stage.
+export function teammates(team, candidates) {
+  const { rows, gaps } = teamReport(team);
+  const holes = rows.filter(r => r.weak > r.resist);
+  const have = new Set(team.flatMap(p => p.types));
+  return candidates.map(c => {
+    const covers = holes.filter(r => mult(r.type, c.types) < 1).map(r => r.type);
+    const adds = holes.filter(r => mult(r.type, c.types) > 1).map(r => r.type);
+    const hitsGaps = gaps.filter(g => c.types.some(t => CHART[t][0].includes(g)));
+    const score = holes.reduce((s, r) => s + (covers.includes(r.type) ? 2 : adds.includes(r.type) ? -2 : 0) * (r.weak - r.resist), 0)
+      + hitsGaps.length - c.types.filter(t => have.has(t)).length * 2 + c.cost * 0.5;
+    return { ...c, score, covers, hitsGaps };
+  }).sort((a, b) => b.score - a.score);
+}

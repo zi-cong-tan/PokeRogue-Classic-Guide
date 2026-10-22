@@ -810,3 +810,8 @@ section { padding: var(--section) var(--m); }
 @media (max-width: 1100px) {
   .builds-body > div, .builds-side, .luck-set, .luck-sheet, .shop-body > div:first-child, .shop-side, .track-log, .track-prep { grid-column: 1 / -1; }
 }
+.ideas li { display: block; padding: 4px 0; }
+.ideas button { display: flex; align-items: baseline; gap: 10px; width: 100%; background: none; border: 0; padding: 6px 0 0; font: inherit; color: inherit; cursor: pointer; text-align: left; }
+.ideas button:hover span:first-child { text-decoration: underline; text-underline-offset: 3px; }
+.ideas small { display: block; color: var(--paper-soft); }
+.ideas .idea-head { display: block; padding-top: 6px; }

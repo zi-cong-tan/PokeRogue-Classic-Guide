@@ -31,6 +31,10 @@ own menus.
 
 - **Throw check (off by default):** the game's battle dice are fixed for each turn, so with this on, each ball also says
   whether this turn's throw is caught or breaks free. Never runs in Daily runs, which have a leaderboard.
+  - *Daily runs:* the throw check is switched off there, because Daily runs share a leaderboard and everyone plays the same
+    seed. That is how the extension ships and the only way it is supported. The code is open, so if you want it on in your
+    own copy you can download the source and ask an AI coding assistant to remove the Daily check, then load that build
+    yourself. It's your call; it isn't part of this extension.
 - **Abilities when picking starters:** on the starter-select screen, a strip under the game's Ability box shows the
   ability the starter is set to and what it does, and follows you as you cycle with E. **All** opens the full list: both
   abilities, the hidden ability and the passive, each with its description and whether it's unlocked.

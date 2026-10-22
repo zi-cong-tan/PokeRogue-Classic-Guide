@@ -28,6 +28,7 @@ And it works: with both guides open, I won my first Classic run, all 200 waves t
 - **The ten villain teams.** A case file per team, from Rocket to Star: boss and grunt sprites, admins by wave, both boss teams, and which Pokemon to watch out for (two health bars, Mega, Gigantamax).
 - **Elite Four and Champions.** A run meets one region's whole league; every region's five fights with full teams, Megas, Tera types and bosses.
 - **Spend your 10 points.** All 572 starters, searchable, with a receipt that adds up your party and checks its type coverage. Tap a starter's cost to apply the candy cost cuts you've bought (up to two: −1 each, or ½ and ¼ for a 1-cost), so cheaper starters fit the budget.
+- **Build around a starter.** Pick the one you want to build around and the receipt suggests teammates you can still afford (candy cuts included), judged on type coverage and on beating Mega Rayquaza (wave 195) and Eternatus (wave 200): final evolutions, best ability and passive, level-up and egg moves. One tap fills the rest of the party, and a "Catch on the way" list shows which wild Pokémon in which biomes help most against those two fights.
 - **A build sheet for your party.** Pick ability (hidden included), passive, nature, IVs, shiny, unlocked egg moves and the four moves you start with. It warns you when an ability changes on evolving, and saves in your browser.
 - **Mid-run help.** Set what each Pokemon has evolved into and the moves it knows now, chosen from everything it can learn (level-up, egg moves, TMs with their shop tier). Each one gets a suggested nature, a suggested moveset, and when to evolve, including moves to learn first because the next form can't.
 - **A team check.** Which attack types hit most of your team, which types your moves can't hit hard, and who to swap out for what type.
@@ -48,7 +49,7 @@ A second, separate guide that lives inside the game: a read-only overlay for pok
 
 ![The overlay in a battle: damage beside each move in the Fight menu, and the Enemy panel with weaknesses, damage and catch odds](docs/overlay-fight.png)
 
-**Catch odds beside each ball.** Open Ball and each ball shows its chance to catch, from the game's catch formula, with an optional check of whether this turn's throw is caught.
+**Catch odds beside each ball.** Open Ball and each ball shows its chance to catch, from the game's catch formula, with an optional check of whether this turn's throw is caught (off in Daily runs, which have a leaderboard; see the [extension notes](extension/README.md)).
 
 ![Catch odds beside each ball in the Ball menu, with the throw check on](docs/overlay-ball.png)
 

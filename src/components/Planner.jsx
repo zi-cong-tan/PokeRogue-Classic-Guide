@@ -3,8 +3,9 @@ import { useReveal, countTo } from '../motion';
 import { STARTERS, LIMIT, MAX_PARTY, MAX_CUTS, cutCost, fmtPts } from '../data/starters';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import { sprite } from '../art';
-import { teamReport } from '../advice';
+import { teamReport, teammates } from '../advice';
 import { members } from '../run';
+import { BOSSES, lineVsBoss, teamVsBosses, bossGain, catchList } from '../boss-plan';
 import PartyEditor from './PartyEditor';
 import CloudTeams from './CloudTeams';
 
@@ -27,6 +28,14 @@ function sharedTeam() {
     return Array.isArray(p) ? { party: p.filter(i => STARTERS[i]).slice(0, MAX_PARTY), builds: b || {}, cuts: c || {} } : null;
   } catch { return null; }
 }
+
+// "Glacial Lance (Ice, 2x, egg move)" for one Pokémon's best hit on a boss.
+const hitText = r => `${r.best.name} (${cap(r.best.type)}, ${r.best.eff}×${r.best.egg ? ', egg move' : ''})`;
+// One line per boss for a suggestion: its best hit, what it resists, and the abilities that help.
+const bossText = (vs, data, hideForm) => vs.map((r, k) => `vs ${BOSSES[k].name.split(' ').pop()}: ${r.best.name ? hitText(r) : 'no strong hit'}`
+  + (r.resists.length ? `, resists ${r.resists.map(cap).join('/')}` : '')
+  + (r.helps.length ? `, ${r.helps.map(a => (data.ABILITIES[a]?.[0] || a) + (a === r.ability ? (r.slot === 2 ? ' (hidden ability)' : '') : ' (passive)')).join(' + ')}` : '')).join('. ')
+  + (vs[0].name && !hideForm ? ` (as ${vs[0].name})` : '');
 
 const Chips = ({ list }) => (
   <span className="chips">{list.map(t => <span key={t} className="ty" style={{ '--t': TYPE_COLOR[t], '--ti': typeInk(t) }}>{cap(t)}</span>)}</span>
@@ -52,7 +61,7 @@ export default function Planner() {
   // The move, ability and evolution lists are big, so they only load once a starter is picked.
   const [data, setData] = useState(null);
   useEffect(() => {
-    if (party.length && !data) Promise.all([import('../data/builds'), import('../data/learnsets')]).then(([b, l]) => setData({ ...b, ...l }));
+    if (party.length && !data) Promise.all([import('../data/builds'), import('../data/learnsets'), import('../data/biome-bosses')]).then(([b, l, z]) => setData({ ...b, ...l, ...z }));
   }, [party.length, data]);
   useEffect(() => save('prg-party-2', party), [party]);
   useEffect(() => save('prg-builds-2', builds), [builds]);
@@ -86,6 +95,26 @@ export default function Planner() {
   const toggle = i => setParty(p => p.includes(i) ? p.filter(x => x !== i) : [...p, i]);
   const report = teamReport(members(party, builds, data));
   const { threats, gaps, swap } = report;
+  // Build around: the starters you can still afford, ranked by how they patch the team's weak spots and how much they
+  // add against Mega Rayquaza and Eternatus. Each starter's boss showing doesn't depend on the team, so it's worked out once.
+  const solo = useMemo(() => data && STARTERS.map((_, i) => BOSSES.map(boss => lineVsBoss(boss, i, {}, data))), [data]);
+  const bosses = data ? teamVsBosses(party, builds, data) : null;
+  const options = (p, pts) => {
+    if (p.length >= MAX_PARTY) return [];
+    const now = solo ? teamVsBosses(p, builds, data) : null;
+    const fit = teammates(members(p, builds, data), STARTERS.map(([name, , , t], i) => ({ i, name, types: t.split(' '), cost: cost(i) }))
+      .filter(c => !p.includes(c.i) && c.cost <= pts));
+    if (!solo) return fit;
+    return fit.map(c => ({ ...c, vs: solo[c.i], score: c.score + 2 * solo[c.i].reduce((s, r, k) => s + bossGain(now[k].answer, r), 0) }))
+      .sort((a, b) => b.score - a.score);
+  };
+  const ideas = party.length ? options(party, left).slice(0, 5) : [];
+  const fill = () => {
+    let p = party, pts = left, pick;
+    while ((pick = options(p, pts)[0])) { p = [...p, pick.i]; pts -= pick.cost; }
+    setParty(p);
+  };
+  const catches = useMemo(() => (bosses && party.length ? catchList(bosses, data.BIOME_BOSSES, data) : []), [bosses && JSON.stringify(bosses.map(b => b.answer?.score)), data, party.length]); // eslint-disable-line react-hooks/exhaustive-deps
   const worst = report.rows.filter(r => r.weak > r.resist).sort((a, b) => b.weak - b.resist - (a.weak - a.resist)).slice(0, 5);
 
   return (
@@ -118,7 +147,7 @@ export default function Planner() {
                 <span>{STARTERS[i][0]}{cuts[i] ? <small> candy ×{cuts[i]}</small> : null}</span><b aria-hidden="true" /><span>{cuts[i] ? <s>{STARTERS[i][2]}</s> : null}{fmtPts(cost(i))}</span>
               </button>
             </li>
-          )) : <li className="empty">Nobody yet. Three 3-cost starters and a 1-cost is a common opener.</li>}
+          )) : <li className="empty">Nobody yet. Three 3-cost starters and a 1-cost is a common opener, or pick the one starter you want to build around and get teammates for it.</li>}
         </ol>
         {backup && (
           <p className="notice">Showing a shared team. Your own team was replaced.{' '}
@@ -139,6 +168,48 @@ export default function Planner() {
             <h3>Could swap out</h3>
             <p>{swap.name}: weak to {swap.weakTo.map(cap).join(', ')}, which already hit most of the team. A {swap.types.map(cap).join(' or ')} type would cover more.</p>
           </>}
+        </>}
+        {bosses && party.length > 0 && <>
+          <h3>The last two fights</h3>
+          {bosses.map(({ boss, answer, rows }) => {
+            const hurt = rows.filter(r => r.weak.length).map(r => STARTERS[r.i][0]);
+            return (
+              <p key={boss.key}><strong>{boss.name}</strong>, wave {boss.wave}:{' '}
+                {answer.best.eff >= 2 ? `${answer.name} hits it hardest, with ${hitText(answer)}.` : `nobody hits it for double yet. ${answer.name} is your best bet.`}
+                {hurt.length ? ` Takes double from its attacks: ${hurt.join(', ')}.` : ' Nobody takes double from its attacks.'}
+              </p>
+            );
+          })}
+          <p>Rayquaza's Delta Stream halves moves that are super effective on Flying, so only Ice, Dragon and Fairy hit it for double. Eternatus uses Dragon, Poison and Fire moves and takes double from Ground, Psychic, Ice and Dragon.</p>
+        </>}
+        {ideas.length > 0 && <>
+          <h3>Build around {party.length === 1 ? STARTERS[party[0]][0] : 'this team'}</h3>
+          <p>The starters you can still afford (after your candy cuts) that patch the team's weak spots and do the most against the last two fights. Judged on each one's final evolution, its best ability and its passive.</p>
+          <ol className="tally ideas">
+            {ideas.map(c => (
+              <li key={c.i}>
+                <button type="button" onClick={() => toggle(c.i)} aria-label={`Add ${c.name}, costs ${fmtPts(c.cost)}`}>
+                  <span>{c.name}</span><b aria-hidden="true" /><span>{fmtPts(c.cost)}</span>
+                </button>
+                <small>{[c.covers.length && `resists ${c.covers.map(cap).join(', ')}`, c.hitsGaps.length && `hits ${c.hitsGaps.map(cap).join(', ')} for double`].filter(Boolean).join('; ') || 'a different type from the rest'}</small>
+                {c.vs && <small>{bossText(c.vs, data)}</small>}
+              </li>
+            ))}
+          </ol>
+          <p className="receipt-actions"><button type="button" className="text-btn" onClick={fill}>Fill the rest for me</button></p>
+        </>}
+        {catches.length > 0 && <>
+          <h3>Catch on the way</h3>
+          <p>Wild Pokémon that add the most against Rayquaza and Eternatus, easiest to find first. Wild catches get ability 1 or 2, no passive and no egg moves.</p>
+          <ol className="tally ideas">
+            {catches.map(c => (
+              <li key={c.sp}>
+                <span className="idea-head">{c.name}{c.vs[0].name !== c.name ? ` → ${c.vs[0].name}` : ''}</span>
+                <small>{c.where.slice(0, 3).map(w => `${w.biome} (${c.tierName(w)})`).join(', ')}</small>
+                <small>{bossText(c.vs, data, true)}</small>
+              </li>
+            ))}
+          </ol>
         </>}
         <p className="inverted"><span>Spent</span><span>{fmtPts(spent)} of {LIMIT}</span></p>
         {party.length > 0 && (
