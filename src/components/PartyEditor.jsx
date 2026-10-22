@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { STARTERS } from '../data/starters';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import { NATURES, STATS, suggestNature, suggestMoves, evolveAdvice, learnable } from '../advice';
@@ -13,12 +13,29 @@ const moveText = ([n, t, cat, power, acc]) =>
 // The last form of a line reachable from `form` (first branch), for advice that should look ahead.
 const finalForm = (form, F) => (F[form][6].length ? finalForm(F[form][6][0][0], F) : form);
 
+// Shiny tiers: each adds that much luck (1, 2, 3) while in the party.
+const SHINY_TIERS = ['No', 'Standard (+1 luck)', 'Rare (+2 luck)', 'Epic (+3 luck)'];
+
+// Under each egg move: type, category, power and accuracy, and what it does.
+function EggInfo({ m, data }) {
+  const row = data.MOVE_LIST[data.MOVE_KEYS.indexOf(m)];
+  if (!row) return null;
+  const [, type, cat, power, acc] = row;
+  return (
+    <p className="egg-info">
+      <span className="ty" style={{ '--t': TYPE_COLOR[type], '--ti': typeInk(type) }}>{cap(type)}</span>
+      {' '}{cat === 'X' ? 'Status' : `${cat === 'P' ? 'Physical' : 'Special'}, ${power || 'varies'} power`}, {acc > 0 ? `${acc}% accuracy` : 'never misses'}.
+      {' '}{data.MOVES[m]?.[1]}
+    </p>
+  );
+}
+
 const newBuild = opts => ({
   shiny: false, ability: 0, passive: false, nature: 'Hardy', ivs: [31, 31, 31, 31, 31, 31],
   egg: [false, false, false, false], moves: opts ? opts[2].slice(0, 4) : [],
 });
 
-export default function PartyEditor({ party, builds, setBuild, data, remove }) {
+export default function PartyEditor({ party, builds, setBuild, data, remove, save }) {
   const [cur, setCur] = useState(0);
 
   const at = Math.min(cur, party.length - 1);
@@ -38,6 +55,8 @@ export default function PartyEditor({ party, builds, setBuild, data, remove }) {
   const opts = BUILDS[i];
   const b = { ...newBuild(opts), ...builds[i] };
   const set = patch => setBuild(i, { ...b, ...patch });
+  // With a synced save, what this starter has unlocked; anything else is greyed out and can't be picked.
+  const own = save?.own[i] || null;
 
   const [abilities, passive, startMoves, eggMoves] = opts;
   const pool = [...startMoves, ...eggMoves.filter((_, k) => b.egg[k])];
@@ -92,10 +111,14 @@ export default function PartyEditor({ party, builds, setBuild, data, remove }) {
 
       <div className="editor-body" role="tabpanel">
         <div className="editor-head">
-          <img src={b.shiny ? shinySprite(id) : sprite(id)} alt={`${name}${b.shiny ? ', shiny' : ''}`} width="96" height="96" />
+          <img src={b.shiny ? shinySprite(id) : sprite(id)} alt={`${name}${b.shiny ? `, shiny tier ${b.tier || 1}` : ''}`} width="96" height="96" />
           <div>
             <h3>{name}</h3>
-            <label className="check"><input type="checkbox" checked={b.shiny} onChange={e => set({ shiny: e.target.checked })} /> Shiny</label>
+            <label className="shiny-pick">Shiny{' '}
+              <select value={b.shiny ? b.tier || 1 : 0} onChange={e => set({ shiny: +e.target.value > 0, tier: +e.target.value })}>
+                {SHINY_TIERS.map((t, n) => <option key={n} value={n} disabled={n > 0 && save?.own[i] && save.own[i].shiny < n}>{t}{n > 0 && save?.own[i] && save.own[i].shiny < n ? ' (not caught)' : ''}</option>)}
+              </select>
+            </label>
           </div>
           <button type="button" className="text-btn editor-remove" onClick={() => remove(i)}>Remove from party</button>
         </div>
@@ -103,9 +126,9 @@ export default function PartyEditor({ party, builds, setBuild, data, remove }) {
         <fieldset>
           <legend>Ability</legend>
           {abilities.map((a, n) => a && (
-            <label key={n} className="radio">
-              <input type="radio" name={`ab-${i}`} checked={b.ability === n} onChange={() => set({ ability: n })} />
-              {ABILITIES[a][0]} <small>{ABILITY_SLOT[n]}</small>
+            <label key={n} className={`radio${own && !own.ab[n] ? ' locked' : ''}`}>
+              <input type="radio" name={`ab-${i}`} checked={b.ability === n} disabled={own && !own.ab[n]} onChange={() => set({ ability: n })} />
+              {ABILITIES[a][0]} <small>{ABILITY_SLOT[n]}{own && !own.ab[n] ? ', not unlocked' : ''}</small>
             </label>
           ))}
           {ab && <p className="hint">{ABILITIES[ab][1]}</p>}
@@ -117,7 +140,7 @@ export default function PartyEditor({ party, builds, setBuild, data, remove }) {
         <fieldset>
           <legend>Passive</legend>
           {passive ? <>
-            <label className="check"><input type="checkbox" checked={b.passive} onChange={e => set({ passive: e.target.checked })} /> {ABILITIES[passive][0]} unlocked</label>
+            <label className={`check${own && !own.passive ? ' locked' : ''}`}><input type="checkbox" checked={b.passive} disabled={!!own} onChange={e => set({ passive: e.target.checked })} /> {ABILITIES[passive][0]} unlocked{own ? <small>{own.passive ? 'from your save' : 'not unlocked yet'}</small> : null}</label>
             <p className="hint">{ABILITIES[passive][1]}</p>
           </> : <p className="hint">No passive listed for this starter.</p>}
         </fieldset>
@@ -125,13 +148,17 @@ export default function PartyEditor({ party, builds, setBuild, data, remove }) {
         <fieldset>
           <legend>Nature</legend>
           <select value={b.nature} onChange={e => set({ nature: e.target.value })} aria-label="Nature">
-            {NATURES.map(([n, up, down]) => <option key={n} value={n}>{up ? `${n}: +${up}, -${down}` : `${n}: no change`}</option>)}
+            {NATURES.map(([n, up, down], k) => (
+              <option key={n} value={n} disabled={own && !own.natures[k] && b.nature !== n}>{up ? `${n}: +${up}, -${down}` : `${n}: no change`}{own && !own.natures[k] ? ' (not caught)' : ''}</option>
+            ))}
           </select>
           {nat[1] && <p className="hint">Raises {nat[1]} by 10% and lowers {nat[2]} by 10%.</p>}
           <div className="suggest">
             <p><strong>Suggested: {nature.nature}</strong>{ahead !== line[0] && <small> for {FORMS[ahead][0]}</small>}</p>
             <p className="hint">{nature.why}</p>
-            {b.nature !== nature.nature && <button type="button" className="mini-btn" onClick={() => set({ nature: nature.nature })}>Use {nature.nature}</button>}
+            {b.nature !== nature.nature && (own && !own.natures[NATURES.findIndex(n => n[0] === nature.nature)]
+              ? <p className="hint">You haven't caught a {nature.nature} {name} yet.</p>
+              : <button type="button" className="mini-btn" onClick={() => set({ nature: nature.nature })}>Use {nature.nature}</button>)}
           </div>
         </fieldset>
 
@@ -150,9 +177,12 @@ export default function PartyEditor({ party, builds, setBuild, data, remove }) {
         <fieldset>
           <legend>Egg moves you have unlocked</legend>
           {eggMoves.map((m, k) => (
-            <label key={m} className="check">
-              <input type="checkbox" checked={b.egg[k]} onChange={() => toggleEgg(k)} /> {MOVES[m][0]}{k === 3 && <small>Rare egg move</small>}
+            <Fragment key={m}>
+            <label className={`check${own && !own.eggs[k] ? ' locked' : ''}`}>
+              <input type="checkbox" checked={b.egg[k]} disabled={!!own} onChange={() => toggleEgg(k)} /> {MOVES[m][0]}{k === 3 && <small>Rare egg move</small>}{own && !own.eggs[k] && <small>not unlocked</small>}
             </label>
+            <EggInfo m={m} data={data} />
+            </Fragment>
           ))}
         </fieldset>
 

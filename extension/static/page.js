@@ -6,6 +6,7 @@
 //  - the enemy's defences and exact HP, and your moves' damage from the game's own damage calculation
 //  - on the reward screen, the items offered and where they sit
 //  - when the ball menu is open, where each ball sits; when the fight menu is open, where each move name sits
+// And every 5 seconds, your starter unlocks for the guide website (see save()).
 (() => {
   const TYPES = ['normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass',
     'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']; // PokemonType enum order in the game
@@ -237,6 +238,32 @@
       return { id: sp.speciesId, name: sp.name, index, unlocked: [!!(attr & 1), !!(attr & 2), !!(attr & 4)], passive: !!((data.passiveAttr || 0) & 1) };
     } catch { return null; }
   }
+  // Your unlocks, for the Field Guide website (content.js keeps them, guide.js hands them to the guide page). Per
+  // starter, by the game's SpeciesId: [abilityAttr (1/2/4 = ability 1/2/hidden), passive unlocked, candy cost cuts,
+  // egg moves (bits 1/2/4/8), caught, natureAttr (bit n+1 = nature n), best IVs, best shiny tier caught (0-3)]. Read from the save the game keeps
+  // in memory; sent every 5 seconds, only when something changed.
+  function save() {
+    const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
+    const gd = battle?.gameData;
+    if (!gd?.starterData || !gd.dexData) return null;
+    const out = {};
+    for (const [id, s] of Object.entries(gd.starterData)) {
+      const d = gd.dexData[id] || {};
+      const c = BigInt(d.caughtAttr || 0);   // DexAttr bits: SHINY 2, VARIANT_2 32, VARIANT_3 64
+      const shiny = c & 2n ? (c & 64n ? 3 : c & 32n ? 2 : 1) : 0;
+      out[id] = [s.abilityAttr || 0, (s.passiveAttr || 0) & 1, s.valueReduction || 0, s.eggMoves || 0, c ? 1 : 0, d.natureAttr || 0, d.ivs || [], shiny];
+    }
+    return out;
+  }
+  let lastSave = '';
+  setInterval(() => {
+    hook();
+    try {
+      const data = save(), key = data && JSON.stringify(data);
+      if (key && key !== lastSave) { lastSave = key; window.postMessage({ __prgSave: 1, data }, location.origin); }
+    } catch { /* not loaded yet */ }
+  }, 5000);
+
   // Cycling the ability (E) should show at once, so this one is read four times a second, sent only when it changes.
   let lastPick = '';
   setInterval(() => {

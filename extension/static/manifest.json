@@ -1,11 +1,46 @@
 {
   "manifest_version": 3,
   "name": "PokeRogue Field Guide overlay",
-  "version": "1.1.1",
-  "description": "Read-only PokeRogue overlay: damage beside your moves and catch odds beside each ball, from the game's own formulas.",
-  "icons": { "16": "icon16.png", "48": "icon48.png", "128": "icon128.png" },
+  "version": "1.2.0",
+  "description": "Read-only PokeRogue overlay: damage beside your moves and catch odds beside each ball, from the game's own formulas. Can pass your starter unlocks to the Field Guide website.",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
   "content_scripts": [
-    { "matches": ["https://pokerogue.net/*", "https://www.pokerogue.net/*"], "js": ["page.js"], "world": "MAIN", "run_at": "document_idle" },
-    { "matches": ["https://pokerogue.net/*", "https://www.pokerogue.net/*"], "js": ["content.js"], "run_at": "document_idle" }
+    {
+      "matches": [
+        "https://pokerogue.net/*",
+        "https://www.pokerogue.net/*"
+      ],
+      "js": [
+        "page.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://pokerogue.net/*",
+        "https://www.pokerogue.net/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://zi-cong-tan.github.io/PokeRogue-Classic-Guide/*"
+      ],
+      "js": [
+        "guide.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "storage"
   ]
 }

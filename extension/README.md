@@ -45,6 +45,10 @@ own menus.
 
 - **Every mode:** Classic shows its fixed fights; Endless and Spliced Endless show their own boss waves (Eternatus every
   250 waves, Eternamax every 1000); Daily hides the Classic-only fights.
+- **Your Pokémon on the website:** while PokeRogue is open, it reads your starter unlocks from your save (owned starters,
+  unlocked abilities, passives, egg moves, natures, best IVs, shiny tiers, candy cost cuts) and hands them to the
+  [Field Guide](https://zi-cong-tan.github.io/PokeRogue-Classic-Guide/) planner when you open it, so suggestions only use
+  what you have. Kept in the extension's own storage in your browser; nothing is uploaded.
 - **Guide button:** items by tier with icons, every Mystery Encounter's advice, Mega and Gigantamax forms of your party,
   and a link to the [full guide](https://zi-cong-tan.github.io/PokeRogue-Classic-Guide/).
 
@@ -70,7 +74,9 @@ the zip above is the same extension.
 
 It reads `window.gameInfo`, which the game publishes itself (mode, biome, wave, luck, your party), plus, from the battle
 itself: the enemies on the field (name, level, HP, types, boss bars, held items that can undo a KO) and which Mystery
-Encounter is on screen. It never changes the game, never sends anything anywhere, and never shows the enemy's moves.
+Encounter is on screen. Every 5 seconds it also reads your starter unlocks from the save the game keeps in memory, to
+hand to the Field Guide website (only that site, only in your browser). It never changes the game, never sends anything to
+a server, and never shows the enemy's moves.
 Damage comes from the game's own calculation in simulated mode; the throw check replays the enemy's move choice and the
 capture rolls, then puts the dice back exactly as they were.
 

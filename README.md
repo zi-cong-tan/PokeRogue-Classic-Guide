@@ -28,6 +28,7 @@ And it works: with both guides open, I won my first Classic run, all 200 waves t
 - **The ten villain teams.** A case file per team, from Rocket to Star: boss and grunt sprites, admins by wave, both boss teams, and which Pokemon to watch out for (two health bars, Mega, Gigantamax).
 - **Elite Four and Champions.** A run meets one region's whole league; every region's five fights with full teams, Megas, Tera types and bosses.
 - **Spend your 10 points.** All 572 starters, searchable, with a receipt that adds up your party and checks its type coverage. Tap a starter's cost to apply the candy cost cuts you've bought (up to two: −1 each, or ½ and ¼ for a 1-cost), so cheaper starters fit the budget.
+- **Your own starters, filled in.** With the overlay extension installed, open PokeRogue once and the planner knows which starters you own and what you've unlocked for each (abilities, passive, egg moves, natures, IVs, shiny tiers, candy cuts). Anything you don't have is greyed out.
 - **Build around a starter.** Pick the one you want to build around and the receipt suggests teammates you can still afford (candy cuts included), judged on type coverage and on beating Mega Rayquaza (wave 195) and Eternatus (wave 200): final evolutions, best ability and passive, level-up and egg moves. One tap fills the rest of the party, and a "Catch on the way" list shows which wild Pokémon in which biomes help most against those two fights.
 - **A build sheet for your party.** Pick ability (hidden included), passive, nature, IVs, shiny, unlocked egg moves and the four moves you start with. It warns you when an ability changes on evolving, and saves in your browser.
 - **Mid-run help.** Set what each Pokemon has evolved into and the moves it knows now, chosen from everything it can learn (level-up, egg moves, TMs with their shop tier). Each one gets a suggested nature, a suggested moveset, and when to evolve, including moves to learn first because the next form can't.
@@ -56,6 +57,8 @@ A second, separate guide that lives inside the game: a read-only overlay for pok
 **Item rankings.** Every reward and shop item gets a tier badge (S to E), rated for your run: your wave, team, items and moves.
 
 ![Tier badges (S to E) on the reward screen, rated for your run](docs/overlay-rewards.png)
+
+**Feeds your Pokémon back to the website.** While PokeRogue is open, the extension reads your starter unlocks from your save and passes them to the planner: which starters you own, unlocked abilities and passives, egg moves, natures, best IVs, shiny tiers and candy cost cuts. The planner then only suggests what you actually have and greys out the rest. It stays in your browser; nothing is uploaded.
 
 **Also:** every ability (hidden and passive included) with descriptions while you pick starters, following the one you cycle to; and panels beside the game for your run, your team, the enemy's weaknesses and Mystery Encounter advice.
 

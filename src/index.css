@@ -817,5 +817,21 @@ section { padding: var(--section) var(--m); }
 .ideas .idea-head { display: flex; align-items: center; gap: 10px; padding-top: 6px; }
 .paper .ideas button { align-items: center; }
 .ideas img { width: 48px; height: 48px; flex: none; image-rendering: pixelated; margin: -6px 0; }
-.ideas small { padding-left: 58px; }
 .editor-remove { margin-left: auto; align-self: flex-start; padding-top: 4px; color: inherit; }
+.ideas small.where { display: block; padding-left: 58px; }
+.why { margin: 4px 0 8px 58px; display: grid; gap: 6px; font-size: var(--step-small); line-height: 1.3; }
+.why-row { display: grid; gap: 2px; }
+.why dt { color: var(--paper-soft); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+.why dd { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.why dd > span { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.why .ty { font-size: 11px; padding: 1px 5px; }
+.why em { font-style: normal; font-weight: 600; }
+.why em.x2 { font-weight: 800; }
+.why i { color: var(--paper-soft); font-style: normal; }
+.picker .sync { font-size: var(--step-small); max-width: 70ch; margin: 12px 0 0; }
+.picker .sync .text-btn { padding: 0; margin-left: 4px; }
+.shiny-pick { display: flex; align-items: center; gap: 8px; min-height: 36px; }
+.shiny-pick select { font: inherit; padding: 2px 4px; }
+.editor .locked { opacity: .45; cursor: not-allowed; }
+.editor .egg-info { margin: -2px 0 8px 32px; font-size: var(--step-small); color: var(--muted); line-height: 1.4; }
+.editor .egg-info .ty { font-size: 11px; padding: 1px 5px; vertical-align: 1px; }

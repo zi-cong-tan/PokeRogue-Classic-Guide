@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useReveal } from '../motion';
 import { LUCK_GRADES, partyLuck, itemOdds, bossOdds, shinyOneIn } from '../advice';
+import { useTeam } from '../run';
 
 const SHINY = [['Not shiny', 0], ['Shiny (+1)', 1], ['Rare shiny (+2)', 2], ['Epic shiny (+3)', 3]];
 const TIER_NAMES = ['Common', 'Great', 'Ultra', 'Rogue', 'Master'];
@@ -13,6 +14,9 @@ export default function Luck() {
   const root = useReveal();
   const [state, setState] = useState(() => load() || { slots: [0, 0, 0, 0, 0, 0], charms: 0 });
   const set = patch => setState(s => { const n = { ...s, ...patch }; save(n); return n; });
+  const team = useTeam();
+  // The planner party's shiny tiers (set in the build sheet, or synced from your save), slot by slot.
+  const fromParty = [...team.party.map(i => (team.builds[i]?.shiny ? team.builds[i].tier || 1 : 0)), 0, 0, 0, 0, 0, 0].slice(0, 6);
   const luck = partyLuck(state.slots);
   const items = itemOdds(luck);
   const base = itemOdds(0);
@@ -39,6 +43,9 @@ export default function Luck() {
               </label>
             ))}
           </div>
+          {team.party.length > 0 && fromParty.join() !== state.slots.join() && (
+            <button type="button" className="text-btn" onClick={() => set({ slots: fromParty })}>Use the shinies in my planner party</button>
+          )}
           <label className="luck-charms">Shiny Charms
             <select value={state.charms} onChange={e => set({ charms: Number(e.target.value) })}>
               {[0, 1, 2, 3, 4].map(n => <option key={n} value={n}>{n}</option>)}

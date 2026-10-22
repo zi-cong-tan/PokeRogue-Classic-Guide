@@ -463,6 +463,11 @@ function mount() {
   }, true);
   addEventListener('resize', () => { place(); badges(); abilityCard(); });
 
+  // Keep your unlocks for the guide website (guide.js passes them on when you open it).
+  addEventListener('message', e => {
+    if (e.source === window && e.data?.__prgSave && e.data.data) chrome.storage?.local.set({ prgSave: { at: Date.now(), data: e.data.data } });
+  });
+
   let last = '';
   addEventListener('message', e => {
     if (e.source !== window || !e.data?.__prgOverlay) return;

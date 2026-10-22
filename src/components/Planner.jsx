@@ -5,6 +5,7 @@ import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import { sprite } from '../art';
 import { teamReport, teammates } from '../advice';
 import { members } from '../run';
+import { useSave } from '../save';
 import { BOSSES, lineVsBoss, teamVsBosses, bossGain, catchList } from '../boss-plan';
 import PartyEditor from './PartyEditor';
 import CloudTeams from './CloudTeams';
@@ -31,11 +32,33 @@ function sharedTeam() {
 
 // "Glacial Lance (Ice, 2x, egg move)" for one Pokémon's best hit on a boss.
 const hitText = r => `${r.best.name} (${cap(r.best.type)}, ${r.best.eff}×${r.best.egg ? ', egg move' : ''})`;
-// One line per boss for a suggestion: its best hit, what it resists, and the abilities that help.
-const bossText = (vs, data, hideForm) => vs.map((r, k) => `vs ${BOSSES[k].name.split(' ').pop()}: ${r.best.name ? hitText(r) : 'no strong hit'}`
-  + (r.resists.length ? `, resists ${r.resists.map(cap).join('/')}` : '')
-  + (r.helps.length ? `, ${r.helps.map(a => (data.ABILITIES[a]?.[0] || a) + (a === r.ability ? (r.slot === 2 ? ' (hidden ability)' : '') : ' (passive)')).join(' + ')}` : '')).join('. ')
-  + (vs[0].name && !hideForm ? ` (as ${vs[0].name})` : '');
+const Ty = ({ t }) => <span className="ty" style={{ '--t': TYPE_COLOR[t], '--ti': typeInk(t) }}>{cap(t)}</span>;
+const Tys = ({ list }) => list.map(t => <Ty key={t} t={t} />);
+// Why a Pokémon is suggested, as short labelled rows with type chips: what it adds to the team, its best hit on
+// each boss and what of the boss's it resists, and the abilities that help.
+function Why({ team, vs, data }) {
+  const helps = [...new Set(vs.flatMap(r => r.helps.map(a => (data.ABILITIES[a]?.[0] || a) + (a === r.ability ? (r.slot === 2 ? ' (hidden)' : '') : ' (passive)'))))];
+  return (
+    <dl className="why">
+      {team && (team.covers.length > 0 || team.hitsGaps.length > 0) && (
+        <div className="why-row">
+          <dt>Team</dt>
+          <dd>{team.hitsGaps.length > 0 && <span>hits <Tys list={team.hitsGaps} /></span>}{team.covers.length > 0 && <span>resists <Tys list={team.covers} /></span>}</dd>
+        </div>
+      )}
+      {vs.map((r, k) => (
+        <div key={k} className="why-row">
+          <dt>{BOSSES[k].name.split(' ').pop()}</dt>
+          <dd>
+            {r.best.name ? <span>{r.best.name} <Ty t={r.best.type} /> <em className={r.best.eff >= 2 ? 'x2' : ''}>{r.best.eff}×</em>{r.best.egg && <i> egg move</i>}</span> : <span>no strong hit</span>}
+            {r.resists.length > 0 && <span>resists <Tys list={r.resists} /></span>}
+          </dd>
+        </div>
+      ))}
+      {helps.length > 0 && <div className="why-row"><dt>Ability</dt><dd><span>{helps.join(', ')}</span></dd></div>}
+    </dl>
+  );
+}
 
 const Chips = ({ list }) => (
   <span className="chips">{list.map(t => <span key={t} className="ty" style={{ '--t': TYPE_COLOR[t], '--ti': typeInk(t) }}>{cap(t)}</span>)}</span>
@@ -63,6 +86,29 @@ export default function Planner() {
   useEffect(() => {
     if (party.length && !data) Promise.all([import('../data/builds'), import('../data/learnsets'), import('../data/biome-bosses')]).then(([b, l, z]) => setData({ ...b, ...l, ...z }));
   }, [party.length, data]);
+  // Your PokeRogue unlocks, if the browser extension has passed them in: candy cuts, and for each starter in a build
+  // sheet its passive, unlocked egg moves, best IVs, best shiny tier and an unlocked ability. Each build takes the save once (synced),
+  // so edits made after that stick until the next sync.
+  const [game, forgetGame] = useSave();
+  useEffect(() => {
+    if (!game) return;
+    setCuts(Object.fromEntries(game.own.map((o, i) => [i, o?.cuts || 0]).filter(([, c]) => c)));
+  }, [game?.at]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!game) return;
+    setBuilds(all => {
+      let next = all;
+      for (const i of new Set([...Object.keys(all).map(Number), ...party])) {
+        const o = game.own[i], b = all[i] || {};
+        if (!o || b.synced === game.at) continue;
+        next = { ...next, [i]: { ...b, synced: game.at, passive: o.passive, egg: o.eggs, shiny: o.shiny > 0, tier: o.shiny, ...(o.ivs ? { ivs: o.ivs } : {}),
+          ...(o.ab[b.ability || 0] || !o.ab.includes(true) ? {} : { ability: o.ab.indexOf(true) }) } };
+      }
+      return next;
+    });
+  }, [game?.at, party]); // eslint-disable-line react-hooks/exhaustive-deps
+  const owns = i => !game || !!game.own[i]?.caught;
+  const [mine, setMine] = useState(true);
   useEffect(() => save('prg-party-2', party), [party]);
   useEffect(() => save('prg-builds-2', builds), [builds]);
   useEffect(() => save('prg-cuts', cuts), [cuts]);
@@ -88,22 +134,28 @@ export default function Planner() {
   const blocked = i => !party.includes(i) && (cost(i) > left || party.length >= MAX_PARTY);
   const shown = useMemo(() => {
     const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
-    return STARTERS.map((_, i) => i).filter(i => words.every(w => KEYS[i].includes(w)) && !(fits && blocked(i)));
+    return STARTERS.map((_, i) => i).filter(i => words.every(w => KEYS[i].includes(w)) && !(fits && blocked(i)) && !(mine && !owns(i)));
     // blocked depends on party and left, both covered by `party`
-  }, [query, fits, party, cuts]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [query, fits, party, cuts, mine, game]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggle = i => setParty(p => p.includes(i) ? p.filter(x => x !== i) : [...p, i]);
   const report = teamReport(members(party, builds, data));
   const { threats, gaps, swap } = report;
   // Build around: the starters you can still afford, ranked by how they patch the team's weak spots and how much they
   // add against Mega Rayquaza and Eternatus. Each starter's boss showing doesn't depend on the team, so it's worked out once.
-  const solo = useMemo(() => data && STARTERS.map((_, i) => BOSSES.map(boss => lineVsBoss(boss, i, {}, data))), [data]);
+  const unlocks = i => {
+    const o = game?.own[i];
+    if (!o) return {};
+    const slots = [0, 1, 2].filter(k => o.ab[k]);
+    return { slots: slots.length ? slots : [0], passive: o.passive, eggs: o.eggs };
+  };
+  const solo = useMemo(() => data && STARTERS.map((_, i) => BOSSES.map(boss => lineVsBoss(boss, i, unlocks(i), data))), [data, game?.at]); // eslint-disable-line react-hooks/exhaustive-deps
   const bosses = data ? teamVsBosses(party, builds, data) : null;
   const options = (p, pts) => {
     if (p.length >= MAX_PARTY) return [];
     const now = solo ? teamVsBosses(p, builds, data) : null;
     const fit = teammates(members(p, builds, data), STARTERS.map(([name, , , t], i) => ({ i, name, types: t.split(' '), cost: cost(i) }))
-      .filter(c => !p.includes(c.i) && c.cost <= pts));
+      .filter(c => !p.includes(c.i) && c.cost <= pts && owns(c.i)));
     if (!solo) return fit;
     return fit.map(c => ({ ...c, vs: solo[c.i], score: c.score + 2 * solo[c.i].reduce((s, r, k) => s + bossGain(now[k].answer, r), 0) }))
       .sort((a, b) => b.score - a.score);
@@ -135,7 +187,7 @@ export default function Planner() {
         </div>
       </div>
 
-      <div className="editor-col" data-reveal><PartyEditor party={party} builds={builds} setBuild={setBuild} data={data} remove={toggle} /></div>
+      <div className="editor-col" data-reveal><PartyEditor party={party} builds={builds} setBuild={setBuild} data={data} remove={toggle} save={game} /></div>
 
       <div className="receipt-col" data-reveal>
       <div className="paper zig receipt" aria-live="polite">
@@ -189,10 +241,9 @@ export default function Planner() {
             {ideas.map(c => (
               <li key={c.i}>
                 <button type="button" onClick={() => toggle(c.i)} aria-label={`Add ${c.name}, costs ${fmtPts(c.cost)}`}>
-                  <img src={sprite(STARTERS[c.i][1])} alt="" loading="lazy" width="96" height="96" /><span>{c.name}</span><b aria-hidden="true" /><span>{fmtPts(c.cost)}</span>
+                  <img src={sprite(STARTERS[c.i][1])} alt="" loading="lazy" width="96" height="96" /><span>{c.name}{c.vs && c.vs[0].name !== c.name ? <small> → {c.vs[0].name}</small> : null}</span><b aria-hidden="true" /><span>{fmtPts(c.cost)}</span>
                 </button>
-                <small>{[c.covers.length && `resists ${c.covers.map(cap).join(', ')}`, c.hitsGaps.length && `hits ${c.hitsGaps.map(cap).join(', ')} for double`].filter(Boolean).join('; ') || 'a different type from the rest'}</small>
-                {c.vs && <small>{bossText(c.vs, data)}</small>}
+                {c.vs ? <Why team={c} vs={c.vs} data={data} /> : <small>a different type from the rest</small>}
               </li>
             ))}
           </ol>
@@ -205,8 +256,8 @@ export default function Planner() {
             {catches.map(c => (
               <li key={c.sp}>
                 <span className="idea-head"><img src={sprite(data.FORMS[c.sp][1])} alt="" loading="lazy" width="96" height="96" />{c.name}{c.vs[0].name !== c.name ? ` → ${c.vs[0].name}` : ''}</span>
-                <small>{c.where.slice(0, 3).map(w => `${w.biome} (${c.tierName(w)})`).join(', ')}</small>
-                <small>{bossText(c.vs, data, true)}</small>
+                <small className="where">{c.where.slice(0, 3).map(w => `${w.biome} (${c.tierName(w)})`).join(' · ')}</small>
+                <Why vs={c.vs} data={data} />
               </li>
             ))}
           </ol>
@@ -227,7 +278,11 @@ export default function Planner() {
         <div className="find">
           <input type="search" value={q} onChange={e => setQ(e.target.value)} placeholder="Search a name or type, like Gible or dragon" aria-label="Search starters" autoComplete="off" />
           <label><input type="checkbox" checked={fits} onChange={e => setFits(e.target.checked)} /> Only show what fits</label>
+          {game && <label><input type="checkbox" checked={mine} onChange={e => setMine(e.target.checked)} /> Only starters I own</label>}
         </div>
+        <p className="sync">{game
+          ? <>Synced from your PokeRogue save ({new Date(game.at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}): you own {game.count} of {STARTERS.length} starters. Abilities, passives, egg moves, IVs and candy cuts come from it, and suggestions only use what you have. <button type="button" className="text-btn" onClick={forgetGame}>Stop using it</button></>
+          : <>With the <a href="https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/tree/main/extension" target="_blank" rel="noreferrer">overlay extension</a> installed, open PokeRogue once and your owned starters, unlocks and candy cuts fill in here by themselves.</>}</p>
         <p className="count" aria-live="polite">{shown.length ? `Showing ${shown.length} of ${STARTERS.length} starters, cheapest first` : 'No starters match. Try a shorter name or a type like water.'}</p>
         <ul className="mons">
           {shown.map(i => {
