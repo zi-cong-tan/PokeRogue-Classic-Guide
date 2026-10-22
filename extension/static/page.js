@@ -241,7 +241,8 @@
   // Your unlocks, for the Field Guide website (content.js keeps them, guide.js hands them to the guide page). Per
   // starter, by the game's SpeciesId: [abilityAttr (1/2/4 = ability 1/2/hidden), passive unlocked, candy cost cuts,
   // egg moves (bits 1/2/4/8), caught, natureAttr (bit n+1 = nature n), best IVs, best shiny tier caught (0-3)]. Read from the save the game keeps
-  // in memory; sent every 5 seconds, only when something changed.
+  // in memory; sent every 5 seconds, only when something changed. Also today's Pokérus starters, once you've opened
+  // the starter-select screen.
   function save() {
     const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
     const gd = battle?.gameData;
@@ -253,14 +254,16 @@
       const shiny = c & 2n ? (c & 64n ? 3 : c & 32n ? 2 : 1) : 0;
       out[id] = [s.abilityAttr || 0, (s.passiveAttr || 0) & 1, s.valueReduction || 0, s.eggMoves || 0, c ? 1 : 0, d.natureAttr || 0, d.ivs || [], shiny];
     }
-    return out;
+    // Today's Pokérus starters (getPokerusStarters, seeded by the date): the starter-select screen keeps them once opened.
+    const ids = battle.ui?.handlers?.find(h => Array.isArray(h?.pokerusSpeciesIds) && h.pokerusSpeciesIds.length)?.pokerusSpeciesIds;
+    return { data: out, pokerus: ids ? { day: new Date().toISOString().slice(0, 10), ids: [...ids] } : null };
   }
   let lastSave = '';
   setInterval(() => {
     hook();
     try {
       const data = save(), key = data && JSON.stringify(data);
-      if (key && key !== lastSave) { lastSave = key; window.postMessage({ __prgSave: 1, data }, location.origin); }
+      if (key && key !== lastSave) { lastSave = key; window.postMessage({ __prgSave: 1, ...data }, location.origin); }
     } catch { /* not loaded yet */ }
   }, 5000);
 

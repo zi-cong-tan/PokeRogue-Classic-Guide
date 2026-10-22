@@ -465,7 +465,9 @@ function mount() {
 
   // Keep your unlocks for the guide website (guide.js passes them on when you open it).
   addEventListener('message', e => {
-    if (e.source === window && e.data?.__prgSave && e.data.data) chrome.storage?.local.set({ prgSave: { at: Date.now(), data: e.data.data } });
+    if (e.source !== window || !e.data?.__prgSave || !e.data.data) return;
+    // Keep the last Pokérus list seen if this read didn't have one (starter select not opened since loading).
+    chrome.storage?.local.get('prgSave', r => chrome.storage.local.set({ prgSave: { at: Date.now(), data: e.data.data, pokerus: e.data.pokerus || r.prgSave?.pokerus || null } }));
   });
 
   let last = '';

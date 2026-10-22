@@ -58,7 +58,7 @@ A second, separate guide that lives inside the game: a read-only overlay for pok
 
 ![Tier badges (S to E) on the reward screen, rated for your run](docs/overlay-rewards.png)
 
-**Feeds your Pokémon back to the website.** While PokeRogue is open, the extension reads your starter unlocks from your save and passes them to the planner: which starters you own, unlocked abilities and passives, egg moves, natures, best IVs, shiny tiers and candy cost cuts. The planner then only suggests what you actually have and greys out the rest. It stays in your browser; nothing is uploaded.
+**Feeds your Pokémon back to the website.** While PokeRogue is open, the extension reads your starter unlocks from your save and passes them to the planner: which starters you own, unlocked abilities and passives, egg moves, natures, best IVs, shiny tiers and candy cost cuts, plus today's Pokérus starters once you've opened starter select. The planner then only suggests what you actually have and greys out the rest. It stays in your browser; nothing is uploaded.
 
 **Also:** every ability (hidden and passive included) with descriptions while you pick starters, following the one you cycle to; and panels beside the game for your run, your team, the enemy's weaknesses and Mystery Encounter advice.
 

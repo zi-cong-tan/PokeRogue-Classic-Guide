@@ -281,7 +281,7 @@ export default function Planner() {
           {game && <label><input type="checkbox" checked={mine} onChange={e => setMine(e.target.checked)} /> Only starters I own</label>}
         </div>
         <p className="sync">{game
-          ? <>Synced from your PokeRogue save ({new Date(game.at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}): you own {game.count} of {STARTERS.length} starters. Abilities, passives, egg moves, IVs and candy cuts come from it, and suggestions only use what you have. <button type="button" className="text-btn" onClick={forgetGame}>Stop using it</button></>
+          ? <>Synced from your PokeRogue save ({new Date(game.at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}): you own {game.count} of {STARTERS.length} starters.{game.pokerus.length > 0 && <> Today's Pokérus: <strong>{game.pokerus.map(i => STARTERS[i][0]).join(', ')}</strong> (marked PKRS below).</>} Abilities, passives, egg moves, IVs and candy cuts come from it, and suggestions only use what you have. <button type="button" className="text-btn" onClick={forgetGame}>Stop using it</button></>
           : <>With the <a href="https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/tree/main/extension" target="_blank" rel="noreferrer">overlay extension</a> installed, open PokeRogue once and your owned starters, unlocks and candy cuts fill in here by themselves.</>}</p>
         <p className="count" aria-live="polite">{shown.length ? `Showing ${shown.length} of ${STARTERS.length} starters, cheapest first` : 'No starters match. Try a shorter name or a type like water.'}</p>
         <ul className="mons">
@@ -292,6 +292,7 @@ export default function Planner() {
                 <button type="button" className="mon" aria-pressed={party.includes(i)} disabled={blocked(i)} onClick={() => toggle(i)} aria-label={`${n}, costs ${c}${k ? ` after ${k} candy cut${k > 1 ? 's' : ''}` : ''}, ${t} type`}>
                   <img src={sprite(id)} alt="" loading="lazy" width="96" height="96" />
                   <span className="mon-n">{n}</span>
+                  {game?.pokerus.includes(i) && <span className="mon-pkrs" title="Has Pokérus today">PKRS</span>}
                   <span className="dots">{t.split(' ').map(x => <i key={x} style={{ '--t': TYPE_COLOR[x] }} />)}</span>
                 </button>
                 {/* the cost is its own button (not inside the tile), so it still works when the starter doesn't fit yet */}

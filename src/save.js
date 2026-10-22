@@ -22,7 +22,10 @@ function parse(raw) {
       ivs: Array.isArray(ivs) && ivs.length === 6 ? ivs.map(v => Math.max(0, Math.min(31, +v || 0))) : null,
     };
   });
-  return { at: raw.at || Date.now(), own, count: own.filter(o => o?.caught).length };
+  // Today's Pokérus starters (by STARTERS index), only if the list is from today (UTC, as the game seeds it by date).
+  const today = new Date().toISOString().slice(0, 10);
+  const pokerus = raw.pokerus?.day === today && Array.isArray(raw.pokerus.ids) ? raw.pokerus.ids.map(id => GAME_IDS.indexOf(id)).filter(i => i > -1) : [];
+  return { at: raw.at || Date.now(), own, count: own.filter(o => o?.caught).length, pokerus };
 }
 
 export function useSave() {
@@ -30,7 +33,7 @@ export function useSave() {
   useEffect(() => {
     const on = e => {
       if (e.source !== window || !e.data?.__prgSave) return;
-      const raw = { at: e.data.at, data: e.data.data };
+      const raw = { at: e.data.at, data: e.data.data, pokerus: e.data.pokerus || null };
       const next = parse(raw);
       if (!next) return;
       try { localStorage.setItem(KEY, JSON.stringify(raw)); } catch { /* private mode: still used for this visit */ }

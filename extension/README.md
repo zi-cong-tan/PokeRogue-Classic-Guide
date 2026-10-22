@@ -46,7 +46,7 @@ own menus.
 - **Every mode:** Classic shows its fixed fights; Endless and Spliced Endless show their own boss waves (Eternatus every
   250 waves, Eternamax every 1000); Daily hides the Classic-only fights.
 - **Your Pokémon on the website:** while PokeRogue is open, it reads your starter unlocks from your save (owned starters,
-  unlocked abilities, passives, egg moves, natures, best IVs, shiny tiers, candy cost cuts) and hands them to the
+  unlocked abilities, passives, egg moves, natures, best IVs, shiny tiers, candy cost cuts, and today's Pokérus starters once you open starter select) and hands them to the
   [Field Guide](https://zi-cong-tan.github.io/PokeRogue-Classic-Guide/) planner when you open it, so suggestions only use
   what you have. Kept in the extension's own storage in your browser; nothing is uploaded.
 - **Guide button:** items by tier with icons, every Mystery Encounter's advice, Mega and Gigantamax forms of your party,
