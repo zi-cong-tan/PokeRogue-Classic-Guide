@@ -31,7 +31,7 @@ function sharedTeam() {
 }
 
 // "Glacial Lance (Ice, 2x, egg move)" for one Pokémon's best hit on a boss.
-const hitText = r => `${r.best.name} (${cap(r.best.type)}, ${r.best.eff}×${r.best.egg ? ', egg move' : ''})`;
+const hitText = r => `${r.best.name} (${cap(r.best.type)}, ${r.best.eff}×${r.best.egg ? ', egg move' : ''})${r.best.setup ? ` after ${r.best.setup}` : ''}`;
 const Ty = ({ t }) => <span className="ty" style={{ '--t': TYPE_COLOR[t], '--ti': typeInk(t) }}>{cap(t)}</span>;
 const Tys = ({ list }) => list.map(t => <Ty key={t} t={t} />);
 // Why a Pokémon is suggested, as short labelled rows with type chips: what it adds to the team, its best hit on
@@ -50,8 +50,9 @@ function Why({ team, vs, data }) {
         <div key={k} className="why-row">
           <dt>{BOSSES[k].name.split(' ').pop()}</dt>
           <dd>
-            {r.best.name ? <span>{r.best.name} <Ty t={r.best.type} /> <em className={r.best.eff >= 2 ? 'x2' : ''}>{r.best.eff}×</em>{r.best.egg && <i> egg move</i>}</span> : <span>no strong hit</span>}
+            {r.best.name ? <span>{r.best.name} <Ty t={r.best.type} /> <em className={r.best.eff >= 2 ? 'x2' : ''}>{r.best.eff}×</em>{r.best.egg && <i> egg move</i>}{r.best.setup && <i> after {r.best.setup}</i>}</span> : <span>no strong hit</span>}
             {r.resists.length > 0 && <span>resists <Tys list={r.resists} /></span>}
+            {r.heal && <span>heals with {r.heal}</span>}
           </dd>
         </div>
       ))}

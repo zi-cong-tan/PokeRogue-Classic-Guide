@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react';
 import { STARTERS } from '../data/starters';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
-import { NATURES, STATS, suggestNature, suggestMoves, evolveAdvice, learnable } from '../advice';
+import { NATURES, STATS, suggestNature, suggestMoves, suggestAbility, abilityRank, evolveAdvice, learnable } from '../advice';
 import { sprite } from '../art';
 
 const ABILITY_SLOT = ['Ability 1', 'Ability 2', 'Hidden ability'];
@@ -59,6 +59,7 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
   const own = save?.own[i] || null;
 
   const [abilities, passive, startMoves, eggMoves] = opts;
+  const abPick = suggestAbility(abilities, own?.ab);
   const pool = [...startMoves, ...eggMoves.filter((_, k) => b.egg[k])];
   const ab = abilities[b.ability] || abilities[0];
   const nat = NATURES.find(n => n[0] === b.nature);
@@ -132,6 +133,14 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
             </label>
           ))}
           {ab && <p className="hint">{ABILITIES[ab][1]}</p>}
+          {abPick && abPick.slot !== slot && abPick.rank > abilityRank(abilities[slot]) && (
+            <div className="suggest">
+              <p><strong>Suggested: {ABILITIES[abPick.key][0]}</strong></p>
+              {abPick.why && <p className="hint">{abPick.why}</p>}
+              <button type="button" className="mini-btn" onClick={() => set({ ability: abPick.slot })}>Use {ABILITIES[abPick.key][0]}</button>
+            </div>
+          )}
+          {abPick && abPick.slot === slot && abPick.why && <p className="hint">Good pick: {abPick.why}</p>}
           {EVOS[i].length > 0 && (changes.length
             ? <p className="evo-note">Changes when it evolves: {changes.map(([n, evoAb]) => `${ABILITIES[evoAbility(evoAb)][0]} as ${n}`).join(', ')}.</p>
             : <p className="hint">Stays {ABILITIES[ab][0]} when it evolves.</p>)}
@@ -242,9 +251,9 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
           <div className="suggest">
             <p><strong>Suggested for {FORMS[form][0]}</strong></p>
             <ol className="suggest-moves">
-              {suggested.map(x => <li key={x.m}><span>{moveText(MOVE_LIST[x.m])}</span><small>{x.label}</small></li>)}
+              {suggested.map(x => <li key={x.m}><span>{moveText(MOVE_LIST[x.m])}</span><small>{x.label}</small>{x.why && <small className="why-move">{x.why}</small>}</li>)}
             </ol>
-            <p className="hint">Two strong moves of its own types, then moves that hit the most other types hard. TMs only turn up at random in shops, so level-up and egg moves win ties. A starting point, not the only answer.</p>
+            <p className="hint">Strong moves of its own types, then up to two moves with a job besides damage (money, setup, healing, or catching for a weaker attacker), then coverage. TMs only turn up at random in shops, so level-up and egg moves win ties. A starting point, not the only answer.</p>
             {suggested.map(x => MOVE_KEYS[x.m]).join() !== runMoves.join() && (
               <button type="button" className="mini-btn" onClick={() => set({ runMoves: suggested.map(x => MOVE_KEYS[x.m]) })}>Use these moves</button>
             )}

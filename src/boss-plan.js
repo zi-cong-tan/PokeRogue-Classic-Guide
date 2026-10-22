@@ -4,7 +4,7 @@
 // movesets, and Strong Winds halving moves that are super effective on Flying), init-abilities.ts (Delta Stream).
 // ponytail: a scoring model, not a battle simulator. Items, Tera, natures and stat boosts are left out.
 import { mult } from './data/types.js';
-import { learnable } from './advice.js';
+import { learnable, AWKWARD, NOT_SELF_HEAL } from './advice.js';
 
 export const BOSSES = [
   {
@@ -36,10 +36,6 @@ const AB = {
   HUGE_POWER: { atk: 2 }, PURE_POWER: { atk: 2 }, GORILLA_TACTICS: { atk: 1.5 }, ADAPTABILITY: { stab: 2 },
 };
 
-// Moves that look strong on paper but are poor in a long boss fight (delayed, need setup, or only work asleep).
-// Recharge, charge-up, one-hit KO and self-KO moves are already flagged in MOVE_LIST.
-const AWKWARD = new Set(['Future Sight', 'Doom Desire', 'Last Resort', 'Focus Punch', 'Dream Eater', 'Belch', 'Snore', 'Sleep Talk']);
-
 // Everything one Pokémon brings to a boss fight: its best attack and how hard the boss hits back.
 // form: FORMS key. abilities: ability keys it has (its ability plus its passive). moves: Map of move index -> source.
 function fight(boss, form, abilities, moves, L) {
@@ -55,12 +51,24 @@ function fight(boss, form, abilities, moves, L) {
     const stab = types.includes(t) ? has('stab')?.stab || 1.5 : 1;
     const atk = cat === 'P' ? st[1] * (has('atk')?.atk || 1) : st[3];
     const val = eff * stab * Math.min(power, 120) * (to ? 1.2 : 1) / 100 * atk / 100;
-    if (val > best.val) best = { val, type: t, eff, name, egg, stab: stab > 1 };
+    if (val > best.val) best = { val, type: t, eff, name, egg, stab: stab > 1, cat };
   };
   for (const [m, src] of moves) {
     const [name, type, cat, power, acc, risky] = L.MOVE_LIST[m];
-    if (power >= 50 && (cat === 'P' || cat === 'S') && !risky && !AWKWARD.has(name)) consider(type, cat, power * (acc > 0 ? acc / 100 : 1), name, src.kind === 'egg');
+    if (power >= 50 && (cat === 'P' || cat === 'S') && !risky && !AWKWARD.has(L.MOVE_KEYS[m])) consider(type, cat, power * (acc > 0 ? acc / 100 : 1), name, src.kind === 'egg');
   }
+  // One turn of setup before attacking (Swords Dance, Nasty Plot, Dragon Dance...) pays off over a long boss fight,
+  // and a healing move keeps it in. Setup counts only if it boosts the stat its best attack uses.
+  let setup = null, heal = null;
+  for (const [m] of moves) {
+    const [name, , , , , , , job = ''] = L.MOVE_LIST[m];
+    if (job.startsWith('setup:')) {
+      const [, kind, n] = job.split(':');
+      if ((kind === 'M' || kind === best.cat) && (!setup || +n > setup.n)) setup = { name, n: +n };
+    }
+    if (job === 'heal' && !NOT_SELF_HEAL.has(L.MOVE_KEYS[m])) heal = name;
+  }
+  if (setup) best = { ...best, val: best.val * (1 + 0.5 * Math.min(setup.n, 2)), setup: setup.name };
   let worst = 0, resists = [], weak = [];
   for (const [type, cat] of boss.attacks) {
     let m = mult(type, types);
@@ -76,8 +84,8 @@ function fight(boss, form, abilities, moves, L) {
     if (m > 1 && !weak.includes(type)) weak.push(type);
   }
   const bulk = st[0] * (boss.attacks.some(a => a[1] === 'P') && !boss.attacks.some(a => a[1] === 'S') ? st[2] : st[4]) / 10000;
-  const tough = bulk / Math.max(worst, 0.25) * (has('first') ? 1.3 : 1) * (has('unaware') ? 1.3 : 1);
-  return { best, resists, weak, helps: abilities.filter(a => AB[a]), score: best.val + tough * 0.7 };
+  const tough = bulk / Math.max(worst, 0.25) * (has('first') ? 1.3 : 1) * (has('unaware') ? 1.3 : 1) * (heal ? 1.25 : 1);
+  return { best, resists, weak, heal, helps: abilities.filter(a => AB[a]), score: best.val + tough * 0.7 };
 }
 
 // A starter line's best showing against a boss: each final form, each ability it could have (+ passive).

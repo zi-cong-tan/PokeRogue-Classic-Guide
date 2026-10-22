@@ -1,6 +1,6 @@
 // Suggestions built from the game data in src/data/learnsets.js: nature, moves, when to evolve, and a team check.
 // They are rules of thumb, not the only good answer, and the page says so.
-import { TYPES, CHART, mult } from './data/types.js';
+import { TYPES, CHART, mult, cap } from './data/types.js';
 
 export const NATURES = [
   ['Hardy'], ['Lonely', 'Atk', 'Def'], ['Brave', 'Atk', 'Spe'], ['Adamant', 'Atk', 'SpA'], ['Naughty', 'Atk', 'SpD'],
@@ -93,43 +93,93 @@ export function suggestMoves(line, form, eggKeys, L) {
   const own = types.split(' ');
   const r = role(stats);
   const src = learnable(line, form, eggKeys, L);
+  const job = m => MOVE_LIST[m][7] || '';
+  const notTm = m => src.get(m).kind !== 'tm';
   const score = m => {
     const [, t, cat, power, acc, risky] = MOVE_LIST[m];
-    if (cat === 'X' || !power || risky) return 0;
+    if (cat === 'X' || !power || risky || AWKWARD.has(MOVE_KEYS[m])) return 0;
     const fit = r === 'M' || cat === r ? 1 : 0.55;
-    return power * (acc < 0 ? 1 : acc / 100) * (own.includes(t) ? 1.5 : 1) * fit * (src.get(m).kind === 'tm' ? 0.9 : 1);
+    return power * (acc < 0 ? 1 : acc / 100) * (own.includes(t) ? 1.5 : 1) * fit * (notTm(m) ? 1 : 0.9);
   };
-  const attacks = [...src.keys()].filter(m => score(m) > 0).sort((a, b) => score(b) - score(a));
-  const pick = [];
-  for (const t of own) {
-    const best = attacks.find(m => MOVE_LIST[m][1] === t);
-    if (best !== undefined) pick.push(best);
+  const all = [...src.keys()];
+  const attacks = all.filter(m => score(m) > 0).sort((a, b) => score(b) - score(a));
+  const pick = [], why = new Map();
+  const add = (m, reason) => { if (m !== undefined && !pick.includes(m) && pick.length < 4) { pick.push(m); if (reason) why.set(m, reason); } };
+
+  // 1. The best attack of each of its own types (STAB).
+  for (const t of own) add(attacks.find(m => MOVE_LIST[m][1] === t), `Its own type (${cap(t)}), so 1.5× power.`);
+
+  // 2. Up to two jobs besides damage, most useful first. A money move it learns by level or egg always makes it:
+  // more money means more shop items over the whole run (Pay Day on Meowth, Make It Rain on Gholdengo).
+  const [hp, atk, def, spa, spd] = stats;
+  const bulky = (hp + def + spd) / 3 >= 85;
+  const weak = Math.max(atk, spa) < 85;
+  const jobs = [];
+  const money = all.filter(m => job(m) === 'money').sort((a, b) => score(b) - score(a))[0];
+  if (money !== undefined && (notTm(money) || score(money) >= score(pick[0] ?? money))) jobs.push([money, JOB_WHY.money]);
+  const setups = all.filter(m => job(m).startsWith('setup:') && (r === 'M' || ['M', r].includes(job(m)[6])))
+    .sort((a, b) => +job(b).split(':')[2] - +job(a).split(':')[2] || notTm(b) - notTm(a));
+  if (setups.length && !weak) jobs.push([setups[0], setupWhy(job(setups[0]))]);
+  const heal = all.filter(m => job(m) === 'heal' && !MOVE_LIST[m][5] && !NOT_SELF_HEAL.has(MOVE_KEYS[m]))[0];
+  if (heal !== undefined && (bulky || setups.length)) jobs.push([heal, JOB_WHY.heal]);
+  if (weak) {
+    // A weak attacker earns its slot as the team's catcher: sleep (2.5× catch odds), False Swipe (stops at 1 HP), paralysis.
+    for (const k of ['sleep', 'swipe', 'para']) {
+      const m = all.filter(x => job(x) === k).sort((a, b) => (MOVE_LIST[b][4] < 0 ? 101 : MOVE_LIST[b][4]) - (MOVE_LIST[a][4] < 0 ? 101 : MOVE_LIST[a][4]))[0];
+      if (m !== undefined) jobs.push([m, JOB_WHY[k]]);
+    }
   }
-  const typesOf = list => list.map(m => MOVE_LIST[m][1]);
+  const knock = all.find(m => MOVE_KEYS[m] === 'KNOCK_OFF');
+  if (knock !== undefined) jobs.push([knock, JOB_WHY.knock]);
+  let used = 0;
+  for (const [m, reason] of jobs) {
+    if (used >= 2 || pick.length >= 4) break;
+    if (pick.includes(m)) { why.set(m, `${why.get(m)} ${reason}`); continue; }
+    add(m, reason); used++;
+  }
+
+  // 3. Fill up with attacks that hit the most other types hard.
+  const typesOf = list => list.filter(m => MOVE_LIST[m][2] !== 'X').map(m => MOVE_LIST[m][1]);
   const gain = m => [...hits([MOVE_LIST[m][1]])].filter(t => !hits(typesOf(pick)).has(t)).length;
-  let lastGain = 0;
   while (pick.length < 4) {
     const rest = attacks.filter(m => !pick.includes(m) && !typesOf(pick).includes(MOVE_LIST[m][1]));
     if (!rest.length) break;
     const best = rest.reduce((a, b) => (gain(b) > gain(a) || (gain(b) === gain(a) && score(b) > score(a)) ? b : a));
-    if (pick.length === 3) lastGain = gain(best);
-    pick.push(best);
+    const newTypes = [...hits([MOVE_LIST[best][1]])].filter(t => !hits(typesOf(pick)).has(t));
+    add(best, newTypes.length ? `Coverage: hits ${newTypes.map(cap).join(', ')} for double.` : 'Another strong attack.');
   }
-  const setup = [...src.keys()].find(m => SETUP[MOVE_KEYS[m]] && (SETUP[MOVE_KEYS[m]] === r || SETUP[MOVE_KEYS[m]] === 'M' || r === 'M'));
-  if (setup !== undefined && (pick.length < 4 || lastGain <= 1)) pick.splice(3, 1, setup);
-  for (const m of attacks) if (pick.length < 4 && !pick.includes(m)) pick.push(m);
+  for (const m of attacks) add(m, 'Another strong attack.');
   // Short movepools (Wobbuffet, Pyukumuku, Magikarp...): fill with attacks whose power varies, then useful status
   // moves, then the risky attacks, then anything left, so every slot it can fill gets a suggestion.
-  const all = [...src.keys()];
   const fillers = [
     all.filter(m => MOVE_LIST[m][2] !== 'X' && !MOVE_LIST[m][3] && !MOVE_LIST[m][5]),
     GOOD_STATUS.map(k => MOVE_KEYS.indexOf(k)).filter(m => src.has(m)),
     all.filter(m => MOVE_LIST[m][2] !== 'X' && MOVE_LIST[m][5]),
     all,
   ];
-  for (const list of fillers) for (const m of list) if (pick.length < 4 && !pick.includes(m)) pick.push(m);
-  return pick.map(m => ({ m, ...src.get(m) }));
+  for (const list of fillers) for (const m of list) add(m, '');
+  return pick.map(m => ({ m, ...src.get(m), why: why.get(m) || '' }));
 }
+
+// Why a move that isn't about damage earns a slot. From what each move does in the game's move.ts.
+const JOB_WHY = {
+  money: 'Money: every use scatters coins worth 20% of the wave\'s prize money, so more to spend in the shop all run.',
+  heal: 'Heals half its HP, so it lasts through long boss fights.',
+  sleep: 'Sleep: the best status for catching (2.5× catch odds), and the target loses turns.',
+  swipe: 'Never knocks out: leaves the target at 1 HP, the safest way to weaken one you want to catch.',
+  para: 'Paralysis: 1.5× catch odds, and the target is slowed and sometimes can\'t move.',
+  knock: 'Knocks off the target\'s held item, and hits harder while it still has one.',
+};
+const setupWhy = j => {
+  const [, kind, n] = j.split(':');
+  const stat = { P: 'Attack', S: 'Sp. Atk', M: 'Attack and Sp. Atk' }[kind];
+  return n === '6' ? `Setup: maxes ${stat} in one turn (costs HP). Use it on a turn the foe can't hurt it much.`
+    : `Setup: raises ${stat}${+n >= 2 ? ' sharply' : ''}. One boost early in a boss fight pays off every turn after.`;
+};
+// Attacks that look strong on paper but are poor picks in a run: delayed, need setup, or only work asleep.
+export const AWKWARD = new Set(['FUTURE_SIGHT', 'DOOM_DESIRE', 'LAST_RESORT', 'FOCUS_PUNCH', 'DREAM_EATER', 'BELCH', 'SNORE', 'SLEEP_TALK']);
+// Heal moves that don't reliably heal the user itself.
+export const NOT_SELF_HEAL = new Set(['REST', 'WISH', 'REVIVAL_BLESSING', 'PURIFY', 'FLORAL_HEALING', 'SWALLOW', 'HEALING_WISH', 'LUNAR_DANCE', 'LIFE_DEW', 'JUNGLE_HEALING', 'LUNAR_BLESSING']);
 
 // For each way this form evolves: how, and the good level-up moves it would lose for good by evolving
 // (the next form can't learn them by level or TM). Only moves you can reach first are listed.
@@ -304,3 +354,89 @@ export function teammates(team, candidates) {
     return { ...c, score, covers, hitsGaps };
   }).sort((a, b) => b.score - a.score);
 }
+
+// Which ability to pick. A rule-of-thumb rank of abilities that matter in a run (higher is better, negative is a
+// drawback), each with the reason shown in the build sheet. Abilities not listed count as 0.
+// ponytail: general community consensus, not run-specific; context like weather teams or Technician movepools is not checked.
+const ABILITY_RANK = {
+  HUGE_POWER: [5, 'Doubles its Attack, the strongest ability in the game for a physical attacker.'],
+  PURE_POWER: [5, 'Doubles its Attack, the strongest ability in the game for a physical attacker.'],
+  SPEED_BOOST: [5, 'Gets faster every turn, so it soon moves first against everything.'],
+  PARENTAL_BOND: [5, 'Every attack hits twice.'],
+  WONDER_GUARD: [4, 'Only super effective hits can touch it. Watch out for status and weather.'],
+  PROTEAN: [4, 'Turns into the type of the move it uses, so every attack gets the 1.5× own-type boost.'],
+  LIBERO: [4, 'Turns into the type of the move it uses, so every attack gets the 1.5× own-type boost.'],
+  MAGIC_GUARD: [4, 'Only attacks hurt it: no poison, burn, weather or recoil damage.'],
+  MULTISCALE: [4, 'Takes half damage at full HP, so it survives the hit it needs to set up.'],
+  SHADOW_SHIELD: [4, 'Takes half damage at full HP, so it survives the hit it needs to set up.'],
+  ADAPTABILITY: [4, 'Its own-type attacks get 2× instead of 1.5×.'],
+  BEAST_BOOST: [4, 'Each knockout raises its best stat.'],
+  MOXIE: [4, 'Each knockout raises its Attack: it snowballs through trainer teams.'],
+  REGENERATOR: [3, 'Heals a third of its HP every time it switches out.'],
+  INTIMIDATE: [3, 'Lowers the foe\'s Attack when it comes in.'],
+  UNAWARE: [4, 'Ignores the foe\'s stat boosts, so set-up bosses don\'t snowball.'],
+  TOUGH_CLAWS: [3, 'Contact moves do 30% more.'],
+  SHEER_FORCE: [3, 'Moves with side effects do 30% more.'],
+  TECHNICIAN: [3, 'Moves of 60 power or less do 50% more.'],
+  SKILL_LINK: [3, 'Multi-hit moves always hit 5 times.'],
+  SERENE_GRACE: [3, 'Doubles the chance of moves\' side effects.'],
+  GUTS: [3, 'Attack 1.5× while it has a status.'],
+  GORILLA_TACTICS: [3, 'Attack 1.5×, but locked into one move.'],
+  AERILATE: [3, 'Normal moves become Flying and do 20% more.'],
+  PIXILATE: [3, 'Normal moves become Fairy and do 20% more.'],
+  REFRIGERATE: [3, 'Normal moves become Ice and do 20% more.'],
+  GALVANIZE: [3, 'Normal moves become Electric and do 20% more.'],
+  STRONG_JAW: [3, 'Biting moves do 50% more.'],
+  IRON_FIST: [2, 'Punching moves do 20% more.'],
+  MEGA_LAUNCHER: [3, 'Pulse and aura moves do 50% more.'],
+  SHARPNESS: [3, 'Slicing moves do 50% more.'],
+  DROUGHT: [3, 'Sets sun: Fire moves 1.5×, Water moves halved.'],
+  DRIZZLE: [3, 'Sets rain: Water moves 1.5×, Fire moves halved.'],
+  SAND_STREAM: [2, 'Sets a sandstorm.'],
+  SNOW_WARNING: [2, 'Sets snow.'],
+  PROTOSYNTHESIS: [2, 'Its best stat rises in sun.'],
+  QUARK_DRIVE: [2, 'Its best stat rises on Electric Terrain.'],
+  DOWNLOAD: [2, 'Raises Attack or Sp. Atk on entry.'],
+  PRANKSTER: [2, 'Status moves go first.'],
+  POISON_HEAL: [3, 'Heals every turn while poisoned (pair with a Toxic Orb).'],
+  THICK_FAT: [3, 'Takes half from Fire and Ice.'],
+  LEVITATE: [3, 'Immune to Ground moves.'],
+  STURDY: [2, 'Survives any one hit from full HP.'],
+  FUR_COAT: [3, 'Takes half from physical hits.'],
+  ICE_SCALES: [3, 'Takes half from special hits.'],
+  FLUFFY: [2, 'Takes half from contact moves, but double from Fire.'],
+  FILTER: [2, 'Super effective hits do 25% less.'],
+  SOLID_ROCK: [2, 'Super effective hits do 25% less.'],
+  PRISM_ARMOR: [2, 'Super effective hits do 25% less.'],
+  COMPOUND_EYES: [2, 'Moves are 30% more accurate (great with sleep moves).'],
+  NO_GUARD: [2, 'Every move hits.'],
+  MOLD_BREAKER: [2, 'Ignores abilities like Sturdy and Levitate.'],
+  INTREPID_SWORD: [3, 'Attack +1 when it comes in.'],
+  DAUNTLESS_SHIELD: [3, 'Defense +1 when it comes in.'],
+  GOOD_AS_GOLD: [2, 'Immune to status moves.'],
+  PURIFYING_SALT: [3, 'Can\'t get a status, and takes half from Ghost.'],
+  WELL_BAKED_BODY: [2, 'Immune to Fire.'],
+  EARTH_EATER: [2, 'Immune to Ground.'],
+  SUPREME_OVERLORD: [2, 'Stronger for each fainted teammate.'],
+  ORICHALCUM_PULSE: [3, 'Sets sun and boosts its Attack in it.'],
+  HADRON_ENGINE: [3, 'Sets Electric Terrain and boosts its Sp. Atk on it.'],
+  CONTRARY: [2, 'Stat drops become boosts (great with Leaf Storm or Overheat).'],
+  PICKUP: [1, 'Can pick up an item after battle.'],
+  TRUANT: [-4, 'Only acts every other turn.'],
+  SLOW_START: [-3, 'Half Attack and Speed for its first five turns in.'],
+  DEFEATIST: [-2, 'Attack and Sp. Atk halve below half HP.'],
+  STALL: [-1, 'Always moves last.'],
+  KLUTZ: [-1, 'Can\'t use held items.'],
+};
+
+// The best ability slot of `abilities` (ability 1, 2, hidden) that is unlocked (all, without a synced save).
+export function suggestAbility(abilities, unlocked) {
+  let best = null;
+  abilities.forEach((a, n) => {
+    if (!a || (unlocked && !unlocked[n])) return;
+    const [rank, why] = ABILITY_RANK[a] || [0, ''];
+    if (!best || rank > best.rank) best = { slot: n, key: a, rank, why };
+  });
+  return best;
+}
+export const abilityRank = a => (ABILITY_RANK[a] || [0])[0];

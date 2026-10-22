@@ -836,3 +836,4 @@ section { padding: var(--section) var(--m); }
 .editor .egg-info { margin: -2px 0 8px 32px; font-size: var(--step-small); color: var(--muted); line-height: 1.4; }
 .editor .egg-info .ty { font-size: 11px; padding: 1px 5px; vertical-align: 1px; }
 .mon-pkrs { position: absolute; top: 4px; left: 4px; background: #9447A8; color: #fff; font: 500 10px/1 "Pixelify Sans", sans-serif; padding: 2px 4px; }
+.suggest-moves .why-move { display: block; color: var(--muted); font-size: var(--step-small); line-height: 1.4; margin-top: 2px; }
