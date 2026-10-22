@@ -4,7 +4,7 @@ Two guides for [PokeRogue](https://pokerogue.net), from the same game data:
 
 | | **1. The website** | **2. The in-game overlay** |
 |---|---|---|
-| What it is | An interactive guide to plan a Classic run | A Chrome extension that draws the numbers on top of the game |
+| What it is | An interactive guide to plan a Classic run | A Chrome and Firefox extension that draws the numbers on top of the game |
 | Use it | Before and between runs, in any browser | While you play, on pokerogue.net |
 | Highlights | Every fixed fight, villain teams, starter planner, build sheet, team check | Damage beside your moves, catch odds beside each ball, ability descriptions at starter select, item rankings, run panels |
 | Get it | **[Open the website](https://zi-cong-tan.github.io/PokeRogue-Classic-Guide/)** | **[Download the extension zip](https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/releases/latest)** |
@@ -63,6 +63,8 @@ A second, separate guide that lives inside the game: a read-only overlay for pok
 **Also:** every ability (hidden and passive included) with descriptions while you pick starters, following the one you cycle to; and panels beside the game for your run, your team, the enemy's weaknesses and Mystery Encounter advice.
 
 **[Download the extension zip](https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/releases/latest)**, unzip it, then in `chrome://extensions` turn on Developer mode and **Load unpacked** the folder. Full feature list and details in [`extension/README.md`](extension/README.md).
+
+**Firefox:** download the Firefox zip from the same release and load it in `about:debugging` → This Firefox → Load Temporary Add-on. Steps in [`extension/README.md`](extension/README.md).
 
 It isn't on the Chrome Web Store yet: publishing there has a registration fee I can't fund right now. If you'd like to sponsor it, [open an issue](https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/issues) and it can be a one-click install.
 

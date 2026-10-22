@@ -65,6 +65,21 @@ own menus.
 
 To update, download the new zip, replace the folder, and click the ↻ button on the extension's card.
 
+## Install (Firefox 128 or newer)
+
+The Firefox version is its own download with the same features: the overlay, damage and catch odds, item badges, the
+ability card, and passing your save to the guide website.
+
+1. Download **`pokerogue-field-guide-extension-firefox.zip`** from the
+   [latest release](https://github.com/zi-cong-tan/PokeRogue-Classic-Guide/releases/latest). No need to unzip it.
+2. Open `about:debugging`, click **This Firefox**, then **Load Temporary Add-on…** and pick the zip.
+3. Open or reload [pokerogue.net](https://pokerogue.net).
+
+Firefox removes temporary add-ons when it closes, so repeat step 2 after a restart. A permanent one-click install
+needs the add-on to be signed on addons.mozilla.org, which is on the to-do list.
+
+To build it yourself: `npm run build:extension:firefox` writes it to `extension/dist-firefox`.
+
 ### Why not the Chrome Web Store?
 
 It could be there, so installing would be one click. Publishing on the Chrome Web Store needs a Google developer
