@@ -135,7 +135,7 @@ export default function Planner() {
         </div>
       </div>
 
-      <div className="editor-col" data-reveal><PartyEditor party={party} builds={builds} setBuild={setBuild} data={data} /></div>
+      <div className="editor-col" data-reveal><PartyEditor party={party} builds={builds} setBuild={setBuild} data={data} remove={toggle} /></div>
 
       <div className="receipt-col" data-reveal>
       <div className="paper zig receipt" aria-live="polite">
@@ -189,7 +189,7 @@ export default function Planner() {
             {ideas.map(c => (
               <li key={c.i}>
                 <button type="button" onClick={() => toggle(c.i)} aria-label={`Add ${c.name}, costs ${fmtPts(c.cost)}`}>
-                  <span>{c.name}</span><b aria-hidden="true" /><span>{fmtPts(c.cost)}</span>
+                  <img src={sprite(STARTERS[c.i][1])} alt="" loading="lazy" width="96" height="96" /><span>{c.name}</span><b aria-hidden="true" /><span>{fmtPts(c.cost)}</span>
                 </button>
                 <small>{[c.covers.length && `resists ${c.covers.map(cap).join(', ')}`, c.hitsGaps.length && `hits ${c.hitsGaps.map(cap).join(', ')} for double`].filter(Boolean).join('; ') || 'a different type from the rest'}</small>
                 {c.vs && <small>{bossText(c.vs, data)}</small>}
@@ -204,7 +204,7 @@ export default function Planner() {
           <ol className="tally ideas">
             {catches.map(c => (
               <li key={c.sp}>
-                <span className="idea-head">{c.name}{c.vs[0].name !== c.name ? ` → ${c.vs[0].name}` : ''}</span>
+                <span className="idea-head"><img src={sprite(data.FORMS[c.sp][1])} alt="" loading="lazy" width="96" height="96" />{c.name}{c.vs[0].name !== c.name ? ` → ${c.vs[0].name}` : ''}</span>
                 <small>{c.where.slice(0, 3).map(w => `${w.biome} (${c.tierName(w)})`).join(', ')}</small>
                 <small>{bossText(c.vs, data, true)}</small>
               </li>

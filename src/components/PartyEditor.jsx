@@ -18,7 +18,7 @@ const newBuild = opts => ({
   egg: [false, false, false, false], moves: opts ? opts[2].slice(0, 4) : [],
 });
 
-export default function PartyEditor({ party, builds, setBuild, data }) {
+export default function PartyEditor({ party, builds, setBuild, data, remove }) {
   const [cur, setCur] = useState(0);
 
   const at = Math.min(cur, party.length - 1);
@@ -97,6 +97,7 @@ export default function PartyEditor({ party, builds, setBuild, data }) {
             <h3>{name}</h3>
             <label className="check"><input type="checkbox" checked={b.shiny} onChange={e => set({ shiny: e.target.checked })} /> Shiny</label>
           </div>
+          <button type="button" className="text-btn editor-remove" onClick={() => remove(i)}>Remove from party</button>
         </div>
 
         <fieldset>

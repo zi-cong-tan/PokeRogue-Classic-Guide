@@ -814,4 +814,8 @@ section { padding: var(--section) var(--m); }
 .ideas button { display: flex; align-items: baseline; gap: 10px; width: 100%; background: none; border: 0; padding: 6px 0 0; font: inherit; color: inherit; cursor: pointer; text-align: left; }
 .ideas button:hover span:first-child { text-decoration: underline; text-underline-offset: 3px; }
 .ideas small { display: block; color: var(--paper-soft); }
-.ideas .idea-head { display: block; padding-top: 6px; }
+.ideas .idea-head { display: flex; align-items: center; gap: 10px; padding-top: 6px; }
+.paper .ideas button { align-items: center; }
+.ideas img { width: 48px; height: 48px; flex: none; image-rendering: pixelated; margin: -6px 0; }
+.ideas small { padding-left: 58px; }
+.editor-remove { margin-left: auto; align-self: flex-start; padding-top: 4px; color: inherit; }
