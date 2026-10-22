@@ -27,7 +27,7 @@ And it works: with both guides open, I won my first Classic run, all 200 waves t
 - **The run, wave by wave.** Every fixed fight in Classic on one itinerary slip: rivals, gym leaders, the evil team, the Elite Four, the Champion and Eternatus. Click a fight to see the trainer.
 - **The ten villain teams.** A case file per team, from Rocket to Star: boss and grunt sprites, admins by wave, both boss teams, and which Pokemon to watch out for (two health bars, Mega, Gigantamax).
 - **Elite Four and Champions.** A run meets one region's whole league; every region's five fights with full teams, Megas, Tera types and bosses.
-- **Spend your 10 points.** All 572 starters, searchable, with a receipt that adds up your party and checks its type coverage.
+- **Spend your 10 points.** All 572 starters, searchable, with a receipt that adds up your party and checks its type coverage. Tap a starter's cost to apply the candy cost cuts you've bought (up to two: −1 each, or ½ and ¼ for a 1-cost), so cheaper starters fit the budget.
 - **A build sheet for your party.** Pick ability (hidden included), passive, nature, IVs, shiny, unlocked egg moves and the four moves you start with. It warns you when an ability changes on evolving, and saves in your browser.
 - **Mid-run help.** Set what each Pokemon has evolved into and the moves it knows now, chosen from everything it can learn (level-up, egg moves, TMs with their shop tier). Each one gets a suggested nature, a suggested moveset, and when to evolve, including moves to learn first because the next form can't.
 - **A team check.** Which attack types hit most of your team, which types your moves can't hit hard, and who to swap out for what type.

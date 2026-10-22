@@ -269,7 +269,19 @@ section { padding: var(--section) var(--m); }
 .mon:disabled { opacity: .3; cursor: not-allowed; transform: none; }
 .mon img { width: 96px; height: 96px; margin: -6px 0 -10px; image-rendering: pixelated; }
 .mon-n { font-size: var(--step-small); font-weight: 600; line-height: 1.25; }
-.mon-c { position: absolute; top: 4px; right: 10px; font: 600 var(--step-body) "Source Serif 4", Georgia, serif; font-variant-numeric: lining-nums; }
+.mon-li { position: relative; }
+/* the cost doubles as the candy-cut button; it sits over the tile's corner and stays clickable when the tile is disabled */
+.mon-c { all: unset; cursor: pointer; position: absolute; top: 2px; right: 4px; min-width: 32px; min-height: 32px; padding: 0 6px; box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px; color: inherit;
+  font: 600 var(--step-body) "Source Serif 4", Georgia, serif; font-variant-numeric: lining-nums; }
+.mon-c { text-decoration: underline dotted; text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 4px; }
+.mon-c:hover { text-decoration-style: solid; text-decoration-color: currentColor; }
+.mon-c:focus-visible { outline: 2px solid var(--accent); }
+.mon-c s { font-size: .75em; opacity: .6; }
+.mon-c.cut { color: var(--accent); }
+.mon-c.on, .mon-c.on.cut { color: var(--accent-ink); }
+.receipt small { font-size: .8em; opacity: .7; }
+.receipt s { opacity: .55; margin-right: 6px; }
 .dots { display: flex; gap: 4px; margin-top: 6px; }
 .dots i { width: 10px; height: 10px; background: var(--t); }
 .note { margin-top: 16px; color: var(--muted); font-size: var(--step-small); }

@@ -4,3 +4,10 @@ export const STARTERS = [["Alolan Rattata",10091,1,"dark normal"],["Castform",35
 
 export const LIMIT = 10;
 export const MAX_PARTY = 6;
+
+// Candy can cut a starter's cost twice (VALUE_REDUCTION_MAX in src/constants.ts). Each cut takes off 1 point,
+// or halves it once it is down to 1, so a 1-cost starter goes to ½ then ¼ (getSpeciesStarterValue in src/system/game-data.ts).
+export const MAX_CUTS = 2;
+export const cutCost = (cost, cuts = 0) => { let c = cost; for (let k = 0; k < cuts; k++) c = c > 1 ? c - 1 : c / 2; return c; };
+// Points as the game shows them: whole numbers, or ½ and ¼.
+export const fmtPts = v => { const w = Math.floor(v + 1e-9), f = Math.round((v - w) * 4); return (w || !f ? String(w) : '') + ['', '¼', '½', '¾'][f]; };

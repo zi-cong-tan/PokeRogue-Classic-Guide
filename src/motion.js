@@ -23,11 +23,12 @@ export function useReveal() {
 }
 
 // Counts a number in an element from its previous value to `to`.
-export function countTo(el, from, to) {
+export function countTo(el, from, to, fmt = Math.round) {
   if (!el) return;
-  if (!window.matchMedia(MOTION_OK).matches) { el.textContent = to; return; }
+  if (!window.matchMedia(MOTION_OK).matches) { el.textContent = fmt(to); return; }
   const o = { n: from };
-  gsap.to(o, { n: to, duration: 0.6, ease: 'power2.out', onUpdate: () => { el.textContent = Math.round(o.n); } });
+  // the last frame shows the exact value, so fractions (½ point) are not rounded away
+  gsap.to(o, { n: to, duration: 0.6, ease: 'power2.out', onUpdate: () => { el.textContent = fmt(o.n); }, onComplete: () => { el.textContent = fmt(to); } });
 }
 
 export { gsap, useGSAP };
