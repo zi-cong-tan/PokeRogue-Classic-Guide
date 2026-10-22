@@ -26,3 +26,4 @@ dist-ssr
 scripts/.cache
 .playwright-cli/
 extension/dist
+extension/dist-firefox

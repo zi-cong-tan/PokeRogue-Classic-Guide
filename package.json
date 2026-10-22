@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "deploy": "vite build && cd dist && touch .nojekyll && git init -q -b gh-pages && git add -A && git commit -qm deploy && git push -qf https://github.com/zi-cong-tan/PokeRogue-Classic-Guide.git gh-pages",
-    "build:extension": "vite build --config vite.extension.config.js"
+    "build:extension": "vite build --config vite.extension.config.js",
+    "build:extension:firefox": "npm run build:extension && node scripts/firefox-extension.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
