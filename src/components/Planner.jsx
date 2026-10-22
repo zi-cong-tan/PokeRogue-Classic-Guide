@@ -43,16 +43,19 @@ function Why({ team, vs, data }) {
       {team && (team.covers.length > 0 || team.hitsGaps.length > 0) && (
         <div className="why-row">
           <dt>Team</dt>
-          <dd>{team.hitsGaps.length > 0 && <span>hits <Tys list={team.hitsGaps} /></span>}{team.covers.length > 0 && <span>resists <Tys list={team.covers} /></span>}</dd>
+          <dd>{team.hitsGaps.length > 0 && <span>Covers your gaps: hits <Tys list={team.hitsGaps} /> for 2×</span>}{team.covers.length > 0 && <span>Resists what hurts your team: <Tys list={team.covers} /></span>}</dd>
         </div>
       )}
       {vs.map((r, k) => (
         <div key={k} className="why-row">
           <dt>{BOSSES[k].name.split(' ').pop()}</dt>
           <dd>
-            {r.best.name ? <span>{r.best.name} <Ty t={r.best.type} /> <em className={r.best.eff >= 2 ? 'x2' : ''}>{r.best.eff}×</em>{r.best.egg && <i> egg move</i>}{r.best.setup && <i> after {r.best.setup}</i>}</span> : <span>no strong hit</span>}
-            {r.resists.length > 0 && <span>resists <Tys list={r.resists} /></span>}
-            {r.heal && <span>heals with {r.heal}</span>}
+            {r.best.name
+              ? <span>Hits for <em className={r.best.eff >= 2 ? 'x2' : ''}>{r.best.eff}×</em> with {r.best.name} <Ty t={r.best.type} />{r.best.egg && <i>(egg move)</i>}</span>
+              : <span>No strong hit on it</span>}
+            {r.best.setup && <span className="sub">Use {r.best.setup} first to power it up</span>}
+            {r.resists.length > 0 && <span>Takes less from its <Tys list={r.resists} /> moves</span>}
+            {r.heal && <span>Can heal with {r.heal}</span>}
           </dd>
         </div>
       ))}

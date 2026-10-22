@@ -2,11 +2,11 @@ import { Fragment, useState } from 'react';
 import { STARTERS } from '../data/starters';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import { NATURES, STATS, suggestNature, suggestMoves, suggestAbility, abilityRank, evolveAdvice, learnable } from '../advice';
-import { sprite } from '../art';
+import { useShinySprite } from '../shiny';
+import { GAME_IDS } from '../data/game-ids';
 
 const ABILITY_SLOT = ['Ability 1', 'Ability 2', 'Hidden ability'];
 
-const shinySprite = id => sprite(id).replace('/pokemon/', '/pokemon/shiny/');
 const SOURCE_GROUP = { level: 'Level-up', egg: 'Egg moves', tm: 'TMs' };
 const moveText = ([n, t, cat, power, acc]) =>
   `${n}: ${cap(t)}${cat === 'X' ? ', status' : `, ${power || 'varies'}`}${acc > 0 && acc < 100 ? `, ${acc}%` : ''}`;
@@ -15,6 +15,11 @@ const finalForm = (form, F) => (F[form][6].length ? finalForm(F[form][6][0][0], 
 
 // Shiny tiers: each adds that much luck (1, 2, 3) while in the party.
 const SHINY_TIERS = ['No', 'Standard (+1 luck)', 'Rare (+2 luck)', 'Epic (+3 luck)'];
+
+// A starter's sprite at its shiny tier (rare and epic shinies have their own colours in PokeRogue).
+function Sprite({ i, tier, alt }) {
+  return <img src={useShinySprite(STARTERS[i][1], GAME_IDS[i], tier)} alt={alt} width="96" height="96" />;
+}
 
 // Under each egg move: type, category, power and accuracy, and what it does.
 function EggInfo({ m, data }) {
@@ -51,7 +56,7 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
 
   const { BUILDS, ABILITIES, MOVES, EVOS, FORMS, LINES, MOVE_LIST, MOVE_KEYS } = data;
   const i = party[at];
-  const [name, id] = STARTERS[i];
+  const [name] = STARTERS[i];
   const opts = BUILDS[i];
   const b = { ...newBuild(opts), ...builds[i] };
   const set = patch => setBuild(i, { ...b, ...patch });
@@ -105,14 +110,14 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
       <div className="editor-tabs" role="tablist" aria-label="Party members">
         {party.map((p, n) => (
           <button key={p} type="button" role="tab" aria-selected={n === at} onClick={() => setCur(n)} aria-label={STARTERS[p][0]}>
-            <img src={builds[p]?.shiny ? shinySprite(STARTERS[p][1]) : sprite(STARTERS[p][1])} alt="" width="96" height="96" />
+            <Sprite i={p} tier={builds[p]?.shiny ? builds[p].tier || 1 : 0} alt="" />
           </button>
         ))}
       </div>
 
       <div className="editor-body" role="tabpanel">
         <div className="editor-head">
-          <img src={b.shiny ? shinySprite(id) : sprite(id)} alt={`${name}${b.shiny ? `, shiny tier ${b.tier || 1}` : ''}`} width="96" height="96" />
+          <Sprite i={i} tier={b.shiny ? b.tier || 1 : 0} alt={`${name}${b.shiny ? `, ${SHINY_TIERS[b.tier || 1].split(' ')[0].toLowerCase()} shiny` : ''}`} />
           <div>
             <h3>{name}</h3>
             <label className="shiny-pick">Shiny{' '}
