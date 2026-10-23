@@ -65,3 +65,6 @@ export function catchHere(wild, holes, partyLines, L, limit = 3) {
   }
   return [...best.values()].sort((a, b) => b.score - a.score).slice(0, limit);
 }
+
+// The game's ability name as the guide's ability key ("Flower Gift" -> FLOWER_GIFT).
+export const abilityKey = n => String(n || '').toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_|_$/g, '');

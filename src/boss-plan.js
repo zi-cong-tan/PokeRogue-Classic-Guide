@@ -47,7 +47,7 @@ export function ownStats(base, ivs, nature) {
     * (n?.[1] && STAT_AT[n[1]] === k ? 1.1 : n?.[2] && STAT_AT[n[2]] === k ? 0.9 : 1));
 }
 
-function fight(boss, form, abilities, moves, L, ivs = null, nature = null) {
+export function fight(boss, form, abilities, moves, L, ivs = null, nature = null) {
   const [, , typeStr, base] = L.FORMS[form];
   const st = ownStats(base, ivs, nature);
   const types = typeStr.split(' ');

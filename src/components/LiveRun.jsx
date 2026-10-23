@@ -3,7 +3,8 @@ import { BIOMES } from '../data/game';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import { sprite, biomeArt, itemArt } from '../art';
 import { NATURES, suggestNature, suggestMoves, evolveAdvice, teamReport } from '../advice';
-import { useLive, formKey, finalForm, catchHere } from '../live';
+import { useLive, formKey, finalForm, catchHere, abilityKey } from '../live';
+import { BOSSES, fight, catchList } from '../boss-plan';
 import { useSave } from '../save';
 import { useReveal } from '../motion';
 
@@ -61,9 +62,20 @@ function Moves({ list, known, label, L }) {
   );
 }
 
+// The two last fights of Classic, as the guide's starter planner scores them (boss-plan.js): Mega Rayquaza (the rival's
+// sixth, wave 195) and Eternatus (wave 200). Sprites by PokeAPI id.
+const BOSS_ART = { ray: 10079, eter: 890 };
+const times = e => `${e === 0.5 ? '½' : e === 0.25 ? '¼' : e}×`;
+// One line on how a member does against a boss with the moves it has now: its best hit, and what the boss does back.
+function bossLine(r) {
+  const hit = r.best.val ? `${r.best.name} ${times(r.best.eff)}${r.best.setup ? ` after ${r.best.setup}` : ''}` : 'Nothing that hurts it';
+  const back = [r.weak.length ? `takes 2× from ${r.weak.map(cap).join(', ')}` : '', r.resists.length ? `resists ${r.resists.map(cap).join(', ')}` : ''].filter(Boolean).join(', ');
+  return { hit, back };
+}
+
 // One party member: what it has now, the moveset it can reach this run, and the best possible one.
 // eggKeys: the egg moves you've unlocked for its starter line (from your save), as the starter build sheet uses.
-function Member({ m, x, L, eggKeys }) {
+function Member({ m, x, L, eggKeys, vs }) {
   const key = formKey(x || {}, L.FORMS);
   const types = lower(m.types);
   const hp = m.maxHP ? Math.max(0, m.currentHP / m.maxHP) : 1;
@@ -120,6 +132,17 @@ function Member({ m, x, L, eggKeys }) {
       <h4>Best possible moveset{fin !== key ? ` as ${F[fin][0]}` : ''}</h4>
       {same ? <p className="live-note">The same four: nothing better is out there for it.</p>
         : <Moves list={possible} known={known} label={(b, has) => how(b, has, m.level, F[key][0], F[fin][0], passed)} L={L} />}
+      {vs && (
+        <>
+          <h4>Against the final bosses, with its moves now</h4>
+          <ul className="live-vs">
+            {vs.map((r, k) => {
+              const { hit, back } = bossLine(r);
+              return <li key={BOSSES[k].key} className={r.best.eff >= 2 ? 'good' : undefined}><strong>{BOSSES[k].name}</strong><span>{hit}{back && <small>{back}</small>}</span></li>;
+            })}
+          </ul>
+        </>
+      )}
       {evo.map(e => <p key={e.to} className="live-note">Evolves into <strong>{e.name}</strong> ({e.how}).</p>)}
       {m.nature && !fits && (
         <p className="live-note">{want.nature} would suit it better{natUp ? ` (+${STAT_WORD[natUp]})` : ''}. A Training Session can change it.</p>
@@ -129,8 +152,10 @@ function Member({ m, x, L, eggKeys }) {
 }
 
 // A biome you can go to next: its art, how you get there, and the wild Pokémon there that fill your team's holes.
-function Biome({ name, odds, here, map, holes, partyLines, L, B }) {
+function Biome({ name, odds, here, map, holes, partyLines, L, B, team }) {
   const picks = catchHere(B[name]?.wild, holes, partyLines, L);
+  // the wild Pokémon here that would most improve your answer to the final bosses (boss-plan.js catchList)
+  const forBosses = B[name] ? catchList(team, { [name]: B[name] }, L, 2, partyLines) : [];
   const how = here ? 'You are here' : map ? 'Your Map lets you pick it' : odds ? `Opens 1 run in ${odds}` : 'The game picks one at random';
   return (
     <li className={here ? 'live-biome here' : 'live-biome'}>
@@ -151,6 +176,22 @@ function Biome({ name, odds, here, map, holes, partyLines, L, B }) {
           ))}
         </ol>
       ) : <p className="live-none">{name === 'End' ? 'No catching here.' : 'Nothing here fills a hole.'}</p>}
+      {forBosses.length > 0 && (
+        <>
+          <h4>For the final bosses</h4>
+          <ol>
+            {forBosses.map(c => (
+              <li key={c.sp}>
+                <img src={sprite(L.FORMS[c.sp][1])} alt="" width="64" height="64" loading="lazy" />
+                <div>
+                  <strong>{c.name}</strong>{c.vs[0]?.name && c.vs[0].name !== c.name && <small>Grows into {c.vs[0].name}</small>}
+                  <p>{c.vs.map((r, k) => `${BOSSES[k].name}: ${r.best.val ? `${r.best.name} ${times(r.best.eff)}` : 'no good hit'}`).join(' · ')}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
     </li>
   );
 }
@@ -162,7 +203,7 @@ export default function LiveRun() {
   const [L, setL] = useState(null);
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    if (run && !L) Promise.all([import('../data/learnsets'), import('../data/biome-bosses'), import('../data/builds')]).then(([l, b, d]) => setL({ ...l, BIOME_BOSSES: b.BIOME_BOSSES, BUILDS: d.BUILDS }));
+    if (run && !L) Promise.all([import('../data/learnsets'), import('../data/biome-bosses'), import('../data/builds')]).then(([l, b, d]) => setL({ ...l, ...d, BIOME_BOSSES: b.BIOME_BOSSES }));
   }, [run, L]);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 5000); return () => clearInterval(t); }, []);
 
@@ -187,6 +228,21 @@ export default function LiveRun() {
       moves: (m.moveset || []).map(n => L.MOVE_LIST[nameIdx[n]]).filter(r => r && r[3] > 0).map(r => r[1]),
     }));
     const holes = teamReport(members);
+    // each member against the final bosses with the moves it has now, its ability and passive, IVs and nature
+    const vs = party.map((m, i) => {
+      if (!keys[i]) return null;
+      const moves = new Map((m.moveset || []).map(n => nameIdx[n]).filter(k => k !== undefined).map(k => [k, { kind: 'level' }]));
+      const abilities = [m.ability, m.isPassiveEnabled ? m.passiveAbility : null].filter(Boolean).map(abilityKey);
+      const ivs = run.party[i]?.ivs?.length === 6 ? run.party[i].ivs : null;
+      return BOSSES.map(boss => fight(boss, keys[i], abilities, moves, L, ivs, m.nature || null));
+    });
+    // the team's best answer to each boss (highest score), for the boss panel and the biome catches
+    const team = BOSSES.map((boss, k) => {
+      let answer = null;
+      vs.forEach((v, i) => { if (v && (!answer || v[k].score > answer.score)) answer = { ...v[k], who: party[i].nickname || party[i].name }; });
+      const weak = vs.map((v, i) => (v && v[k].weak.length ? party[i].nickname || party[i].name : null)).filter(Boolean);
+      return { boss, answer, weak };
+    });
     const next = [[info.biome, 0, true], ...(BIOMES[info.biome] || []).map(([d, n]) => [d, n, false])];
     body = (
       <>
@@ -195,7 +251,7 @@ export default function LiveRun() {
             // egg moves unlocked for its starter line; with no save read yet, all of them, as the build sheet does
             const li = keys[i] ? L.LINES.findIndex(l => l.includes(keys[i])) : -1;
             const eggs = li > -1 ? (L.BUILDS[li]?.[3] || []).filter((_, k) => !save?.own?.[li] || save.own[li].eggs[k]) : [];
-            return <Member key={i} m={m} x={run.party[i]} L={L} eggKeys={eggs} />;
+            return <Member key={i} m={m} x={run.party[i]} L={L} eggKeys={eggs} vs={vs[i]} />;
           })}
         </ul>
 
@@ -211,13 +267,34 @@ export default function LiveRun() {
           {holes.swap && <p className="live-swap">{holes.swap.name} is weakest to these. A {holes.swap.types.map(cap).join(', ')} type in its place would help most.</p>}
         </div>
 
+        <div className="live-bosses" data-reveal>
+          <h3>The last two fights</h3>
+          <p>Mega Rayquaza is your rival's sixth Pokémon at wave 195; Eternatus is wave 200. This is your party as it is now, with the moves it knows.</p>
+          <ul>
+            {team.map(({ boss, answer, weak }) => (
+              <li key={boss.key} className={answer?.best.eff >= 2 ? 'covered' : undefined}>
+                <img src={sprite(BOSS_ART[boss.key])} alt="" width="96" height="96" loading="lazy" />
+                <div>
+                  <h4>{boss.name} <small>wave {boss.wave}</small></h4>
+                  <p className="chips">{boss.types.map(t => <Chip key={t} t={t} />)}</p>
+                  <p>{answer?.best.val
+                    ? <>Your best answer: <strong>{answer.who}</strong> with {answer.best.name} ({times(answer.best.eff)}{answer.best.setup ? `, after ${answer.best.setup}` : ''}).</>
+                    : 'Nobody in your party can hurt it yet.'}
+                    {answer && answer.best.eff < 2 ? ' Nothing hits it super-effectively yet: look below for a catch that does.' : ''}</p>
+                  {weak.length > 0 && <p className="live-warn">Takes 2× from its attacks: {weak.join(', ')}.</p>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div className="live-where" data-reveal>
           <h3>Where to go next</h3>
           <p>{run.map
-            ? 'You hold a Map, so you pick the next biome. Each one lists the wild Pokémon there that cover your team\'s holes.'
+            ? 'You hold a Map, so you pick the next biome. Each one lists the wild Pokémon there that cover your team\'s holes, and the ones that would help most against the final bosses.'
             : 'No Map, so the game picks the next biome for you. A Map from a reward screen lets you choose.'}</p>
           <ul>
-            {next.map(([name, n, here]) => <Biome key={name} name={name} odds={n} here={here} map={run.map} holes={holes} partyLines={partyLines} L={L} B={L.BIOME_BOSSES} />)}
+            {next.map(([name, n, here]) => <Biome key={name} name={name} odds={n} here={here} map={run.map} holes={holes} partyLines={partyLines} L={L} B={L.BIOME_BOSSES} team={team} />)}
           </ul>
         </div>
       </>
