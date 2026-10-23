@@ -183,7 +183,68 @@ function catchPanel(e, predict) {
     ${c.strong ? '<p class="muted tiny">Bosses only take a ball once down to their last bar (Master Ball works any time).</p>' : '<p class="muted tiny">From the game\'s catch formula: HP, status, ball, Pokédex size and Catching Charm' + (c.shiny ? ', plus 2× for a shiny' : '') + '. Lower its HP or put it to sleep to raise the odds.</p>'}`;
 }
 
-function enemyPanel(info, enemies, encounterId, rewards, calc, predict) {
+// The IV scanner: off until you turn it on, never in Daily runs. Each IV out of 31, and where it beats your starter's
+// for this evolution line (a catch keeps the higher value per stat).
+const IV_STATS = ['HP', 'Attack', 'Defense', 'Sp. Atk', 'Sp. Def', 'Speed'];
+function ivPanel(e, scan) {
+  const btn = `<button type="button" class="predict scan" aria-pressed="${scan}">${scan ? 'IV scanner on: tap to turn off' : 'Scan its IVs'}</button>`;
+  if (e.scanDaily) return `<h4>IVs</h4>${btn}<p class="muted tiny">Off in Daily runs: they have a leaderboard.</p>`;
+  if (!scan || !e.ivs?.length) return `<h4>IVs</h4>${btn}`;
+  const best = e.bestIvs, better = best ? e.ivs.filter((v, i) => v > best[i]).length : 6;
+  const rows = e.ivs.map((v, i) => {
+    const newMax = v === 31 && (!best || best[i] < 31);
+    const call = newMax ? `★ MAX${best ? `, yours is ${best[i]}` : ''}` : v === 31 ? 'max, you have it' : best && v > best[i] ? `beats your ${best[i]}` : '';
+    return `<li class="${newMax ? 'newmax' : v === 31 ? 'ko' : ''}"><span>${IV_STATS[i]}</span><span>${v}</span><strong>${call}</strong></li>`;
+  }).join('');
+  const note = !best ? 'Not caught yet: any catch sets your starter\'s IVs.' : better ? `Catching it raises ${better} of your starter's IVs.` : 'Nothing above your starter\'s IVs.';
+  return `<h4>IVs <small>${sum(e.ivs)} / 186</small></h4><ul class="dmg">${rows}</ul><p class="muted tiny">${note}</p>${btn}`;
+}
+
+// The same scan as a hexagon over the game, laid out like the game's summary chart (ui/containers/stats-container.ts):
+// HP top, Attack upper right, Defense lower right, Speed bottom, Sp. Def lower left, Sp. Atk upper left. Green fill is
+// the wild one, the dashed line your starter; a stat that beats your starter is lit with its gain.
+const HEX = [[0, -1], [0.825, -0.5], [0.825, 0.5], [-0.825, -0.5], [-0.825, 0.5], [0, 1]];   // HP Atk Def SpA SpD Spe
+const RING = [0, 1, 2, 5, 4, 3];
+const HEX_LABEL = ['HP', 'Atk', 'Def', 'SpA', 'SpD', 'Spe'];
+function ivHex(e) {
+  const R = 52, cx = 140, cy = 92;
+  const pt = (i, v) => `${(cx + HEX[i][0] * R * v / 31).toFixed(1)},${(cy + HEX[i][1] * R * v / 31).toFixed(1)}`;
+  const poly = vals => RING.map(i => pt(i, vals[i])).join(' ');
+  const best = e.bestIvs;
+  // a 31 your starter doesn't have yet is the big one
+  const newMax = e.ivs.map((v, i) => v === 31 && (!best || best[i] < 31));
+  const labels = e.ivs.map((v, i) => {
+    const [mx, my] = HEX[i], gain = best ? v - best[i] : v;
+    const x = cx + mx * (R + 12), y = cy + my * (R + 10) + (my > 0.9 ? 12 : my < -0.9 ? -4 : 5);
+    const anchor = mx > 0 ? 'start' : mx < 0 ? 'end' : 'middle';
+    const cls = newMax[i] ? 'newmax' : v === 31 ? 'max' : gain > 0 ? 'up' : '';
+    return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}" class="${cls}">${newMax[i] ? '★ ' : ''}${HEX_LABEL[i]} ${v}${gain > 0 && best && !newMax[i] ? ` +${gain}` : ''}</text>`;
+  }).join('');
+  const better = best ? e.ivs.filter((v, i) => v > best[i]).length : 6;
+  const news = newMax.map((n, i) => n ? IV_STATS[i] : '').filter(Boolean);
+  return `${news.length ? `<div class="new">★ NEW MAX IV: ${esc(news.join(', '))}</div>` : ''}<svg viewBox="0 0 280 186" role="img" aria-label="IVs">
+    <polygon points="${poly([31, 31, 31, 31, 31, 31])}" class="bg"/><polygon points="${poly([15.5, 15.5, 15.5, 15.5, 15.5, 15.5])}" class="grid"/>
+    ${[[0, 5], [1, 4], [2, 3]].map(([a, b]) => `<line x1="${pt(a, 31).split(',')[0]}" y1="${pt(a, 31).split(',')[1]}" x2="${pt(b, 31).split(',')[0]}" y2="${pt(b, 31).split(',')[1]}" class="grid"/>`).join('')}
+    <polygon points="${poly(e.ivs)}" class="wild"/>${best ? `<polygon points="${poly(best)}" class="mine"/>` : ''}
+    ${e.ivs.map((v, i) => v === 31 ? `<circle cx="${pt(i, 31).split(',')[0]}" cy="${pt(i, 31).split(',')[1]}" r="${newMax[i] ? 6 : 3.5}" class="${newMax[i] ? 'dot new' : 'dot'}"/>` : '').join('')}
+    ${labels}</svg>
+    <p><b>${sum(e.ivs)}</b>/186 · ${!best ? 'not caught yet' : better ? `beats your starter on ${better}` : 'no gain on your starter'}</p>`;
+}
+function ivHexes(enemies) {
+  const c = document.querySelector('canvas');
+  if (!c) return '';
+  const r = c.getBoundingClientRect(), w = Math.min(300, Math.max(190, 0.18 * r.width)), two = enemies.length > 1;
+  return enemies.map(e => {
+    if (!e.ivs?.length || !e.box) return '';
+    // one enemy: under its HP box, in from the left past the turn-order column; two: beside each box
+    const left = r.left + (two ? e.box.x + e.box.w : e.box.x + e.box.w * 0.3) * r.width + (two ? 6 : 0);
+    const top = r.top + (two ? e.box.y : e.box.y + e.box.h) * r.height + 4;
+    const gold = e.ivs.some((v, i) => v === 31 && (!e.bestIvs || e.bestIvs[i] < 31));
+    return `<div class="ivhex${gold ? ' gold' : ''}" style="left:${left}px;top:${top}px;width:${w}px">${ivHex(e)}</div>`;
+  }).join('');
+}
+
+function enemyPanel(info, enemies, encounterId, rewards, calc, predict, scan) {
   if (rewards?.options?.length) return rewardsPanel(info, rewards);
   const me = ME_BY_ID[encounterId];
   if (me) {
@@ -205,6 +266,7 @@ function enemyPanel(info, enemies, encounterId, rewards, calc, predict) {
         ${half.length || none.length ? `<p class="muted">${half.length ? `Resists ${half.map(cap).join(', ')}` : ''}${none.length ? `${half.length ? '; ' : ''}immune to ${none.map(cap).join(', ')}` : ''}</p>` : ''}
         <p class="pick">${top ? `Use <strong>${esc(top.best.name)}</strong> from ${esc(top.who)} (${x(top.best.eff)})` : 'No super-effective move on your team: use your strongest same-type move, or switch.'}</p>
         ${damagePanel(info, e, i, calc)}
+        ${ivPanel(e, scan)}
         ${catchPanel(e, predict)}
       </section>`;
     }).join('');
@@ -267,6 +329,19 @@ b { display: inline-block; min-width: 24px; }
 .dmg li { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: baseline; background: #182d19; padding: 4px 8px; font-variant-numeric: tabular-nums; }
 .dmg li.ko { background: #c6f19d; color: #0f1f10; } .dmg li.ko small { color: #3c5a3e; }
 .dmg li.maybe strong { color: #c6f19d; }
+.ivhex { position: fixed; pointer-events: none; background: rgba(15,31,16,.88); box-shadow: 0 2px 8px rgba(0,0,0,.5); padding: 2px 4px 6px; }
+.ivhex svg { display: block; width: 100%; height: auto; font: 700 15px Georgia, serif; }
+.ivhex .bg { fill: #2c3d2d; stroke: #a9b3a9; stroke-width: 1; } .ivhex .grid { fill: none; stroke: #a9b3a9; stroke-opacity: .4; stroke-width: .75; }
+.ivhex .wild { fill: #98d8a0; fill-opacity: .75; stroke: #c6f19d; stroke-width: 1.5; }
+.ivhex .mine { fill: none; stroke: #fff; stroke-width: 1.5; stroke-dasharray: 3 2; }
+.ivhex text { fill: #d4dbd4; paint-order: stroke; stroke: #0f1f10; stroke-width: 4px; }
+.ivhex text.up { fill: #c6f19d; font-size: 16px; } .ivhex text.max { fill: #ffd84d; fill-opacity: .7; }
+.ivhex text.newmax { fill: #ffd84d; font-size: 18px; }
+.ivhex .dot { fill: #ffd84d; fill-opacity: .7; } .ivhex .dot.new { fill-opacity: 1; stroke: #0f1f10; stroke-width: 2; }
+.ivhex.gold { outline: 3px solid #ffd84d; box-shadow: 0 0 16px rgba(255,216,77,.6), 0 2px 8px rgba(0,0,0,.5); }
+.ivhex .new { background: #ffd84d; color: #0f1f10; font: 700 13px/1.2 Georgia, serif; text-align: center; padding: 4px 6px; margin: -2px -4px 2px; }
+.dmg li.newmax { background: #ffd84d; color: #0f1f10; font-weight: 700; }
+.ivhex p { margin: 0; text-align: center; color: #d4dbd4; font: 13px/1.2 Georgia, serif; } .ivhex p b { color: #fff; min-width: 0; }
 .turns { position: fixed; z-index: 2147483000; display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
   cursor: grab; user-select: none; touch-action: none; font: 12px/1 Georgia, serif; --s: 52px; }
 .turns[hidden] { display: none; }
@@ -349,9 +424,9 @@ function mount() {
   const drawer = root.querySelector('.drawer'), body = root.querySelector('.drawer-body');
   // folded: null until the player chooses, then remembered
   const saved = (() => { try { return JSON.parse(localStorage.getItem('prg-hud')) || {}; } catch { return {}; } })();
-  const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items', predict: !!saved.predict, abil: !!saved.abil, turns: saved.turnBar || null };
-  const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right, predict: ui.predict, abil: ui.abil, turnBar: ui.turns })); } catch { /* storage blocked */ } };
-  const tellPage = () => window.postMessage({ __prgOverlayCmd: 1, predict: ui.predict }, location.origin);
+  const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items', predict: !!saved.predict, scan: !!saved.scan, abil: !!saved.abil, turns: saved.turnBar || null };
+  const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right, predict: ui.predict, scan: ui.scan, abil: ui.abil, turnBar: ui.turns })); } catch { /* storage blocked */ } };
+  const tellPage = () => window.postMessage({ __prgOverlayCmd: 1, predict: ui.predict, scan: ui.scan }, location.origin);
   let state = { info: null, enemies: [], encounter: null, rewards: null, balls: null, moves: null, calc: null, order: null };
   let roomy = true;
 
@@ -402,7 +477,7 @@ function mount() {
   function badges() {
     const rw = state.rewards;
     const c = document.querySelector('canvas');
-    if (!rw?.options?.length || !c || !state.info) { badgeLayer.innerHTML = ballBadges() + moveBadges(); return; }
+    if (!rw?.options?.length || !c || !state.info) { badgeLayer.innerHTML = ballBadges() + moveBadges() + ivHexes(state.enemies); return; }
     const r = c.getBoundingClientRect();
     const run = { ...state.info, held: rw.held };
     badgeLayer.innerHTML = rw.options.filter(o => o.x != null).map(o => {
@@ -461,18 +536,21 @@ function mount() {
     right.style.cssText = `right:${roomy ? 4 : innerWidth - r.right + 6}px;top:${top}px;width:${roomy ? Math.min(340, spaceR) : 280}px;max-height:${maxH}px;${right.dataset.hide ? 'display:none' : ''}`;
     left.classList.toggle('folded', ui.left ?? !roomy);
     right.classList.toggle('folded', ui.right ?? !roomy);
-    // the turn column: by default down the left edge, under the enemy's HP box and above the message box
-    const t = ui.turns || { x: 0.012, y: 0.3 };
+    // the turn column: by default down the left edge, just below the lowest enemy HP box (two in doubles), so it never
+    // covers their caught-ball icons
+    const H = r.bottom - r.top, below = Math.max(0, ...state.enemies.map(e => e.box ? e.box.y + e.box.h : 0));
+    const t = ui.turns || { x: 0.012, y: below ? below + 0.012 : 0.3 };
     turns.style.left = `${r.left + t.x * (r.right - r.left)}px`;
-    turns.style.top = `${r.top + t.y * (r.bottom - r.top)}px`;
-    // portraits scale with the game: four fit between the enemy's HP box and the message box
-    turns.style.setProperty('--s', `${Math.round(Math.min(64, Math.max(36, 0.075 * (r.bottom - r.top))))}px`);
+    turns.style.top = `${r.top + t.y * H}px`;
+    // portraits shrink to end above the message box (about 73% down); the first is 1.35x, 4px between each
+    const n = state.order?.order?.length || 2;
+    turns.style.setProperty('--s', `${Math.round(Math.min(64, Math.max(26, ((0.73 - t.y) * H - 4 * n) / (n + 0.35))))}px`);
   }
 
   // Who moves first, over the game. Drag it anywhere; the spot is kept (as a share of the canvas).
   const turns = document.createElement('div');
   turns.className = 'turns';
-  turns.title = 'Who moves first if everyone picks a move. Switching, items and balls go before moves; an enemy priority move can jump ahead. Drag to move.';
+  turns.title = 'Who moves first if everyone picks a move. Switching, items and balls go before moves; an enemy priority move can jump ahead. Drag to move, double-click to put it back.';
   root.append(turns);
   turns.addEventListener('pointerdown', e => {
     const c = document.querySelector('canvas')?.getBoundingClientRect(), b = turns.getBoundingClientRect();
@@ -484,6 +562,8 @@ function mount() {
     addEventListener('pointermove', move);
     addEventListener('pointerup', up);
   });
+  // double-click: back to the automatic spot under the enemy HP boxes
+  turns.addEventListener('dblclick', () => { ui.turns = null; save(); place(); });
 
   function render() {
     const { info, enemies, encounter } = state;
@@ -491,7 +571,7 @@ function mount() {
     turns.innerHTML = live ? orderStrip(state.order) : '';
     turns.hidden = !turns.innerHTML;
     root.querySelector('.l').innerHTML = live ? runPanel(info, enemies) : '<section><p class="muted">Start or continue a run: your wave, biome, team and the next fights show here.</p></section>';
-    root.querySelector('.r').innerHTML = live ? enemyPanel(info, enemies, encounter, state.rewards, state.calc, ui.predict) : '';
+    root.querySelector('.r').innerHTML = live ? enemyPanel(info, enemies, encounter, state.rewards, state.calc, ui.predict, ui.scan) : '';
     badges();
     right.dataset.hide = live ? '' : '1';
     if (!drawer.hidden) body.innerHTML = guideTab(ui.tab, info);
@@ -504,8 +584,10 @@ function mount() {
   folds[0].addEventListener('click', () => { ui.left = !left.classList.contains('folded'); save(); place(); });
   folds[1].addEventListener('click', () => { ui.right = !right.classList.contains('folded'); save(); place(); });
   right.addEventListener('click', e => {
-    if (!e.target.closest('.predict')) return;
-    ui.predict = !ui.predict; save(); tellPage(); render();
+    if (e.target.closest('.scan')) ui.scan = !ui.scan;
+    else if (e.target.closest('.predict')) ui.predict = !ui.predict;
+    else return;
+    save(); tellPage(); render();
   });
   root.querySelector('.guide-btn').addEventListener('click', () => { drawer.hidden = false; body.innerHTML = guideTab(ui.tab, state.info); });
   root.querySelector('.close').addEventListener('click', () => { drawer.hidden = true; });
@@ -529,9 +611,21 @@ function mount() {
     chrome.storage?.local.get('prgSave', r => chrome.storage.local.set({ prgSave: { at: Date.now(), data: e.data.data, pokerus: e.data.pokerus || r.prgSave?.pokerus || null } }));
   });
 
+  // Your run for the guide website: the game's party info plus page.js's extras, saved when it changes (at most every
+  // 3 seconds); guide.js hands it to the guide's "Your party, live" section.
+  let lastRun = '', runAt = 0;
+  function saveRun(info, extra) {
+    if (!info || info.gameMode === 'Title' || !info.wave || !extra || !chrome.runtime?.id) return;
+    const key = JSON.stringify([info, extra]);
+    if (key === lastRun || Date.now() - runAt < 3000) return;
+    lastRun = key; runAt = Date.now();
+    chrome.storage.local.set({ prgRun: { at: runAt, info, ...extra } });
+  }
+
   let last = '';
   addEventListener('message', e => {
     if (e.source !== window || !e.data?.__prgOverlay) return;
+    saveRun(e.data.info, e.data.run);
     state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null, rewards: e.data.rewards ?? null, balls: e.data.balls ?? null, moves: e.data.moves ?? null, calc: e.data.calc ?? null, order: e.data.order ?? null };
     const key = JSON.stringify(state);
     if (key !== last) { last = key; render(); } else { place(); badges(); }

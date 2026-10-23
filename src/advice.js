@@ -86,13 +86,15 @@ const GOOD_STATUS = ['RECOVER', 'ROOST', 'SLACK_OFF', 'SOFT_BOILED', 'MILK_DRINK
 
 // Two moves of its own types, then the moves that hit the most new types for double, with a stat-boosting move
 // in the last slot when one fits and a fourth attack would add little. Level-up and egg moves are preferred over
-// TMs, which only show up at random in shops.
-export function suggestMoves(line, form, eggKeys, L) {
+// TMs, which only show up at random in shops. allow (optional): only consider the moves it passes, e.g. what a
+// Pokémon mid-run actually has or will still learn.
+export function suggestMoves(line, form, eggKeys, L, allow) {
   const { FORMS: F, MOVE_LIST, MOVE_KEYS } = L;
   const [, , types, stats] = F[form];
   const own = types.split(' ');
   const r = role(stats);
   const src = learnable(line, form, eggKeys, L);
+  if (allow) for (const [m, s] of src) if (!allow(m, s)) src.delete(m);
   const job = m => MOVE_LIST[m][7] || '';
   const notTm = m => src.get(m).kind !== 'tm';
   const score = m => {

@@ -4,10 +4,11 @@
 //  - the enemies on the field, limited to what the battle screen shows: name, level, HP, types, boss bars
 //  - which Mystery Encounter is on screen, if any
 //  - the enemy's defences and exact HP, and your moves' damage from the game's own damage calculation
+//  - when you turn the IV scanner on (never in Daily runs), the enemy's IVs
 //  - who moves first this turn (speed, Trick Room, your moves' priority)
 //  - on the reward screen, the items offered and where they sit
 //  - when the ball menu is open, where each ball sits; when the fight menu is open, where each move name sits
-// And every 5 seconds, your starter unlocks for the guide website (see save()).
+// And every 5 seconds, your starter unlocks for the guide website (see save()); your run goes there too (runExtras()).
 (() => {
   const TYPES = ['normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass',
     'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy']; // PokemonType enum order in the game
@@ -32,6 +33,14 @@
     catch { return 0; }
   }
 
+  // A game object's box on the canvas, 0 to 1
+  function box(o) {
+    try {
+      const b = o.getBounds(), W = scenes.game?.config?.width || 1920, H = scenes.game?.config?.height || 1080;
+      return { x: b.x / W, y: b.y / H, w: b.width / W, h: b.height / H };
+    } catch { return null; }
+  }
+
   function enemies() {
     const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
     if (!battle?.currentBattle) return [];
@@ -45,6 +54,12 @@
           boss: !!p.isBoss?.(), bars: p.bossSegments || 0, barIndex: p.bossSegmentIndex ?? 0, terastallized: !!p.isTerastallized,
           // the Classic final boss can't be knocked out in its first form: its last bar stops at 1 HP
           noKo: !!battle.currentBattle.isClassicFinalBoss && !p.formIndex,
+          // IV scanner, only when turned on: its IVs (HP, Atk, Def, SpA, SpD, Spe; 0-31) and your starter's (the root of its
+          // evolution line; a catch raises each starter IV to the higher value: updateSpeciesDexIvs)
+          ivs: scan && !battle.gameMode?.isDaily ? [...(p.ivs || [])] : null, scanDaily: scan && !!battle.gameMode?.isDaily,
+          bestIvs: scan ? battle.gameData?.dexData?.[p.species?.getRootSpeciesId?.() ?? p.species?.speciesId]?.ivs || null : null,
+          // where its HP box sits on the canvas (0 to 1): the turn column goes below it, the IV hexagon beside it
+          box: box(p.battleInfo),
           // for the damage estimate: defences and their stat changes (Stat enum: DEF 2, SPDEF 4)
           catch: catchOdds(battle, p, field.length),
           // held items that undo a KO: Focus Band (each stack 1 in 10 to hang on at 1 HP, up to 5) and Reviver Seed (back at half HP)
@@ -67,8 +82,9 @@
   // move choice draws (EnemyCommandPhase -> getNextMove), so this replays that choice, then draws the capture rolls
   // (one critical-capture roll out of 256, then up to three shake rolls out of 65536), then puts every bit of state
   // back. Once per turn, while you pick a command. Quick Claw or Quick Draw can draw first, so then it's flagged unsure.
-  let predict = false, rolled = null;
-  addEventListener('message', e => { if (e.source === window && e.data?.__prgOverlayCmd) predict = !!e.data.predict; });
+  // The IV scanner (scan) is opt-in the same way, and also off in Daily runs.
+  let predict = false, scan = false, rolled = null;
+  addEventListener('message', e => { if (e.source === window && e.data?.__prgOverlayCmd) { predict = !!e.data.predict; scan = !!e.data.scan; } });
   function throwRolls(battle) {
     const b = battle.currentBattle;
     if (!predict || battle.gameMode?.isDaily) return null;
@@ -193,6 +209,25 @@
     } catch { return null; }
   }
 
+  // Your run, for the guide website (content.js saves it, guide.js hands it over): each party member's species, named the
+  // way the guide's data names it (regional forms carry their region), IVs and held items, and whether you hold the Map
+  // (then you pick the next biome). window.gameInfo has the rest: level, HP, moves, ability, nature.
+  const REGION = { 2: 'Alolan', 4: 'Galarian', 6: 'Hisuian', 8: 'Paldean' };
+  function runExtras() {
+    const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
+    if (!battle?.currentBattle || !Array.isArray(battle.party)) return null;
+    try {
+      const name = sp => { const r = sp.speciesId >= 2000 && REGION[Math.floor(sp.speciesId / 1000)]; return r && !sp.name.startsWith(r) ? `${r} ${sp.name}` : sp.name; };
+      return {
+        map: !!battle.findModifier?.(m => m.is?.('MapModifier')),
+        party: battle.party.map(p => ({
+          id: p.species.speciesId, species: name(p.species), fusion: p.fusionSpecies ? name(p.fusionSpecies) : null, ivs: [...(p.ivs || [])],
+          items: (p.getHeldItems?.() || []).map(m => m.type?.name && m.type.name + (m.stackCount > 1 ? ` ×${m.stackCount}` : '')).filter(Boolean),
+        })),
+      };
+    } catch { return null; }
+  }
+
   // The Mystery Encounter on screen, as the game's MysteryEncounterType number (or null).
   function encounter() {
     const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
@@ -310,6 +345,6 @@
 
   setInterval(() => {
     hook();
-    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards(), balls: ballMenu(), moves: fightMenu(), calc: damageCalc(), order: turnOrder() }, location.origin);
+    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards(), balls: ballMenu(), moves: fightMenu(), calc: damageCalc(), order: turnOrder(), run: runExtras() }, location.origin);
   }, 1000);
 })();

@@ -1,6 +1,7 @@
 import Hero from './components/Hero';
 import Itinerary from './components/Itinerary';
 import Tracker, { TrackerOnly } from './components/Tracker';
+import LiveRun from './components/LiveRun';
 import Villains from './components/Villains';
 import League from './components/League';
 import Planner from './components/Planner';
@@ -21,6 +22,7 @@ export default function App() {
       <main>
         <Hero />
         <Tracker />
+        <LiveRun />
         <Itinerary />
         <Villains />
         <League />

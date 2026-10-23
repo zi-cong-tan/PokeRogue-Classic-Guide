@@ -20,7 +20,7 @@ export default function Hero() {
       <nav className="top" aria-label="Sections">
         <a className="mark" href="#top">PokeRogue Field Guide</a>
         <div className="links">
-          <a href="#run">The run</a><a href="#villains">Villains</a><a href="#starters">Starters</a><a href="#biomes">Biomes</a><a href="#encounters">Encounters</a><a href="#types">Types</a>
+          <a href="#live">Your party</a><a href="#run">The run</a><a href="#villains">Villains</a><a href="#starters">Starters</a><a href="#biomes">Biomes</a><a href="#encounters">Encounters</a><a href="#types">Types</a>
         </div>
         <a className="btn" href="#starters">Plan a team</a>
       </nav>
