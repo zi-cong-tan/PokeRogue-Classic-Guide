@@ -4,6 +4,7 @@ import { TYPE_COLOR, cap, typeInk } from '../data/types';
 import { sprite, biomeArt } from '../art';
 import { NATURES, suggestNature, suggestMoves, evolveAdvice, teamReport } from '../advice';
 import { useLive, formKey, finalForm, catchHere } from '../live';
+import { useSave } from '../save';
 import { useReveal } from '../motion';
 
 const Chip = ({ t }) => <span className="ty" style={{ '--t': TYPE_COLOR[t], '--ti': typeInk(t) }}>{cap(t)}</span>;
@@ -20,12 +21,49 @@ function ago(at, now) {
 
 // Moves a Pokémon mid-run can count on: the ones it has, and level-up moves of its own form still ahead (or on
 // evolving). Passed ones (a level gone by, or a form it evolved from) need a Memory Mushroom; TMs show up at random.
-const missed = (s, level) => s.kind === 'level' && (s.label.startsWith('As ') || (s.lvl > 0 && s.lvl <= level) || s.lvl === -1);
 const ahead = (s, level) => s.kind === 'level' && !s.label.startsWith('As ') && (s.lvl > level || s.lvl === 0);
 const when = (s, has) => (has ? 'Has it' : s.lvl === 0 ? 'On evolving' : `Level ${s.lvl}`);
 
-// One party member: what it has now, and the moveset to aim for.
-function Member({ m, x, L }) {
+// Forms of the line that come before `form` (it evolved from them).
+function before(form, line, F) {
+  const reaches = (f, to) => f === to || F[f][6].some(([n]) => line.includes(n) && reaches(n, to));
+  return new Set(line.filter(f => f !== form && reaches(f, form)).map(f => F[f][0]));
+}
+
+// How a move of the best possible set is reached from where this Pokémon is now. Moves in the possible set are
+// labelled by the form that learns them ("As Wartortle, level 35", or no prefix for the final form).
+function how(s, has, level, cur, fin, passed) {
+  if (has) return 'Has it';
+  if (s.kind === 'egg') return 'Egg move, picked at the start';
+  if (s.kind !== 'level') return s.label;
+  const form = s.label.startsWith('As ') ? s.label.slice(3, s.label.indexOf(',')) : fin;
+  // a level it is already past is gone for this form and any later one (evolving only teaches "on evolving" moves)
+  if (passed.has(form) || s.lvl === -1 || (s.lvl > 0 && s.lvl <= level)) return 'Memory Mushroom';
+  const at = s.lvl === 0 ? 'on evolving' : `level ${s.lvl}`;
+  return form === cur ? at[0].toUpperCase() + at.slice(1) : `As ${form}, ${at}`;
+}
+
+function Moves({ list, known, label, L }) {
+  return (
+    <ol className="live-moves">
+      {list.map(b => {
+        const [name, type] = L.MOVE_LIST[b.m];
+        const has = known.includes(b.m);
+        return (
+          <li key={b.m} className={has ? 'has' : undefined} title={b.why || undefined}>
+            <span className="live-move"><i style={{ '--t': TYPE_COLOR[type] }} aria-hidden="true" />{name}</span>
+            <b aria-hidden="true" />
+            <span>{label(b, has)}</span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+// One party member: what it has now, the moveset it can reach this run, and the best possible one.
+// eggKeys: the egg moves you've unlocked for its starter line (from your save), as the starter build sheet uses.
+function Member({ m, x, L, eggKeys }) {
   const key = formKey(x || {}, L.FORMS);
   const types = lower(m.types);
   const hp = m.maxHP ? Math.max(0, m.currentHP / m.maxHP) : 1;
@@ -41,12 +79,12 @@ function Member({ m, x, L }) {
   const nameIdx = Object.fromEntries(L.MOVE_LIST.map((r, i) => [r[0], i]));
   const known = (m.moveset || []).map(n => nameIdx[n]).filter(i => i !== undefined);
   const knownKeys = known.map(i => L.MOVE_KEYS[i]);
-  // the plan: from what it has and will still learn; then the best set with anything, for TMs and Memory Mushrooms
+  // this run: from what it has and will still learn. Best possible: its final form with your unlocked egg moves and
+  // any TM, as the starter build sheet works it out.
   const best = suggestMoves(line, key, knownKeys, L, (mi, s) => known.includes(mi) || ahead(s, m.level)).slice(0, 4);
-  const ideal = suggestMoves(line, key, knownKeys, L).slice(0, 4).filter(b => !best.some(x => x.m === b.m) && !known.includes(b.m));
-  // only TMs that pull their weight: 60+ power, or a status move with a job (setup, healing...)
-  const tms = ideal.filter(b => b.kind === 'tm' && (L.MOVE_LIST[b.m][3] >= 60 || L.MOVE_LIST[b.m][2] === 'X')).map(b => L.MOVE_LIST[b.m][0]);
-  const mush = ideal.filter(b => missed(b, m.level)).map(b => L.MOVE_LIST[b.m][0]);
+  const fin = finalForm(key, F), passed = before(key, line, F);
+  const possible = suggestMoves(line, fin, [...new Set([...knownKeys, ...eggKeys])], L).slice(0, 4);
+  const same = possible.every(p => best.some(b => b.m === p.m));
   const drop = known.filter(i => !best.some(b => b.m === i)).map(i => L.MOVE_LIST[i][0]);
   const evo = evolveAdvice(key, L);
   const want = suggestNature(F[finalForm(key, F)][3]);
@@ -67,23 +105,12 @@ function Member({ m, x, L }) {
         <div><dt>Ability</dt><dd>{m.ability}{m.passiveAbility && m.isPassiveEnabled ? `, passive ${m.passiveAbility}` : ''}</dd></div>
         {x?.items?.length > 0 && <div><dt>Holding</dt><dd>{x.items.join(', ')}</dd></div>}
       </dl>
-      <h4>Best moveset</h4>
-      <ol className="live-moves">
-        {best.map(b => {
-          const [name, type] = L.MOVE_LIST[b.m];
-          const has = known.includes(b.m);
-          return (
-            <li key={b.m} className={has ? 'has' : undefined} title={b.why || undefined}>
-              <span className="live-move"><i style={{ '--t': TYPE_COLOR[type] }} aria-hidden="true" />{name}</span>
-              <b aria-hidden="true" />
-              <span>{when(b, has)}</span>
-            </li>
-          );
-        })}
-      </ol>
+      <h4>Best moveset this run</h4>
+      <Moves list={best} known={known} label={when} L={L} />
       {drop.length > 0 && <p className="live-note">Drop when the new ones come: {drop.join(', ')}</p>}
-      {tms.length > 0 && <p className="live-note">TMs worth grabbing: <strong>{tms.join(', ')}</strong></p>}
-      {mush.length > 0 && <p className="live-note">With a Memory Mushroom: <strong>{mush.join(', ')}</strong></p>}
+      <h4>Best possible moveset{fin !== key ? ` as ${F[fin][0]}` : ''}</h4>
+      {same ? <p className="live-note">The same four: nothing better is out there for it.</p>
+        : <Moves list={possible} known={known} label={(b, has) => how(b, has, m.level, F[key][0], F[fin][0], passed)} L={L} />}
       {evo.map(e => <p key={e.to} className="live-note">Evolves into <strong>{e.name}</strong> ({e.how}).</p>)}
       {m.nature && !fits && (
         <p className="live-note">{want.nature} would suit it better{natUp ? ` (+${STAT_WORD[natUp]})` : ''}. A Training Session can change it.</p>
@@ -121,11 +148,12 @@ function Biome({ name, odds, here, map, holes, partyLines, L, B }) {
 
 export default function LiveRun() {
   const run = useLive();
+  const [save] = useSave();
   const root = useReveal();
   const [L, setL] = useState(null);
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    if (run && !L) Promise.all([import('../data/learnsets'), import('../data/biome-bosses')]).then(([l, b]) => setL({ ...l, BIOME_BOSSES: b.BIOME_BOSSES }));
+    if (run && !L) Promise.all([import('../data/learnsets'), import('../data/biome-bosses'), import('../data/builds')]).then(([l, b, d]) => setL({ ...l, BIOME_BOSSES: b.BIOME_BOSSES, BUILDS: d.BUILDS }));
   }, [run, L]);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 5000); return () => clearInterval(t); }, []);
 
@@ -154,7 +182,12 @@ export default function LiveRun() {
     body = (
       <>
         <ul className="live-party">
-          {party.map((m, i) => <Member key={i} m={m} x={run.party[i]} L={L} />)}
+          {party.map((m, i) => {
+            // egg moves unlocked for its starter line; with no save read yet, all of them, as the build sheet does
+            const li = keys[i] ? L.LINES.findIndex(l => l.includes(keys[i])) : -1;
+            const eggs = li > -1 ? (L.BUILDS[li]?.[3] || []).filter((_, k) => !save?.own?.[li] || save.own[li].eggs[k]) : [];
+            return <Member key={i} m={m} x={run.party[i]} L={L} eggKeys={eggs} />;
+          })}
         </ul>
 
         <div className="live-holes" data-reveal>
