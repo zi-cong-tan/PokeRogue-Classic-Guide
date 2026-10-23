@@ -4,6 +4,7 @@
 //  - the enemies on the field, limited to what the battle screen shows: name, level, HP, types, boss bars
 //  - which Mystery Encounter is on screen, if any
 //  - the enemy's defences and exact HP, and your moves' damage from the game's own damage calculation
+//  - who moves first this turn (speed, Trick Room, your moves' priority)
 //  - on the reward screen, the items offered and where they sit
 //  - when the ball menu is open, where each ball sits; when the fight menu is open, where each move name sits
 // And every 5 seconds, your starter unlocks for the guide website (see save()).
@@ -42,6 +43,8 @@
         return {
           name: p.name, species: p.species?.name, level: p.level, hp: p.hp, maxHp: p.getMaxHp?.(), types,
           boss: !!p.isBoss?.(), bars: p.bossSegments || 0, barIndex: p.bossSegmentIndex ?? 0, terastallized: !!p.isTerastallized,
+          // the Classic final boss can't be knocked out in its first form: its last bar stops at 1 HP
+          noKo: !!battle.currentBattle.isClassicFinalBoss && !p.formIndex,
           // for the damage estimate: defences and their stat changes (Stat enum: DEF 2, SPDEF 4)
           catch: catchOdds(battle, p, field.length),
           // held items that undo a KO: Focus Band (each stack 1 in 10 to hang on at 1 HP, up to 5) and Reviver Seed (back at half HP)
@@ -77,14 +80,41 @@
     try {
       foes.forEach(e => e.getNextMove());
       const draws = [battle.randBattleSeedInt(256), battle.randBattleSeedInt(65536), battle.randBattleSeedInt(65536), battle.randBattleSeedInt(65536)];
-      const quick = [...battle.getPlayerField(), ...foes].some(p => p && !p.isFainted?.() && (
-        (p.getHeldItems?.() || []).some(m => m.type?.id === 'QUICK_CLAW') || [p.getAbility?.()?.name, p.getPassiveAbility?.()?.name].includes('Quick Draw')));
+      const quick = [...battle.getPlayerField(), ...foes].some(p => p && !p.isFainted?.() && quickChance(p));
       rolled = { wave: b.waveIndex, turn: b.turn, draws, unsure: quick };
       return rolled;
     } catch { return null; } finally {
       b.battleSeedState = saved;
       foes.forEach((e, i) => { if (e.summonData && queues[i]) e.summonData.moveQueue = queues[i]; });
     }
+  }
+
+  // Quick Claw or Quick Draw: a chance to jump ahead of its priority bracket each turn
+  const quickChance = p => (p.getHeldItems?.() || []).some(m => m.type?.id === 'QUICK_CLAW')
+    || [p.getAbility?.()?.name, p.getPassiveAbility?.()?.name].includes('Quick Draw');
+
+  // Who moves first, by the game's rules (queues/move-phase-priority-queue.ts, utils/speed-order.ts): switching, balls
+  // and items before any move; then the move's priority; then speed from getEffectiveStat (stages, paralysis, items,
+  // abilities, weather), fastest first, or slowest first under Trick Room; equal speeds are a coin flip each turn.
+  // Your moves' priority comes from the game's getPriority (Prankster, Gale Wings, Triage included). The enemy's moves
+  // aren't on screen, so they aren't read.
+  function turnOrder() {
+    const battle = scenes?.scenes?.find(s => typeof s.getEnemyField === 'function');
+    if (!battle?.currentBattle) return null;
+    try {
+      const alive = p => p && !p.isFainted?.();
+      const row = (p, you) => ({
+        name: p.name, you, speed: p.getEffectiveStat(5), quick: quickChance(p),   // Stat.SPD
+        // national dex number for the portrait: regional forms are 2000/4000/6000/8000 + dex in the game
+        dex: (p.species?.speciesId ?? 0) % 2000,
+        priority: you ? p.getMoveset().filter(Boolean).map(pm => pm.getMove())
+          .map(mv => ({ name: mv.name, priority: mv.getPriority?.(p, true) ?? mv.priority ?? 0 })).filter(m => m.priority) : [],
+      });
+      const trickRoom = !!battle.arena?.getTag?.('TRICK_ROOM');
+      const order = [...battle.getPlayerField().filter(alive).map(p => row(p, true)), ...battle.getEnemyField().filter(alive).map(p => row(p, false))]
+        .sort((a, b) => trickRoom ? a.speed - b.speed : b.speed - a.speed);
+      return order.length > 1 ? { trickRoom, order } : null;
+    } catch { return null; }
   }
 
   function catchOdds(battle, p, onField) {
@@ -146,7 +176,10 @@
           try {
             const hit = e.getAttackDamage({ source: me, move: mv, simulated: true });
             const crit = e.getAttackDamage({ source: me, move: mv, isCritical: true, simulated: true });
-            return { name: mv.name, max: hit.damage, crit: crit.damage, multi: !!mv.hasAttr?.('MultiHitAttr') };
+            // crit odds by crit stage (getCriticalHitResult): 1 in 24 / 8 / 2 / always
+            let critIn = null;
+            try { critIn = [24, 8, 2, 1][Math.min(3, Math.max(0, e.getCritStage(me, mv)))]; } catch { /* older game */ }
+            return { name: mv.name, max: hit.damage, crit: crit.damage, critIn, multi: !!mv.hasAttr?.('MultiHitAttr') };
           } catch { return { name: mv.name, error: true }; }
         })),
       });
@@ -277,6 +310,6 @@
 
   setInterval(() => {
     hook();
-    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards(), balls: ballMenu(), moves: fightMenu(), calc: damageCalc() }, location.origin);
+    window.postMessage({ __prgOverlay: 1, info: window.gameInfo || null, enemies: enemies(), encounter: encounter(), rewards: rewards(), balls: ballMenu(), moves: fightMenu(), calc: damageCalc(), order: turnOrder() }, location.origin);
   }, 1000);
 })();

@@ -11,6 +11,7 @@ import { ENCOUNTER_NOTES } from '../../src/data/encounter-notes.js';
 import { ITEM_TIERS } from '../../src/data/items.js';
 import { SPECIAL_FORMS } from '../../src/data/megas.js';
 import { rateItem } from './rate.js';
+import { hit, hitsToKo } from './boss.js';
 import { STARTERS } from '../../src/data/starters.js';
 import { BUILDS, ABILITIES } from '../../src/data/builds.js';
 
@@ -73,13 +74,17 @@ function moveVerdict(m, e) {
   if (!m.max) return { range: 'no effect', verdict: '', cls: '' };
   const pct = v => Math.round((v / e.maxHp) * 100);
   const min = Math.floor(m.max * 0.85);
-  const hits = Math.ceil(e.hp / Math.max(1, min));
-  const verdict = e.boss ? 'stops at each bar'
-    : min >= e.hp ? 'KO' : m.max >= e.hp ? 'Can KO' : m.multi ? (hits <= 5 ? `KO if it hits ${hits}+ times` : `about ${Math.ceil(hits / 3)} uses`) : m.crit >= e.hp ? 'KO on a crit' : `${hits} hits`;
+  const lo = hit(e, min), hi = hit(e, m.max);
+  const hits = hitsToKo(e, Math.max(1, min));
+  const verdict = !lo.hp ? 'KO' : !hi.hp ? 'Can KO' : hits === Infinity ? "can't KO this form"
+    : m.multi ? (hits <= 5 ? `KO if it hits ${hits}+ times` : `about ${Math.ceil(hits / 3)} uses`) : !hit(e, m.crit).hp ? (m.critIn === 1 ? 'KO (always crits)' : `KO on a crit${m.critIn ? ` (1 in ${m.critIn})` : ''}`) : `${hits} hits`;
+  // bars left after one hit, on a low and a high roll
+  const [a, b] = [hi.barIndex + 1, lo.barIndex + 1];
+  const bars = e.boss && e.bars > 1 && lo.hp && !m.multi ? `leaves ${a === b || !hi.hp ? b : `${a}–${b}`} bar${b > 1 ? 's' : ''}` : '';
   // a KO call can still be undone by what the enemy holds
-  const kos = /KO/.test(verdict) && !e.boss;
+  const kos = !lo.hp || !hi.hp || hits !== Infinity && /KO/.test(verdict);
   const saves = kos ? [e.band ? `Focus Band ${Math.min(5, e.band) * 10}% to hang on` : '', e.seed ? 'Reviver Seed: back at ½ HP' : ''].filter(Boolean) : [];
-  return { range: `${pct(min)}–${pct(m.max)}%${m.multi ? ' a hit' : ''}`, verdict: [verdict, ...saves].join(' · '), cls: !e.boss && min >= e.hp ? 'ko' : !e.boss && m.max >= e.hp ? 'maybe' : '' };
+  return { range: `${pct(e.hp - lo.hp)}–${pct(e.hp - hi.hp)}%${m.multi ? ' a hit' : ''}`, verdict: [bars, verdict, ...saves].filter(Boolean).join(' · '), cls: !lo.hp ? 'ko' : !hi.hp ? 'maybe' : '' };
 }
 
 function damagePanel(info, e, i, calc) {
@@ -96,7 +101,22 @@ function damagePanel(info, e, i, calc) {
   }).join('');
   const field = [calc?.weather, calc?.terrain].filter(Boolean).join(', ');
   return `<h4>${esc(calc?.attacker || me?.nickname || me?.name || 'Your')}'s moves on it <small>(it has ${pct(e.hp)}% HP)</small></h4><ul class="dmg">${rows}</ul>
-    <p class="muted tiny">${game ? `From the game's own damage calculation: abilities, held items, weather, terrain and move rules included${field ? ` (now: ${esc(field)})` : ''}. Range is the 85-100% damage roll; crits count only in "KO on a crit".` : 'Estimate: no crits, abilities, items or weather.'}</p>`;
+    <p class="muted tiny">${game ? `From the game's own damage calculation: abilities, held items, weather, terrain and move rules included${field ? ` (now: ${esc(field)})` : ''}. Range is the 85-100% damage roll; crits count only in "KO on a crit".` : 'Estimate: no crits, abilities, items or weather.'}</p>
+    ${e.boss && e.bars > 1 ? '<p class="muted tiny">Boss bars: a hit breaks the bar it lands on, but leftover damage breaks 1 more bar only at 2 bars’ worth, 2 more at 4, 3 at 8; the rest is lost. Shown as the game applies it. Hit counts leave out the stat boost it gets for each bar broken.</p>' : ''}`;
+}
+
+// ---- who moves first this turn (page.js turnOrder), as a JRPG-style portrait column over the game: next to act on
+// top, yours framed green, enemies dark; "=" between equal speeds (a coin flip), QC for Quick Claw/Draw, Trick Room
+// flagged; your priority moves underneath. Portraits are the base form's (Megas, fusions and regional forms show base).
+function orderStrip(o) {
+  if (!o?.order?.length) return '';
+  const cards = o.order.map((r, i) => {
+    const tie = i && o.order[i - 1].speed === r.speed ? '<i title="Same speed: a coin flip each turn">=</i>' : '';
+    const tip = `${i + 1}. ${r.name} (${r.you ? 'yours' : 'enemy'}), speed ${r.speed}${r.quick ? '. Quick Claw or Quick Draw: may jump ahead' : ''}`;
+    return `${tie}<span class="${r.you ? 'you' : ''}" title="${esc(tip)}"><img src="${sprite(r.dex)}" alt="${esc(r.name)}" draggable="false"><b>${i + 1}</b>${r.quick ? '<sup>QC</sup>' : ''}<small>${esc(r.speed)}</small></span>`;
+  }).join('');
+  const pri = o.order.filter(r => r.you).flatMap(r => r.priority.map(m => `${m.name} ${m.priority > 0 ? `+${m.priority} goes first` : `${m.priority} goes last`}`));
+  return `${o.trickRoom ? '<em>Trick Room</em>' : ''}${cards}${pri.length ? `<div class="pri">${esc(pri.join(' · '))}</div>` : ''}`;
 }
 
 // ---- left band: your run and your team
@@ -247,6 +267,20 @@ b { display: inline-block; min-width: 24px; }
 .dmg li { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: baseline; background: #182d19; padding: 4px 8px; font-variant-numeric: tabular-nums; }
 .dmg li.ko { background: #c6f19d; color: #0f1f10; } .dmg li.ko small { color: #3c5a3e; }
 .dmg li.maybe strong { color: #c6f19d; }
+.turns { position: fixed; z-index: 2147483000; display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  cursor: grab; user-select: none; touch-action: none; font: 12px/1 Georgia, serif; --s: 52px; }
+.turns[hidden] { display: none; }
+.turns span { position: relative; width: var(--s); height: var(--s); background: #0f1f10; outline: 2px solid #3c5a3e; box-shadow: 0 2px 8px rgba(0,0,0,.5); overflow: hidden; }
+.turns span.you { background: #2a442b; outline-color: #c6f19d; }
+.turns span:first-of-type { width: calc(var(--s) * 1.35); height: calc(var(--s) * 1.35); outline-width: 3px; }
+.turns img { position: absolute; inset: -18%; width: 136%; height: 136%; image-rendering: pixelated; pointer-events: none; }
+.turns b { position: absolute; left: 0; top: 0; min-width: 0; padding: 2px 4px; background: #0f1f10; color: #fff; font-weight: 700; }
+.turns .you b { background: #c6f19d; color: #0f1f10; }
+.turns small { position: absolute; right: 2px; bottom: 2px; color: #fff; font-size: 10px; text-shadow: 0 1px 2px #000, 0 0 2px #000; font-variant-numeric: tabular-nums; }
+.turns sup { position: absolute; right: 2px; top: 2px; font-size: 9px; font-weight: 700; background: #ffd84d; color: #0f1f10; padding: 1px 2px; }
+.turns i { width: var(--s); text-align: center; font-style: normal; font-weight: 700; font-size: 14px; color: #fff; text-shadow: 0 1px 3px #000; margin: -3px 0; }
+.turns em { font-style: normal; background: #ffb4a8; color: #0f1f10; font-weight: 700; padding: 4px 6px; }
+.turns .pri { background: #0f1f10; color: #c6f19d; font-size: 11px; padding: 4px 6px; max-width: 160px; line-height: 1.3; }
 .tiny { font-size: 11px; }
 .tier, .badge { display: inline-grid; place-items: center; font: 700 14px/1 Georgia, serif; color: #0f1f10; }
 .tier { width: 26px; height: 26px; flex: none; }
@@ -315,10 +349,10 @@ function mount() {
   const drawer = root.querySelector('.drawer'), body = root.querySelector('.drawer-body');
   // folded: null until the player chooses, then remembered
   const saved = (() => { try { return JSON.parse(localStorage.getItem('prg-hud')) || {}; } catch { return {}; } })();
-  const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items', predict: !!saved.predict, abil: !!saved.abil };
-  const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right, predict: ui.predict, abil: ui.abil })); } catch { /* storage blocked */ } };
+  const ui = { left: saved.left ?? null, right: saved.right ?? null, tab: 'items', predict: !!saved.predict, abil: !!saved.abil, turns: saved.turnBar || null };
+  const save = () => { try { localStorage.setItem('prg-hud', JSON.stringify({ left: ui.left, right: ui.right, predict: ui.predict, abil: ui.abil, turnBar: ui.turns })); } catch { /* storage blocked */ } };
   const tellPage = () => window.postMessage({ __prgOverlayCmd: 1, predict: ui.predict }, location.origin);
-  let state = { info: null, enemies: [], encounter: null, rewards: null, balls: null, moves: null, calc: null };
+  let state = { info: null, enemies: [], encounter: null, rewards: null, balls: null, moves: null, calc: null, order: null };
   let roomy = true;
 
   // Starter select. A strip under the game's Ability box (over the G / N / V key hints, about 86-100% down the canvas, so
@@ -427,11 +461,35 @@ function mount() {
     right.style.cssText = `right:${roomy ? 4 : innerWidth - r.right + 6}px;top:${top}px;width:${roomy ? Math.min(340, spaceR) : 280}px;max-height:${maxH}px;${right.dataset.hide ? 'display:none' : ''}`;
     left.classList.toggle('folded', ui.left ?? !roomy);
     right.classList.toggle('folded', ui.right ?? !roomy);
+    // the turn column: by default down the left edge, under the enemy's HP box and above the message box
+    const t = ui.turns || { x: 0.012, y: 0.3 };
+    turns.style.left = `${r.left + t.x * (r.right - r.left)}px`;
+    turns.style.top = `${r.top + t.y * (r.bottom - r.top)}px`;
+    // portraits scale with the game: four fit between the enemy's HP box and the message box
+    turns.style.setProperty('--s', `${Math.round(Math.min(64, Math.max(36, 0.075 * (r.bottom - r.top))))}px`);
   }
+
+  // Who moves first, over the game. Drag it anywhere; the spot is kept (as a share of the canvas).
+  const turns = document.createElement('div');
+  turns.className = 'turns';
+  turns.title = 'Who moves first if everyone picks a move. Switching, items and balls go before moves; an enemy priority move can jump ahead. Drag to move.';
+  root.append(turns);
+  turns.addEventListener('pointerdown', e => {
+    const c = document.querySelector('canvas')?.getBoundingClientRect(), b = turns.getBoundingClientRect();
+    if (!c) return;
+    const dx = e.clientX - b.left, dy = e.clientY - b.top;
+    const clamp = v => Math.min(1, Math.max(0, v));
+    const move = ev => { ui.turns = { x: clamp((ev.clientX - dx - c.left) / c.width), y: clamp((ev.clientY - dy - c.top) / c.height) }; place(); };
+    const up = () => { removeEventListener('pointermove', move); removeEventListener('pointerup', up); save(); };
+    addEventListener('pointermove', move);
+    addEventListener('pointerup', up);
+  });
 
   function render() {
     const { info, enemies, encounter } = state;
     const live = info && info.gameMode !== 'Title' && info.wave;
+    turns.innerHTML = live ? orderStrip(state.order) : '';
+    turns.hidden = !turns.innerHTML;
     root.querySelector('.l').innerHTML = live ? runPanel(info, enemies) : '<section><p class="muted">Start or continue a run: your wave, biome, team and the next fights show here.</p></section>';
     root.querySelector('.r').innerHTML = live ? enemyPanel(info, enemies, encounter, state.rewards, state.calc, ui.predict) : '';
     badges();
@@ -465,7 +523,8 @@ function mount() {
 
   // Keep your unlocks for the guide website (guide.js passes them on when you open it).
   addEventListener('message', e => {
-    if (e.source !== window || !e.data?.__prgSave || !e.data.data) return;
+    // !runtime.id: the extension was reloaded and this copy is cut off until the page reloads
+    if (e.source !== window || !e.data?.__prgSave || !e.data.data || !chrome.runtime?.id) return;
     // Keep the last Pokérus list seen if this read didn't have one (starter select not opened since loading).
     chrome.storage?.local.get('prgSave', r => chrome.storage.local.set({ prgSave: { at: Date.now(), data: e.data.data, pokerus: e.data.pokerus || r.prgSave?.pokerus || null } }));
   });
@@ -473,7 +532,7 @@ function mount() {
   let last = '';
   addEventListener('message', e => {
     if (e.source !== window || !e.data?.__prgOverlay) return;
-    state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null, rewards: e.data.rewards ?? null, balls: e.data.balls ?? null, moves: e.data.moves ?? null, calc: e.data.calc ?? null };
+    state = { info: e.data.info, enemies: (e.data.enemies || []).map(en => ({ ...en, types: lower(en.types) })), encounter: e.data.encounter ?? null, rewards: e.data.rewards ?? null, balls: e.data.balls ?? null, moves: e.data.moves ?? null, calc: e.data.calc ?? null, order: e.data.order ?? null };
     const key = JSON.stringify(state);
     if (key !== last) { last = key; render(); } else { place(); badges(); }
   });
