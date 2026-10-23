@@ -858,8 +858,10 @@ section { padding: var(--section) var(--m); }
 .live-mon h3 { font: 700 var(--step-lead)/1 "Pixelify Sans", sans-serif; margin: 0; }
 .live-mon h3 small { display: block; font: 400 var(--step-small)/1.3 "Source Serif 4", Georgia, serif; color: var(--paper-soft); margin-top: 4px; }
 .live-id p { color: var(--paper-soft); font-size: var(--step-small); margin-top: 4px; font-variant-numeric: tabular-nums; }
-.live-hp { height: 6px; background: var(--paper-step); margin-top: 8px; }
+.live-hp { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; margin-top: 8px; }
+.live-hp > div { height: 6px; background: var(--paper-step); }
 .live-hp span { display: block; height: 100%; background: var(--paper-ink); }
+.live-hp small { font-size: var(--step-small); color: var(--paper-soft); font-variant-numeric: tabular-nums; }
 .live-mon .chips { margin-top: 0; }
 .live-facts { margin: 0; display: grid; gap: 4px; font-size: var(--step-small); }
 .live-facts div { display: grid; grid-template-columns: 70px 1fr; gap: 8px; }

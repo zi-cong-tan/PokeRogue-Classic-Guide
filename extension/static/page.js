@@ -218,7 +218,14 @@
     if (!battle?.currentBattle || !Array.isArray(battle.party)) return null;
     try {
       const name = sp => { const r = sp.speciesId >= 2000 && REGION[Math.floor(sp.speciesId / 1000)]; return r && !sp.name.startsWith(r) ? `${r} ${sp.name}` : sp.name; };
+      // In a Classic rival fight, the rival Pokémon on the field by party slot. The rival's lineup is fixed for the run
+      // (every rival fight seeds slot n the same way: trainer.ts genPartyMember, static party), so the guide can tell
+      // which evolved form each slot will be in later fights.
+      const b = battle.currentBattle, RIVAL_WAVES = [8, 25, 55, 95, 145, 195];
+      const rivalFight = b.battleType === 1 && battle.gameMode?.isClassic && RIVAL_WAVES.includes(b.waveIndex);
+      const foeParty = rivalFight ? battle.getEnemyParty?.() || [] : [];
       return {
+        rival: rivalFight ? { wave: b.waveIndex, seen: battle.getEnemyField().filter(Boolean).map(p => [foeParty.indexOf(p), name(p.species)]).filter(([k]) => k > -1) } : null,
         map: !!battle.findModifier?.(m => m.is?.('MapModifier')),
         party: battle.party.map(p => ({
           id: p.species.speciesId, species: name(p.species), fusion: p.fusionSpecies ? name(p.fusionSpecies) : null, ivs: [...(p.ivs || [])],

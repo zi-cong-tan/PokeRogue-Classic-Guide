@@ -12,6 +12,7 @@ import { useRun, setRun, useTeam, waveRule, fits, biomeKey, runMembers, BOSS_TIE
 import { BIOME_BOSSES } from '../data/biome-bosses';
 import MonCard from './MonCard';
 import { RIVALS } from '../data/rivals';
+import { useLive } from '../live';
 
 const FIGHTS = [...RUN.flatMap(g => g.rows), FINAL].map(f => ({ ...f, waves: (f.at.match(/\d+/g) || [f.n]).map(Number) }));
 const ODDS = { 2: ', 1 run in 2', 3: ', 1 run in 3' };
@@ -33,8 +34,8 @@ function nextBossWave(w, run) {
 // Bosses whose teams are known for this run, in wave order.
 function knownBosses(run) {
   const out = [];
-  // Rivals roll every slot fresh each fight, so the prep groups each slot by type: exact for the starter from fight 4,
-  // which Terastallizes to its first type; birds by their full typing; the big pools by their main type.
+  // Until you've seen a slot, the prep groups its options by type: exact for the starter from fight 4, which
+  // Terastallizes to its first type; birds by their full typing; the big pools by their main type.
   for (const r of RIVALS) {
     const slots = r.slots.map((s, k) => {
       const label = s.pool.length === 1 ? s.pool[0][0] : k === 0 ? 'Their starter' : k === 1 ? 'Their bird' : `Slot ${k + 1}`;
@@ -82,15 +83,33 @@ const Chip = ({ t }) => <span className="ty" style={{ '--t': TYPE_COLOR[t], '--t
 const tidy = note => { const s = (note || '').replace(/^Their starter(, |; )?/, '').replace(/^Always a bird(; )?/, ''); return s && s[0].toUpperCase() + s.slice(1); };
 
 // Rival prep: one row per slot, each type group a cell with your best answer, so gaps stand out at a glance.
-// Rival prep: one row per slot, each type group a cell with your best answer, so gaps stand out at a glance.
 // Seen their team? Mark each Pokémon from its card: that slot then shows only it, saved per fight in your run.
+// The rival's lineup is fixed for the run: every rival fight seeds slot n the same way (trainer.ts genPartyMember,
+// static party), so it lands on the same place in each fight's pool, evolved. Slots the extension saw in an earlier
+// fight fill themselves in; your own marks still win.
+function autoRival(wave, seen) {
+  const fight = RIVALS.find(r => r.wave === wave), out = {};
+  for (const [w, slots] of Object.entries(seen || {})) {
+    const then = RIVALS.find(r => r.wave === +w);
+    for (const [k, name] of Object.entries(slots)) {
+      const at = then?.slots[k]?.pool.findIndex(p => norm(p[0]).toLowerCase() === norm(name).toLowerCase());
+      const now = at > -1 ? fight?.slots[k]?.pool[at] : null;
+      if (now && !out[k]) out[k] = now[0];
+    }
+  }
+  return out;
+}
+
 function RivalPrep({ slots, team, wave, run }) {
   const [open, setOpen] = useState(null);   // the Pokémon clicked, shown up close under its row
   const [wide, setWide] = useState({});      // groups expanded to show every option
   const [all, setAll] = useState({});        // marked slots opened back up to every option
-  const picks = run.rivalPicks?.[wave] || {};
+  const live = useLive();
+  const auto = autoRival(wave, live?.rivalSeen);
+  const own = run.rivalPicks?.[wave] || {};
+  const picks = { ...auto, ...own };
   const mark = (slot, name) => {
-    const next = { ...picks };
+    const next = { ...own };
     if (next[slot] === name) delete next[slot]; else next[slot] = name;
     setRun({ rivalPicks: { ...(run.rivalPicks || {}), [wave]: next } });
   };
@@ -116,7 +135,7 @@ function RivalPrep({ slots, team, wave, run }) {
   };
   return (
     <div className="rival-prep">
-      <p className="hint">{marked ? `Marked ${marked} of ${slots.length} slots for this fight.` : 'Seen their team? Tap each Pokémon you see and mark it: that slot then shows only that one.'}</p>
+      <p className="hint">{Object.keys(auto).length ? `Your rival keeps the same team all run, evolved. ${Object.keys(auto).length} of ${slots.length} slots are filled in from the rival fights the extension saw.` : marked ? `Marked ${marked} of ${slots.length} slots for this fight.` : 'Seen their team? Tap each Pokémon you see and mark it: that slot then shows only that one. With the extension on, slots fill in by themselves from your earlier rival fights.'}</p>
       {slots.map(slot => {
         const pickName = picks[slot.index];
         const pick = pickName && slot.groups.flatMap(g => g.list).find(m => m[0] === pickName);
@@ -276,7 +295,7 @@ function Body({ popped, onPop }) {
       {boss && (
         <div className="track-prep">
           <h3>Boss prep: {boss.title}</h3>
-          {boss.rival && ms ? <><p className="hint">Each slot is rolled fresh every fight. Its options are grouped by type, with your best answer to each.</p><RivalPrep slots={boss.rivalSlots} team={ms} wave={boss.wave} run={run} /></>
+          {boss.rival && ms ? <><p className="hint">Your rival's team is fixed for the run: each slot is the same Pokémon every fight, evolved. Slots you haven't seen yet are grouped by type, with your best answer to each.</p><RivalPrep slots={boss.rivalSlots} team={ms} wave={boss.wave} run={run} /></>
             : !team.party.length && !run.caught?.length ? <p className="hint">Pick your starters in the planner, or add what you caught below, to see how your team matches up.</p>
             : !prep ? <p className="hint">Loading the matchup...</p> : <>
               <p className="hint">{boss.extra ? `${boss.extra} ` : ''}{boss.biome ? `One of these will show up (or the gym leader on a gym wave). ` : ''}{uncovered ? `${uncovered} of ${prep.length} have no super-effective hit from your team. Teach a move of the type below them, or swap someone in.` : 'Your team can hit every one of them for at least double.'}</p>

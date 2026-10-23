@@ -613,9 +613,15 @@ function mount() {
 
   // Your run for the guide website: the game's party info plus page.js's extras, saved when it changes (at most every
   // 3 seconds); guide.js hands it to the guide's "Your party, live" section.
-  let lastRun = '', runAt = 0;
+  // rivalSeen: { wave: { slot: species } } for every rival fight seen this run; a lower wave than before means a new run.
+  let lastRun = '', runAt = 0, rivalSeen = {}, lastWave = 0;
+  chrome.storage?.local.get('prgRun', r => { rivalSeen = r.prgRun?.rivalSeen || {}; lastWave = r.prgRun?.info?.wave || 0; });
   function saveRun(info, extra) {
     if (!info || info.gameMode === 'Title' || !info.wave || !extra || !chrome.runtime?.id) return;
+    if (info.wave < lastWave) rivalSeen = {};
+    lastWave = info.wave;
+    if (extra.rival) for (const [slot, sp] of extra.rival.seen) (rivalSeen[extra.rival.wave] ||= {})[slot] = sp;
+    extra = { ...extra, rivalSeen };
     const key = JSON.stringify([info, extra]);
     if (key === lastRun || Date.now() - runAt < 3000) return;
     lastRun = key; runAt = Date.now();

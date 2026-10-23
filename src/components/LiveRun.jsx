@@ -59,7 +59,7 @@ function Member({ m, x, L }) {
         <div>
           <h3>{m.nickname || m.name}{m.isFusion && x.fusion ? <small> fused with {x.fusion}</small> : null}</h3>
           <p>Lv {m.level}{m.nature ? ` · ${m.nature}` : ''}{m.currentHP <= 0 ? ' · Fainted' : m.status ? ` · ${m.status}` : ''}</p>
-          <div className="live-hp" role="img" aria-label={`${m.currentHP} of ${m.maxHP} HP`}><span style={{ width: `${Math.round(hp * 100)}%` }} /></div>
+          <div className="live-hp"><div aria-hidden="true"><span style={{ width: `${Math.round(hp * 100)}%` }} /></div><small>{m.currentHP} / {m.maxHP} HP</small></div>
         </div>
       </div>
       <p className="chips">{types.map(t => <Chip key={t} t={t} />)}</p>
