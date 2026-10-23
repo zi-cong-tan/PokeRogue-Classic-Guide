@@ -876,11 +876,14 @@ section { padding: var(--section) var(--m); }
 .live-moves li.has > span:last-child { color: var(--accent-ink); font-weight: 600; }
 .live-move { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: var(--step-body); }
 .live-move .ty { width: 74px; text-align: center; padding: 2px 0; font-size: 13px; flex: none; }
-.live-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.live-items li { display: grid; grid-template-columns: 32px 1fr; gap: 10px; align-items: start; background: var(--paper-step); padding: 8px 10px; }
-.live-items img { width: 32px; height: 32px; image-rendering: pixelated; }
-.live-items strong { font-size: var(--step-small); }
+.live-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.live-items li { display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: start; }
+.live-items img { width: 28px; height: 28px; image-rendering: pixelated; margin-top: -3px; }
 .live-items p { font-size: var(--step-small); color: var(--paper-soft); line-height: 1.35; }
+.live-items strong { color: var(--paper-ink); }
+.live-more summary { cursor: pointer; font-size: var(--step-small); font-weight: 600; min-height: 32px; display: flex; align-items: center; }
+.live-more summary:hover { text-decoration: underline; text-underline-offset: 3px; }
+.live-more .live-items { margin-top: 4px; }
 .live-note { font-size: var(--step-small); color: var(--paper-soft); }
 .live-note strong { color: var(--paper-ink); }
 
@@ -932,3 +935,7 @@ section { padding: var(--section) var(--m); }
 .live-warn { color: #ffb4a8 !important; }
 .live-biome h4 { font: 600 var(--step-small) "Source Serif 4", Georgia, serif; color: var(--paper-soft); margin: 0; padding: 4px 16px 0; }
 @media (max-width: 720px) { .live-bosses ul { grid-template-columns: 1fr; } .live-bosses li { grid-template-columns: 64px 1fr; padding: 18px; } .live-bosses img { width: 64px; height: 64px; } }
+.live-held { display: grid; gap: 6px; }
+.live-items-plain { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.live-items-plain li { display: flex; align-items: center; gap: 4px; font-size: var(--step-small); color: var(--paper-soft); }
+.live-items-plain img { width: 28px; height: 28px; image-rendering: pixelated; }

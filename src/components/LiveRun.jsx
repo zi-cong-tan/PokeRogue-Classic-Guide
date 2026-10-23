@@ -73,6 +73,42 @@ function bossLine(r) {
   return { hit, back };
 }
 
+// Held items everyone knows (vitamins, Soothe Bell, Mystical Rock) show as a small row of sprites; berries and the
+// rest keep the game's description of what they do. Keyed by the game's item icon.
+const PLAIN_ITEMS = new Set(['hp_up', 'protein', 'iron', 'calcium', 'zinc', 'carbos', 'soothe_bell', 'mystical_rock']);
+function Items({ items }) {
+  const list = items.filter(it => typeof it === 'object');
+  const plain = list.filter(it => PLAIN_ITEMS.has(it.icon)), full = list.filter(it => !PLAIN_ITEMS.has(it.icon));
+  // a well-stocked Pokémon can hold a dozen items: the first four are spelled out, the rest fold away
+  const row = (it, k) => (
+    <li key={k}>
+      {it.icon && <img src={itemArt(it.icon)} alt="" width="32" height="32" loading="lazy" />}
+      <p><strong>{it.name}{it.count > 1 ? ` ×${it.count}` : ''}</strong> {it.desc}</p>
+    </li>
+  );
+  return (
+    <div className="live-held" aria-label="Holding">
+      {full.length > 0 && <ul className="live-items">{full.slice(0, 4).map(row)}</ul>}
+      {full.length > 4 && (
+        <details className="live-more">
+          <summary>+{full.length - 4} more item{full.length - 4 > 1 ? 's' : ''}</summary>
+          <ul className="live-items">{full.slice(4).map(row)}</ul>
+        </details>
+      )}
+      {plain.length > 0 && (
+        <ul className="live-items-plain">
+          {plain.map((it, k) => (
+            <li key={k} title={it.desc || undefined}>
+              <img src={itemArt(it.icon)} alt="" width="32" height="32" loading="lazy" />
+              <span>{it.name}{it.count > 1 ? ` ×${it.count}` : ''}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 // One party member: what it has now, the moveset it can reach this run, and the best possible one.
 // eggKeys: the egg moves you've unlocked for its starter line (from your save), as the starter build sheet uses.
 function Member({ m, x, L, eggKeys, vs }) {
@@ -116,16 +152,7 @@ function Member({ m, x, L, eggKeys, vs }) {
       <dl className="live-facts">
         <div><dt>Ability</dt><dd>{m.ability}{m.passiveAbility && m.isPassiveEnabled ? `, passive ${m.passiveAbility}` : ''}</dd></div>
       </dl>
-      {x?.items?.length > 0 && (
-        <ul className="live-items" aria-label="Holding">
-          {x.items.map((it, k) => typeof it === 'string' ? <li key={k}><strong>{it}</strong></li> : (
-            <li key={k}>
-              {it.icon && <img src={itemArt(it.icon)} alt="" width="32" height="32" loading="lazy" />}
-              <div><strong>{it.name}{it.count > 1 ? ` ×${it.count}` : ''}</strong>{it.desc && <p>{it.desc}</p>}</div>
-            </li>
-          ))}
-        </ul>
-      )}
+      {x?.items?.length > 0 && <Items items={x.items} />}
       <h4>Best moveset this run</h4>
       <Moves list={best} known={known} label={when} L={L} />
       {drop.length > 0 && <p className="live-note">When it learns one of these, forget: {drop.join(', ')}</p>}
