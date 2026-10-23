@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BIOMES } from '../data/game';
 import { TYPE_COLOR, cap, typeInk } from '../data/types';
-import { sprite, biomeArt } from '../art';
+import { sprite, biomeArt, itemArt } from '../art';
 import { NATURES, suggestNature, suggestMoves, evolveAdvice, teamReport } from '../advice';
 import { useLive, formKey, finalForm, catchHere } from '../live';
 import { useSave } from '../save';
@@ -51,7 +51,7 @@ function Moves({ list, known, label, L }) {
         const has = known.includes(b.m);
         return (
           <li key={b.m} className={has ? 'has' : undefined} title={b.why || undefined}>
-            <span className="live-move"><i style={{ '--t': TYPE_COLOR[type] }} aria-hidden="true" />{name}</span>
+            <span className="live-move"><Chip t={type} />{name}</span>
             <b aria-hidden="true" />
             <span>{label(b, has)}</span>
           </li>
@@ -103,11 +103,20 @@ function Member({ m, x, L, eggKeys }) {
       <p className="chips">{types.map(t => <Chip key={t} t={t} />)}</p>
       <dl className="live-facts">
         <div><dt>Ability</dt><dd>{m.ability}{m.passiveAbility && m.isPassiveEnabled ? `, passive ${m.passiveAbility}` : ''}</dd></div>
-        {x?.items?.length > 0 && <div><dt>Holding</dt><dd>{x.items.join(', ')}</dd></div>}
       </dl>
+      {x?.items?.length > 0 && (
+        <ul className="live-items" aria-label="Holding">
+          {x.items.map((it, k) => typeof it === 'string' ? <li key={k}><strong>{it}</strong></li> : (
+            <li key={k}>
+              {it.icon && <img src={itemArt(it.icon)} alt="" width="32" height="32" loading="lazy" />}
+              <div><strong>{it.name}{it.count > 1 ? ` ×${it.count}` : ''}</strong>{it.desc && <p>{it.desc}</p>}</div>
+            </li>
+          ))}
+        </ul>
+      )}
       <h4>Best moveset this run</h4>
       <Moves list={best} known={known} label={when} L={L} />
-      {drop.length > 0 && <p className="live-note">Drop when the new ones come: {drop.join(', ')}</p>}
+      {drop.length > 0 && <p className="live-note">When it learns one of these, forget: {drop.join(', ')}</p>}
       <h4>Best possible moveset{fin !== key ? ` as ${F[fin][0]}` : ''}</h4>
       {same ? <p className="live-note">The same four: nothing better is out there for it.</p>
         : <Moves list={possible} known={known} label={(b, has) => how(b, has, m.level, F[key][0], F[fin][0], passed)} L={L} />}

@@ -229,7 +229,12 @@
         map: !!battle.findModifier?.(m => m.is?.('MapModifier')),
         party: battle.party.map(p => ({
           id: p.species.speciesId, species: name(p.species), fusion: p.fusionSpecies ? name(p.fusionSpecies) : null, ivs: [...(p.ivs || [])],
-          items: (p.getHeldItems?.() || []).map(m => m.type?.name && m.type.name + (m.stackCount > 1 ? ` ×${m.stackCount}` : '')).filter(Boolean),
+          // held items: name, stack, the game's own icon and description
+          items: (p.getHeldItems?.() || []).filter(m => m.type?.name).map(m => {
+            let desc = '';
+            try { desc = m.type.getDescription?.() || ''; } catch { /* some need a party context */ }
+            return { name: m.type.name, count: m.stackCount || 1, icon: m.type.iconImage || '', desc };
+          }),
         })),
       };
     } catch { return null; }
