@@ -3,6 +3,9 @@
 // held items, and whether you hold the Map. Kept in this browser like the rest of the guide; nothing is sent anywhere.
 import { useEffect, useState } from 'react';
 import { mult } from './data/types.js';
+import { finalForm } from './advice.js';
+
+export { finalForm };
 
 const KEY = 'prg-live';
 const read = () => { try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; } };
@@ -38,8 +41,6 @@ export function formKey(member, F) {
 }
 
 // The last form of a line reachable from `form` (first branch): what a catch grows into.
-export const finalForm = (form, F) => (F[form][6].length && F[F[form][6][0][0]] ? finalForm(F[form][6][0][0], F) : form);
-
 // Wild Pokémon in a biome worth catching for this team, best three. A good one resists what hits the team hard
 // (threats) and hits what the team's moves can't (gaps), judged by what it evolves into; stronger ones and commoner
 // ones rank higher. With no holes to fill it ranks by strength alone. Lines already in the party are left out.

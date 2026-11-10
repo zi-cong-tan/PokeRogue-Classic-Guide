@@ -69,6 +69,43 @@ def how(e):
     return [target, " + ".join(words) or "level 1"]
 
 
+def form_key(text):
+    """A form's key as written: "partner" -> partner, SpeciesFormKey.GIGANTAMAX -> GIGANTAMAX."""
+    m = re.match(r'\s*(?:"([^"]*)"|\[?SpeciesFormKey\.(\w+)\]?|(\w+))', text)
+    return m[1] if m[1] is not None else m[2] or m[3]
+
+
+def starter_forms(block, evo):
+    """Forms you can pick on the starter screen, when they differ in more than looks (Pikachu: Partner, Cosplay...):
+    [name, types, stats, [ability 1, ability 2, hidden], passive, [[level, move]] only that form learns, can evolve]."""
+    if "forms: [" not in block:
+        return []
+    body = block.split("forms: [", 1)[1]
+    passives = dict(re.findall(r"\n      (\d+): AbilityId\.(\w+)", block.split("passives: {", 1)[1].split("\n    },", 1)[0])) \
+        if "passives: {" in block else {}
+    one = re.search(r"\n    passives: AbilityId\.(\w+)", block)
+    flm = {}
+    if "formLevelMoves: {\n" in block:
+        sec = block.split("formLevelMoves: {\n", 1)[1].split("\n    },", 1)[0]
+        for chunk in re.split(r"\n(?= {6}[^\s\]])", sec):
+            flm[form_key(chunk.split(":", 1)[0])] = [[int(l), m] for l, m in re.findall(r"\[(-?\d+), MoveId\.(\w+)\]", chunk)]
+    pre = re.findall(r"new Species(?:Form)?Evolution\(\{(.*?)\}\)", evo, re.S)
+    out = []
+    for n, f in enumerate(re.findall(r"new PokemonForm\(\{(.*?)\}\)", body, re.S)):
+        if "isStarterSelectable: true" not in f:
+            continue
+        key = form_key(re.search(r"formKey: (.*)", f)[1])
+        stat = lambda k: int(re.search(k + r": (\d+)", f)[1])
+        out.append([re.search(r'formName: "([^"]*)"', f)[1],
+                    " ".join(t.lower() for t in re.findall(r"type[12]: PokemonType\.(\w+)", f)),
+                    [stat(k) for k in ("baseHp", "baseAtk", "baseDef", "baseSpatk", "baseSpdef", "baseSpd")],
+                    [clean((re.search(k + r": AbilityId\.(\w+)", f) or [None, None])[1]) for k in ("ability1", "ability2", "abilityHidden")],
+                    passives.get(str(n), passives.get("0")) or (one[1] if one else None),
+                    flm.get(key, []),
+                    any("preFormKey" not in e or form_key(re.search(r"preFormKey: (.*)", e)[1]) == key for e in pre)])
+    return out if len(out) > 1 and len({json.dumps(o[1:]) for o in out}) > 1 else []
+
+
 # --- species: every block, plus the extra fields on starters
 species, starters, forms = {}, {}, {}
 for g in range(1, 10):
@@ -99,7 +136,8 @@ for g in range(1, 10):
         moves = block.split("levelMoves: [", 1)[1].split("\n    ],", 1)[0] if "levelMoves: [" in block else ""
         moves = moves.replace("EVOLVE_MOVE", "0").replace("RELEARN_MOVE", "-1")
         start = [m for lvl, m in re.findall(r"\[(-?\d+), MoveId\.(\w+)\]", moves) if 0 < int(lvl) <= 5]
-        starters[sid] = {"cost": int(cost.group(1)), "ab": ab, "passive": passive.group(1) if passive else None, "start": start}
+        starters[sid] = {"cost": int(cost.group(1)), "ab": ab, "passive": passive.group(1) if passive else None, "start": start,
+                         "forms": starter_forms(block, evo)}
 
 egg_moves = {sid: re.findall(r"MoveId\.(\w+)", moves) for sid, moves in
              re.findall(r"\[SpeciesId\.(\w+)\]: \[([^\]]+)\]", fetch(f"{SRC}balance/moves/egg-moves.ts"))}
@@ -132,13 +170,13 @@ def display_name(sid):
     return sid.title().replace("_", " ")
 
 
-builds, evos, used_ab, used_mv, problems = [], [], set(), set(), []
+builds, evos, used_ab, used_mv, problems, starter_forms_out = [], [], set(), set(), [], []
 for name, _sprite, cost, _types in guide:
     sid = species_key(name)
     s = starters.get(sid)
     if not s:
         problems.append(f"{name}: no starter called {sid} in the source")
-        builds.append(None); evos.append([])
+        builds.append(None); evos.append([]); starter_forms_out.append([])
         continue
     if s["cost"] != cost:
         problems.append(f"{name}: cost is {s['cost']} in the source, {cost} in starters.js")
@@ -146,6 +184,10 @@ for name, _sprite, cost, _types in guide:
     used_ab.update(a for a in s["ab"] + [s["passive"]] if a)
     used_mv.update(s["start"] + eggs)
     builds.append([s["ab"], s["passive"], s["start"], eggs])
+    for fm in s["forms"]:
+        used_ab.update(a for a in fm[3] + [fm[4]] if a)
+        used_mv.update(m for _, m in fm[5])
+    starter_forms_out.append(s["forms"])
 
     chain, queue, seen = [], list(species[sid]["evos"]), set()
     while queue:  # every Pokemon it can evolve into, branches included
@@ -180,7 +222,10 @@ out = (
     f"export const BUILDS = {j(builds)};\n\n// key: [name, description]\nexport const ABILITIES = {j(abilities)};\n\n"
     f"export const MOVES = {j(moves)};\n\n"
     "// Every Pokemon each starter can evolve into, in order: [name, [ability 1, ability 2, hidden ability]].\n"
-    f"export const EVOS = {j(evos)};\n"
+    f"export const EVOS = {j(evos)};\n\n"
+    "// Forms you pick on the starter screen that differ in more than looks (empty for most): [name, types,\n"
+    "//  [HP, Atk, Def, SpA, SpD, Spe], [ability 1, ability 2, hidden], passive, [[level, move]] only that form learns, can evolve].\n"
+    f"export const STARTER_FORMS = {j(starter_forms_out)};\n"
 )
 (ROOT / "src/data/builds.js").write_text(out, encoding="utf-8")
 # --- learnsets.js: every form in each starter's line, for the mid-run build, advice and the team check

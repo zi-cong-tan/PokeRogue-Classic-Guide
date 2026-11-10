@@ -2,8 +2,8 @@
 import assert from 'node:assert/strict';
 import * as L from '../src/data/learnsets.js';
 import { STARTERS } from '../src/data/starters.js';
-import { BUILDS } from '../src/data/builds.js';
-import { suggestNature, suggestMoves, evolveAdvice, teamReport, learnable, bossPrep, fuse, itemOdds, bossOdds, partyLuck, shinyOneIn, TACTICS, tacticStarters, fusionPicks } from '../src/advice.js';
+import { BUILDS, EVOS, STARTER_FORMS } from '../src/data/builds.js';
+import { suggestNature, suggestMoves, evolveAdvice, teamReport, learnable, bossPrep, fuse, itemOdds, bossOdds, partyLuck, shinyOneIn, TACTICS, tacticStarters, fusionPicks, finalForm, suggestForm, suggestAbility } from '../src/advice.js';
 
 const at = n => STARTERS.findIndex(s => s[0] === n);
 const name = m => L.MOVE_LIST[m][0];
@@ -11,6 +11,10 @@ const name = m => L.MOVE_LIST[m][0];
 assert.equal(suggestNature(L.FORMS.GARCHOMP[3]).nature, 'Jolly');      // fast physical
 assert.equal(suggestNature(L.FORMS.VENUSAUR[3]).nature, 'Modest');     // slow special-leaning
 assert.equal(suggestNature(L.FORMS.ALAKAZAM[3]).nature, 'Timid');      // fast special
+const rows = (...n) => n.map(x => L.MOVE_LIST.find(r => r[0] === x));
+assert.equal(suggestNature(L.FORMS.GYARADOS[3], rows('Aqua Tail', 'Hurricane', 'Dragon Dance', 'Knock Off')).nature, 'Jolly');   // Speed setup
+assert.equal(suggestNature(L.FORMS.TINKATON[3], rows('Play Rough', 'Gigaton Hammer', 'Knock Off')).nature, 'Jolly');           // physical by its moves
+assert.equal(suggestNature(L.FORMS.GYARADOS[3]).nature, 'Adamant');   // no moves: stat rule as before
 
 const g = at('Gible'), gm = suggestMoves(L.LINES[g], 'GARCHOMP', BUILDS[g][3], L);
 assert.equal(gm.length, 4);
@@ -62,4 +66,16 @@ console.log('Leech Seed top:', seed.slice(0, 5).map(s => L.FORMS[s.form][0]).joi
 console.log('Garchomp:', gm.map(x => `${name(x.m)} (${x.label})`).join(', '));
 console.log('Ivysaur ->', evo.map(e => `${e.name} by ${e.how}; keep ${e.keep.map(k => name(k.m) + ' @' + k.lvl).join(', ') || 'nothing'}`).join(' | '));
 console.log('swap', team.swap);
+// Split evolutions: Pikachu plans for Raichu (same stats as Alolan Raichu, 1 weakness instead of 4) unless told otherwise.
+assert.equal(finalForm('PIKACHU', L.FORMS), 'RAICHU');
+assert.equal(finalForm('PIKACHU', L.FORMS, 'ALOLA_RAICHU'), 'ALOLA_RAICHU');
+// Partner Pikachu: starts at 430 and still evolves; the cosplay forms can't evolve.
+const pk = at('Pikachu');
+assert.equal(STARTER_FORMS[pk][suggestForm(STARTER_FORMS[pk], L.LINES[pk], L.FORMS).best][0], 'Partner');
+assert.equal(STARTER_FORMS[pk].find(f => f[0] === 'Tough Cosplay')[6], false);
+// The ability it ends up with counts: Magikarp's hidden Rattled becomes Gyarados' Moxie.
+const mk = at('Magikarp'), gy = EVOS[mk].find(([n]) => n === 'Gyarados');
+assert.equal(suggestAbility(BUILDS[mk][0], null, gy).as, 'Gyarados');
+// Every starter now gets a ranked suggestion or an explicit "any is fine".
+assert.ok(BUILDS.every(b => !b || suggestAbility(b[0])));
 console.log('ok');

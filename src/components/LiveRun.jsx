@@ -135,7 +135,7 @@ function Member({ m, x, L, eggKeys, vs }) {
   const same = possible.every(p => best.some(b => b.m === p.m));
   const drop = known.filter(i => !best.some(b => b.m === i)).map(i => L.MOVE_LIST[i][0]);
   const evo = evolveAdvice(key, L);
-  const want = suggestNature(F[finalForm(key, F)][3]);
+  const want = suggestNature(F[finalForm(key, F)][3], best.map(b => L.MOVE_LIST[b.m]));
   const natUp = NATURES.find(n => n[0] === want.nature)?.[1];
   const fits = m.nature === want.nature;
   return (

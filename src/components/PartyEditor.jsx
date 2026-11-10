@@ -1,17 +1,18 @@
 import { Fragment, useState } from 'react';
 import { STARTERS } from '../data/starters';
-import { TYPE_COLOR, cap, typeInk } from '../data/types';
-import { NATURES, STATS, suggestNature, bestOwnedNature, suggestMoves, suggestAbility, abilityRank, evolveAdvice, learnable } from '../advice';
+import { TYPE_COLOR, TYPES, cap, mult, typeInk } from '../data/types';
+import { NATURES, STATS, suggestNature, bestOwnedNature, suggestMoves, suggestAbility, evolveAdvice, learnable, finalForm, suggestForm } from '../advice';
+import { SPECIAL_FORMS } from '../data/megas';
 import { useShinySprite } from '../shiny';
 import { GAME_IDS } from '../data/game-ids';
 
 const ABILITY_SLOT = ['Ability 1', 'Ability 2', 'Hidden ability'];
 
+const stat = s => s.reduce((a, b) => a + b, 0);
+
 const SOURCE_GROUP = { level: 'Level-up', egg: 'Egg moves', tm: 'TMs' };
 const moveText = ([n, t, cat, power, acc]) =>
   `${n}: ${cap(t)}${cat === 'X' ? ', status' : `, ${power || 'varies'}`}${acc > 0 && acc < 100 ? `, ${acc}%` : ''}`;
-// The last form of a line reachable from `form` (first branch), for advice that should look ahead.
-const finalForm = (form, F) => (F[form][6].length ? finalForm(F[form][6][0][0], F) : form);
 
 // Shiny tiers: each adds that much luck (1, 2, 3) while in the party.
 const SHINY_TIERS = ['No', 'Standard (+1 luck)', 'Rare (+2 luck)', 'Epic (+3 luck)'];
@@ -58,7 +59,7 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
   }
   if (!data) return <div className="editor"><p>Loading the move and ability lists...</p></div>;
 
-  const { BUILDS, ABILITIES, MOVES, EVOS, FORMS, LINES, MOVE_LIST, MOVE_KEYS } = data;
+  const { BUILDS, ABILITIES, MOVES, EVOS, FORMS, LINES, MOVE_LIST, MOVE_KEYS, STARTER_FORMS } = data;
   const i = party[at];
   const [name] = STARTERS[i];
   const opts = BUILDS[i];
@@ -67,8 +68,11 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
   // With a synced save, what this starter has unlocked; anything else is greyed out and can't be picked.
   const own = save?.own[i] || null;
 
-  const [abilities, passive, startMoves, eggMoves] = opts;
-  const abPick = suggestAbility(abilities, own?.ab);
+  const [abilities, basePassive, startMoves, eggMoves] = opts;
+  // Starter-screen forms that play differently (Pikachu: Partner, Cosplay...). The picked one sets the passive.
+  const sforms = STARTER_FORMS[i] || [];
+  const sform = sforms[b.sform] ? b.sform : 0;
+  const passive = sforms.length ? sforms[sform][4] : basePassive;
   const pool = [...startMoves, ...eggMoves.filter((_, k) => b.egg[k])];
   const ab = abilities[b.ability] || abilities[0];
   const nat = NATURES.find(n => n[0] === b.nature);
@@ -81,11 +85,20 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
   const line = LINES[i];
   const form = line.includes(b.form) ? b.form : line[0];
   const unlockedEggs = eggMoves.filter((_, k) => b.egg[k]);
-  const ahead = finalForm(form, FORMS);
-  const nature = suggestNature(FORMS[ahead][3]);
-  const fallback = own ? bestOwnedNature(nature.nature, FORMS[ahead][3], own.natures) : null;
+  const ahead = finalForm(form, FORMS, b.target);
+  // The ability it ends up with decides the pick (Magikarp's Swift Swim slot is Gyarados' Moxie); a form that can't
+  // evolve keeps its own.
+  const later = sforms.length && !sforms[sform][6] ? null : EVOS[i].find(([n]) => n === FORMS[ahead][0]);
+  const abPick = suggestAbility(abilities, own?.ab, later);
+  const abNow = suggestAbility(abilities.map((a, n) => (n === slot ? a : null)), null, later);
+  const abWhy = p => p.why || ABILITIES[p.key]?.[1] || '';
+  const formPick = sforms.length ? suggestForm(sforms, line, FORMS) : null;
+  const branches = FORMS[form][6].length > 1 ? FORMS[form][6].map(([to]) => to).filter(to => FORMS[to]) : [];
+  const startPick = suggestMoves(line, line[0], unlockedEggs, data, m => pool.includes(MOVE_KEYS[m]));
   const learn = learnable(line, form, unlockedEggs, data);
   const suggested = suggestMoves(line, form, unlockedEggs, data);
+  const nature = suggestNature(FORMS[ahead][3], suggested.slice(0, 4).map(x => MOVE_LIST[x.m]));
+  const fallback = own ? bestOwnedNature(nature.nature, FORMS[ahead][3], own.natures) : null;
   const evolving = evolveAdvice(form, data);
   const runMoves = (b.runMoves || []).filter(k => learn.has(MOVE_KEYS.indexOf(k)));
   const grouped = Object.keys(SOURCE_GROUP).map(kind => [kind, [...learn].filter(([, v]) => v.kind === kind)
@@ -134,6 +147,31 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
           <button type="button" className="text-btn editor-remove" onClick={() => remove(i)}>Remove from party</button>
         </div>
 
+        {sforms.length > 0 && (
+          <fieldset>
+            <legend>Form</legend>
+            <select value={sform} onChange={e => set({ sform: +e.target.value })} aria-label="Starter form">
+              {sforms.map((f, n) => <option key={n} value={n}>{f[0]}</option>)}
+            </select>
+            <p className="hint">
+              {stat(sforms[sform][2])} base stats{sforms[sform][1] !== sforms[0][1] && <>, {sforms[sform][1].split(' ').map(cap).join('/')}</>}.
+              {' '}Passive: {ABILITIES[sforms[sform][4]]?.[0] || 'none'}.
+              {sforms[sform][5].length > 0 && <> Only this form learns {sforms[sform][5].map(([l, m]) => `${MOVES[m]?.[0] || m} (${l <= 1 ? 'from the start' : `level ${l}`})`).join(', ')}.</>}
+              {' '}{sforms[sform][6] ? 'Can evolve.' : 'Can\'t evolve.'}
+            </p>
+            <div className="suggest">
+              <p><strong>Suggested: {sforms[formPick.best][0]}</strong></p>
+              <p className="hint">
+                {formPick.endName ? `It can still evolve into ${formPick.endName}, the strongest it gets` : `${formPick.bst} base stats, the most of its forms`}
+                {sforms.some((f, n) => n !== formPick.best && stat(f[2]) < formPick.bst && f[6] === sforms[formPick.best][6]) ? `, and it starts with ${formPick.bst} base stats, more than the other forms that ${sforms[formPick.best][6] ? 'evolve' : 'stay as they are'}` : ''}.
+                {sforms.some(f => !f[6]) && sforms[formPick.best][6] && ' Forms that can\'t evolve stay weaker for the whole run.'}
+              </p>
+              {sform !== formPick.best && <button type="button" className="mini-btn" onClick={() => set({ sform: formPick.best })}>Use {sforms[formPick.best][0]}</button>}
+            </div>
+            <p className="hint">Pick the form on the game's starter screen. The moves and evolutions below are the usual form's.</p>
+          </fieldset>
+        )}
+
         <fieldset>
           <legend>Ability</legend>
           {abilities.map((a, n) => a && (
@@ -143,14 +181,17 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
             </label>
           ))}
           {ab && <p className="hint">{ABILITIES[ab][1]}</p>}
-          {abPick && abPick.slot !== slot && abPick.rank > abilityRank(abilities[slot]) && (
-            <div className="suggest">
-              <p><strong>Suggested: {ABILITIES[abPick.key][0]}</strong></p>
-              {abPick.why && <p className="hint">{abPick.why}</p>}
-              <button type="button" className="mini-btn" onClick={() => set({ ability: abPick.slot })}>Use {ABILITIES[abPick.key][0]}</button>
-            </div>
-          )}
-          {abPick && abPick.slot === slot && abPick.why && <p className="hint">Good pick: {abPick.why}</p>}
+          {abPick && (abPick.tie
+            ? <p className="hint">Its abilities are about equal in a run, so any of them is fine.</p>
+            : abPick.slot !== slot && abPick.rank > abNow.rank
+              ? (
+                <div className="suggest">
+                  <p><strong>Suggested: {ABILITIES[abilities[abPick.slot]][0]}</strong>{abPick.as && <small> ({ABILITIES[abPick.key][0]} as {abPick.as})</small>}</p>
+                  <p className="hint">{abWhy(abPick)}</p>
+                  <button type="button" className="mini-btn" onClick={() => set({ ability: abPick.slot })}>Use {ABILITIES[abilities[abPick.slot]][0]}</button>
+                </div>
+              )
+              : <p className="hint">Good pick{abNow.as ? ` (${ABILITIES[abNow.key][0]} as ${abNow.as})` : ''}: {abWhy(abNow)}</p>)}
           {EVOS[i].length > 0 && (changes.length
             ? <p className="evo-note">Changes when it evolves: {changes.map(([n, evoAb]) => `${ABILITIES[evoAbility(evoAb)][0]} as ${n}`).join(', ')}.</p>
             : <p className="hint">Stays {ABILITIES[ab][0]} when it evolves.</p>)}
@@ -221,6 +262,17 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
             ))}
           </div>
           <p className="hint">Choices are the moves it learns by level 5 plus the egg moves you have unlocked, as on the game's starter screen.</p>
+          {startPick.length > 0 && (
+            <div className="suggest">
+              <p><strong>Bring these {startPick.length} from the start</strong></p>
+              <ol className="suggest-moves">
+                {startPick.map(x => <li key={x.m}><span>{moveText(MOVE_LIST[x.m])}</span><small>{x.kind === 'egg' ? 'Egg move' : 'Starting move'}</small>{x.why && <small className="why-move">{x.why}</small>}</li>)}
+              </ol>
+              {startPick.map(x => MOVE_KEYS[x.m]).join() !== b.moves.join() && (
+                <button type="button" className="mini-btn" onClick={() => set({ moves: startPick.map(x => MOVE_KEYS[x.m]) })}>Use these moves</button>
+              )}
+            </div>
+          )}
         </fieldset>
 
         <h4 className="editor-part">During the run</h4>
@@ -247,6 +299,30 @@ export default function PartyEditor({ party, builds, setBuild, data, remove, sav
               )}
             </div>
           )) : <p className="hint">{FORMS[form][0]} does not evolve any further.</p>}
+          {branches.length > 1 && (
+            <div className="suggest">
+              <p><strong>Which one? Suggested: {FORMS[finalForm(form, FORMS)][0]}</strong></p>
+              <ul className="suggest-moves">
+                {branches.map(to => {
+                  const end = FORMS[finalForm(to, FORMS)];
+                  const weak = TYPES.filter(t => mult(t, end[2].split(' ')) > 1);
+                  const megas = SPECIAL_FORMS.filter(m => m.kind === 'mega' && m.name === end[0]);
+                  return (
+                    <li key={to}>
+                      <span>{end[0]}: {end[2].split(' ').map(cap).join('/')}, {stat(end[3])} base stats</span>
+                      <small className="why-move">Weak to {weak.map(cap).join(', ') || 'nothing'}.{megas.length > 0 && ` Has ${megas.length > 1 ? `${megas.length} Megas` : 'a Mega'} (${megas.map(m => `${m.form}: ${stat(m.stats)}`).join(', ')}) once you have a Mega Bracelet.`}</small>
+                    </li>
+                  );
+                })}
+              </ul>
+              <p className="hint">The pick has the most base stats, then the fewest weaknesses. The nature above is for the one you plan for.</p>
+              <label>Plan for{' '}
+                <select value={FORMS[ahead][0]} onChange={e => set({ target: branches.map(to => finalForm(to, FORMS)).find(f => FORMS[f][0] === e.target.value) })}>
+                  {branches.map(to => FORMS[finalForm(to, FORMS)][0]).map(n => <option key={n}>{n}</option>)}
+                </select>
+              </label>
+            </div>
+          )}
         </fieldset>
 
         <fieldset>
