@@ -306,7 +306,7 @@ export default function Planner() {
         <p className="count" aria-live="polite">{shown.length ? `Showing ${shown.length} of ${STARTERS.length} starters, cheapest first` : 'No starters match. Try a shorter name or a type like water.'}</p>
         <ul className="mons">
           {shown.map(i => {
-            const [n, id, base, t] = STARTERS[i], k = cuts[i] || 0, c = fmtPts(cost(i));
+            const [n, id, , t] = STARTERS[i], k = cuts[i] || 0, c = fmtPts(cost(i));
             return (
               <li key={id} className="mon-li">
                 <button type="button" className="mon" aria-pressed={party.includes(i)} disabled={blocked(i)} onClick={() => toggle(i)} aria-label={`${n}, costs ${c}${k ? ` after ${k} candy cut${k > 1 ? 's' : ''}` : ''}, ${t} type`}>
@@ -319,7 +319,7 @@ export default function Planner() {
                 <button type="button" className={`mon-c${k ? ' cut' : ''}${party.includes(i) ? ' on' : ''}`} onClick={() => cut(i)}
                   title={k < MAX_CUTS ? 'Lower the cost with candy' : 'Back to full cost'}
                   aria-label={`${n} cost ${c}. ${k < MAX_CUTS ? `Apply candy cut ${k + 1} of ${MAX_CUTS}` : 'Remove candy cuts'}`}>
-                  {k ? <s>{base}</s> : null}{c}
+                  {c}
                 </button>
               </li>
             );

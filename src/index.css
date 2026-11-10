@@ -277,7 +277,6 @@ section { padding: var(--section) var(--m); }
 .mon-c { text-decoration: underline dotted; text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); text-underline-offset: 4px; }
 .mon-c:hover { text-decoration-style: solid; text-decoration-color: currentColor; }
 .mon-c:focus-visible { outline: 2px solid var(--accent); }
-.mon-c s { font-size: .75em; opacity: .6; }
 .mon-c.cut { color: var(--accent); }
 .mon-c.on, .mon-c.on.cut { color: var(--accent-ink); }
 .receipt small { font-size: .8em; opacity: .7; }
